@@ -1,0 +1,16 @@
+{
+  "name": "sdd-marketplace",
+  "owner": {
+    "name": "Jason McCoy"
+  },
+  "metadata": {
+    "description": "Spec-driven development workflow plugin for Claude Code"
+  },
+  "plugins": [
+    {
+      "name": "sdd",
+      "source": "./plugins/sdd",
+      "description": "Structured, interview-driven workflow for planning and building software projects"
+    }
+  ]
+}

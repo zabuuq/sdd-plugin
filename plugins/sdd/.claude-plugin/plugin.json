@@ -1,0 +1,9 @@
+{
+  "name": "sdd",
+  "description": "Spec-driven development workflow — from scoping through retrospective — producing real artifacts at every stage.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Jason McCoy"
+  },
+  "license": "MIT"
+}
