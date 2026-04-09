@@ -8,7 +8,7 @@ SDD is a Claude Code plugin that guides you through a structured, interview-driv
 
 ```bash
 # Add the marketplace (one-time)
-/plugin marketplace add <github-user>/sdd-plugin
+/plugin marketplace add zabuuq/sdd-plugin
 
 # Install the plugin
 /plugin install sdd@sdd-marketplace
