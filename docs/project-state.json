@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "currentSprint": 0,
+  "buildMode": null,
+  "lastCommand": "/sdd:scope",
+  "commandExplanationsShown": {
+    "scope": true,
+    "prd": true,
+    "spec": true,
+    "sprint": true,
+    "build": true,
+    "iterate": true,
+    "reflect": true,
+    "refine": false,
+    "retro": false,
+    "feedback": true
+  },
+  "notes": "SDD v2 cycle. v1 planning docs archived to docs/archive/v1/. v2 is being scoped from the feedback pile in docs/sdd-feedback.md (collected across Event Planning App, fiver-gigs, and sdd-plugin self-use during v1)."
+}
