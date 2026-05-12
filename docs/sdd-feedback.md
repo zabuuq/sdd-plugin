@@ -89,3 +89,15 @@
 - **After command:** /sdd:feedback
 - **Project:** sdd-plugin
 - **Note:** create a process with /feedback to transfer feedback from one project to the plugin project for use. Should be runable from either project.
+
+### 2026-05-04T00:00:00Z
+- **Sprint:** 0
+- **After command:** /sdd:scope
+- **Project:** sdd-plugin
+- **Note:** Clarifying questions must not advance the interview. Across multiple projects and steps (scope, prd, spec, etc.), the agent has a recurring tendency, when the user asks a clarifying question mid-interview, to (a) provide the clarification, (b) substitute its own recommendation as if it were the user's answer, and (c) advance to the next question. The user's clarifying question is NOT an answer to the current question. Plugin behavior should require the agent to: answer the clarification only, hold position on the current question, never substitute its own recommendation as the user's answer, and only advance the interview pointer on an explicit user answer to the question that was asked. Applies to all interview commands (discovery, scope, spec, plan, refine, polish).
+
+### 2026-05-11T00:00:00Z
+- **Sprint:** 0
+- **After command:** /sdd:scope
+- **Project:** sdd-plugin
+- **Note:** Right-size detection for small projects. Interview commands (/discovery, /scope, /prd, /spec, /plan) must recognize when a project is small/simple and not go overboard with rounds, questions, or ceremony. Concretely: detect small-project signals during /discovery (and re-evaluate at each subsequent step) and propagate a "small project" hint downstream; when set, lower round-count expectations, fire fewer Phase 1 beats, lean harder toward a definite "I do not think we need another round, because..." closure, and pick fewer than the suggested 5 questions per round when answers are obviously thin. Motivation: v2 chain is gaining a /prd step; chain length must not punish small projects. This generalizes the existing 2026-04-21 feedback about fast-path /sdd:reflect for simple sprints to every interview command in the chain. Detection signals and exact thresholds deferred to spec time — the right shape is a small heuristic, not a numeric rule.

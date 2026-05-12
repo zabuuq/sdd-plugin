@@ -2,7 +2,7 @@
   "version": 1,
   "currentSprint": 0,
   "buildMode": null,
-  "lastCommand": "/sdd:scope",
+  "lastCommand": "/sdd:prd",
   "commandExplanationsShown": {
     "scope": true,
     "prd": true,
@@ -15,5 +15,5 @@
     "retro": false,
     "feedback": true
   },
-  "notes": "SDD v2 cycle. v1 planning docs archived to docs/archive/v1/. v2 is being scoped from the feedback pile in docs/sdd-feedback.md (collected across Event Planning App, fiver-gigs, and sdd-plugin self-use during v1)."
+  "notes": "SDD v2 cycle. v1 planning docs archived to docs/archive/v1/. v2 scoped from the feedback pile in docs/sdd-feedback.md (Event Planning App, fiver-gigs, sdd-plugin self-use). Scope phase complete (docs/scope.md). PRD phase complete (docs/prd.md) — 13 epics, ~54 stories, Phase 2 Round 1 tightened Bug Fix #2 / Sprint Loop / /build wrap-up. Next: /sdd:spec."
 }
