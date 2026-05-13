@@ -509,3 +509,103 @@ Resumed via `/sdd:prd` re-invocation. Resume file (`docs/prd-resume.md`) was loa
 - Two new open concerns appended to `docs/open-concerns.md`: PRD-AC reference tag syntax; iteration-candidate marker syntax. Both target `/sdd:spec`.
 - Resume file `docs/prd-resume.md` deleted.
 - Next: user runs `/clear`, then `/sdd:spec`.
+
+## /sdd:spec
+
+- **Loaded:** sdd-guide/SKILL.md, deepening-rounds.md, docs/scope.md, docs/prd.md, docs/open-concerns.md, docs/project-state.json, ~/.claude/sdd-user-profile.json. Skipped the spec explanation (commandExplanationsShown.spec was true from v1).
+- **Opening posture decision:** Skipped the canonical tech-prefs/deployment/stack interview — settled in v1 (markdown skills, Claude Code plugin, GitHub marketplace, no runtime). Drove the interview around the 12 open concerns targeting /sdd:spec plus the parser-driver details deferred from the PRD.
+
+### Beat 1 — Spec posture (lean delta-and-resolution)
+- **User accepted lean posture.** `docs/spec.md` is delta-and-resolution: cross-references PRD epics + resolves all open concerns; "how" content (parser rules, schemas, loading orders, behavioral text) lives in `references/*.md` files inside the plugin. Resolves the spec/runtime-duplication open concern carried over from v1 retro.
+
+### Beat 2 — PRD-AC reference tag syntax
+- **Decision:** ID-based, not positional. 4-char lowercase alphabetic IDs assigned at PRD-write time, inline backticks in AC lines. Sprint tag format `[PRD: id1, id2]` or `[unmapped]`. No drift detection, no embedded snippets.
+- **Tradeoff acknowledged:** sprint files unreadable without loading PRD context. Mitigated by /plan and /build always loading PRD anyway.
+- **Note caught at spec write:** the interview example `a7kp` is alphanumeric; spec text and parser regex adopt strict `[a-z]{4}` alphabetic-only. Flagged in spec's Open Issues for backfill scripts to use the alphabetic form.
+
+### Beat 3 — Iteration-candidate marker syntax
+- **Decision:** single class `[iteration-candidate]` start-of-line + free prose. Optional inline `(item: a7kp)` reference. No severity. Tech-debt, quality concerns, surprises live at wrap-up's "anything notable?" — not as in-flight markers.
+
+### Beat 4 — Right-size detection (smallProject)
+- **Pushback resolved:** user pushed back on /sdd:discovery as detection point — "I'm afraid it's just adding too much to that step." Detection relocated entirely to /sdd:scope. /sdd:discovery does no detection.
+- **Flagged as PRD edit required:** removes the /sdd:discovery small-project ACs; equivalent ACs move to /sdd:scope. Captured in spec's PRD Edits Required section.
+- **Heuristic, not threshold.** Signals catalogued in `references/right-sizing.md`. Detection at /sdd:scope; re-evaluation by subsequent commands.
+- **Per-command skippable beats and thinness signal:** enumerated for /scope, /prd, /spec, /plan. /discovery has no skippable beats.
+
+### Beat 5 — Three-tier between-rounds context management
+- **Locked:** signals for continue / /compact / /clear recommendations. Failure-mode mitigation (override upward always allowed; downward override gets a warning).
+- **Consolidation noted:** /clear branch writes a pause resume file before recommending. Same schema as /sdd:pause. Single mechanism.
+
+### Beat 6 — End-of-command handoff wording
+- **Locked:** two-line standard handoff with one-line outcome + the literal Run-/clear-then-next-command sentence. First-handoff explanatory paragraph tracked via `handoffWarningShown` on user profile (cross-project, one-time-per-user). Out-of-pattern commands enumerated (/build, /retro, /pause, /unpause, /feedback).
+
+### Beat 7 — Pause distillation + per-round summary (consolidated)
+- **Consolidation:** per-round summary writes ARE pause resume files. Same schema, same location (`docs/<command>-resume.md`).
+- **Quality bar locked per section:** Status / Setup-already-done / Confirmed decisions / Round status / Pending decision / Files for next-session / Instructions for next-session. Distill-not-dump rules and 1–3 page length target.
+- **Canonical location:** `references/pause-resume.md`. Resolves two open concerns at once.
+
+### Beat 8 — File uploads at non-discovery workflow points
+- **Decision:** shared `docs/refs/` directory. Readers limited to /sdd:discovery (PRD-required) and /sdd:spec (architectural reference context). No interactive upload UI anywhere. No new beats in other commands.
+- **Late-arriving refs after /discovery:** not retroactively incorporated into earlier-command outputs. If they substantively change shape, that is a re-scope event.
+
+### Beat 9 — docs/v2-verification.md schema
+- **Format:** 6-column markdown table. ID / Source / Summary / Shipped (sprint/item) / Verified / Notes.
+- **ID format:** FB-NNN three-digit padded. Stable. Assigned at /sdd:spec finalization seeding.
+- **Write triggers:** /spec seeds; /build wrap-up updates Shipped + Notes; Verified is manual-only; /retro doesn't touch.
+- **New tag:** `[FB: FB-NNN]` on sprint items implementing in-scope feedback. /plan prompts for it only when v2-verification.md exists.
+- **Activation gate:** file presence in project IS the activation. Sdd-plugin-specific. Future v3+ ships `<version>-verification.md` per the same pattern.
+
+### Beat 10 — /sdd:polish re-open mechanism
+- **Manifest-based, user-driven, surgical.** Close-sprint writes a `[close-sprint-manifest]` block to process-notes-sprint-N.md. Re-open prompts user to pick which checked-off ACs to un-check; reverses corresponding splits; appends `[sprint-reopened]` marker.
+- **Edge cases enumerated (in Round 1 Q3):** partial un-split, /refine-added ACs to split-off story, /refine-deleted ACs from manifest, multi-cycle close-reopen.
+- **Not reversed:** iteration-candidate dispositions, tech-debt entries, v2-verification Shipped rows.
+
+### Beat 11 — feedbackLocalPath path normalization
+- **Six-step normalization:** absolute → resolve symlinks → forward slashes → strip trailing slash → case-fold on Windows/macOS, preserve on Linux → descendant check via equals-or-startsWith-path-plus-slash.
+- **Edge cases covered:** unset/null, missing path, file-not-directory, symlink loops, macOS case-sensitive APFS (user-resolved by aligning config).
+
+### Beat 12 — Clean-state for /sdd:build revert (v1 carry-over)
+- **Decision:** clean state = last user commit. /sdd:build does NOT auto-commit. Revert is `git reset --hard HEAD` (gitPreference=true) or manual rollback summary (gitPreference=false). Pre-revert warning on uncommitted changes.
+- **Rejected:** auto-checkpoint per item. That's feature expansion outside v2's streamlining scope. Deferred to a future /sdd:refine pass if wanted.
+
+### Beat 13 — MIT-distribution soft ACs (v1 carry-over)
+- **Outcome:** stays deferred. Target is /sdd:refine, not /sdd:spec. Pre-publication hardening concern; not a v2 architectural decision.
+
+### Phase 2 — Deepening rounds
+
+**Round 1 (5 questions):**
+- **Q1 — /sdd:plan PRD-state-check priority:** /sdd:refine wins over /sdd:retro when both conditions hold. Unvetted must be empty before /retro becomes a candidate.
+- **Q2 — /sdd:refine interaction with locked artifacts:** v2-verification.md not touched. Checked ACs preserved on pure reword, un-checked on semantic change (and the shipped work surfaced as iteration candidate). Open sprint refs updated in lockstep; closed sprint files untouched. v2 update ordering: PRD → spec → open sprint files → AGENTS.md → CLAUDE.md.
+- **Q3 — Story-split unwind edge cases:** partial un-split via user-selected ACs. /refine-added ACs to split-off story persist independently. /refine-deleted manifest ACs produce informational warnings. Most-recent manifest authoritative.
+- **Q4 — MIGRATION-v1-to-v2.md table rows:** user pushback caught a real ambiguity — collapsed two-state mid-flight-vs-completed columns produced a much cleaner 11-row table. Resume-file renames in a separate sub-section.
+- **Q5 — v2 plugin file structure tree:** Round 1 audit caught my mistake — I briefly conflated /sdd:refine with /sdd:polish. User caught it, I confirmed the renames (sprint→plan, iterate→polish; refine and polish are different commands with different jobs). Tree finalized; spec write proceeds.
+
+**Round 2 (3 small loose-end questions):**
+- **Q1 — Cross-project pattern capture file:** separate file `~/.claude/sdd-cross-project-patterns.md`, markdown free-form, /onboard reads both files on re-run display.
+- **Q2 — Backlog Source field format:** `Source: /sdd:[command] — [phase/round] — [topic]` dash-separated.
+- **Q3 — /sdd:discovery non-empty docs/refs/ behavior:** brief one-line acknowledgment with filenames only (no recitation), then reference uploads naturally during interview as relevant.
+
+**Round 2 closure:** definite recommendation — no further round needed. Spec write proceeds.
+
+### Mid-spec /sdd:feedback notes captured
+
+User logged four feedback notes during the /sdd:spec interview (all show "After command: /sdd:spec" per the v2-correct semantics):
+1. /sdd:sdd setup command for docs/ + refs/ scaffold + clear-environment behavior.
+2. --help modifier for every command (explains command + place in chain).
+3. /sdd:backlog tag for manually adding items to backlog.
+4. /sdd:viability optional command, runnable anytime, distinct from /sdd:discovery (descriptive) — evaluative stress-test for whether the idea is sound. Surfaced when user asked whether /sdd:discovery could double as viability assessment; agent recommended keeping the two jobs distinct.
+
+All four notes filed for /sdd:retro review.
+
+### Outputs
+
+- **docs/spec.md** written (lean v2 posture).
+- **CLAUDE.md** generated at project root (no existing file; new write).
+- **AGENTS.md** generated at project root (no existing file; new write).
+- **plugins/sdd/CLAUDE.md** (the plugin's own minimal loader) untouched.
+- **docs/open-concerns.md** to be updated: 12 spec-targeted concerns resolved or appropriately deferred; new concerns from spec write appended.
+- **PRD edits required**, flagged in spec's PRD Edits Required section: /sdd:discovery loses small-project detection ACs; /sdd:scope gains equivalents. Plus add `defaultSprintMode` and `handoffWarningShown` to onboard profile schema. Plus name `~/.claude/sdd-cross-project-patterns.md` as the cross-project pattern file. PRD edit happens before any v2 implementation sprint begins.
+
+### Next
+
+User runs `/clear`, then `/sdd:plan` to begin sprint planning for v2 implementation. First sprint candidates likely include: PRD AC ID backfill, /sdd:prd ID generation, the PRD edit for smallProject relocation, and seeding docs/v2-verification.md.

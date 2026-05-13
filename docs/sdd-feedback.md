@@ -101,3 +101,27 @@
 - **After command:** /sdd:scope
 - **Project:** sdd-plugin
 - **Note:** Right-size detection for small projects. Interview commands (/discovery, /scope, /prd, /spec, /plan) must recognize when a project is small/simple and not go overboard with rounds, questions, or ceremony. Concretely: detect small-project signals during /discovery (and re-evaluate at each subsequent step) and propagate a "small project" hint downstream; when set, lower round-count expectations, fire fewer Phase 1 beats, lean harder toward a definite "I do not think we need another round, because..." closure, and pick fewer than the suggested 5 questions per round when answers are obviously thin. Motivation: v2 chain is gaining a /prd step; chain length must not punish small projects. This generalizes the existing 2026-04-21 feedback about fast-path /sdd:reflect for simple sprints to every interview command in the chain. Detection signals and exact thresholds deferred to spec time — the right shape is a small heuristic, not a numeric rule.
+
+### 2026-05-12T15:30:00Z
+- **Sprint:** 0
+- **After command:** /sdd:spec
+- **Project:** sdd-plugin
+- **Note:** Add a command for setting up the environment (maybe /sdd:sdd). When run the plugin creates the docs directory and the directory for placing reference documents (used for /sdd:discovery). If the environment is already set up, it lets the user know and asks if the user wants anything cleared.
+
+### 2026-05-12T15:31:00Z
+- **Sprint:** 0
+- **After command:** /sdd:spec
+- **Project:** sdd-plugin
+- **Note:** Add a --help modifier to all commands. When passed, the plugin explains the command and where the command falls in the normal path of commands.
+
+### 2026-05-12T15:32:00Z
+- **Sprint:** 0
+- **After command:** /sdd:spec
+- **Project:** sdd-plugin
+- **Note:** Add a /sdd:backlog tag to manually add something to the backlog.
+
+### 2026-05-12T15:45:00Z
+- **Sprint:** 0
+- **After command:** /sdd:spec
+- **Project:** sdd-plugin
+- **Note:** Add an optional /sdd:viability command that can be run anytime. Stress-tests the idea — solves a real problem, audience is real, approach is sound. Distinct from /sdd:discovery (descriptive/exploratory) so the tone problem of mixing supportive exploration with evaluative critique stays separated.
