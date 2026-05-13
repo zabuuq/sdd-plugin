@@ -16,7 +16,7 @@ docs/<command>-resume.md
 
 - A pause during `/sdd:scope` writes `docs/scope-resume.md`.
 - A `/clear` consolidation during `/sdd:prd` writes `docs/prd-resume.md`.
-- A pause during `/sdd:sprint` writes `docs/sprint-resume.md`.
+- A pause during `/sdd:plan` writes `docs/plan-resume.md`.
 
 One resume file per in-flight command. If a resume file already exists for that command (e.g., a prior `/clear` consolidation), the writer overwrites it — the new file is the current state.
 

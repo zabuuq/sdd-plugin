@@ -56,7 +56,7 @@ Output the following as plain text. This is not a question — do not wait for a
 
 **What /sdd:retro does**
 
-Project retrospective looks across all sprints and the full development lifecycle to assess what worked, what didn't, and how the SDD workflow itself performed. Unlike `/sdd:reflect` (which reviews a single sprint), retro synthesizes patterns across the entire project. If you logged plugin feedback during the project, retro also explains how to act on it. The result is a project-level retrospective document at `docs/retro.md`.
+Project retrospective looks across all sprints and the full development lifecycle to assess what worked, what didn't, and how the SDD workflow itself performed. Unlike per-sprint wrap-up (handled inside `/sdd:build`'s close), retro synthesizes patterns across the entire project and captures cross-project patterns to your user profile. If you logged plugin feedback during the project, retro also explains how to act on it. The result is a project-level retrospective document at `docs/retro.md`.
 
 ---
 

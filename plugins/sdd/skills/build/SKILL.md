@@ -31,9 +31,9 @@ On startup, load the following in order:
 All prerequisites are checked before any work begins. If any check fails, stop immediately.
 
 - `docs/project-state.json` must exist and parse as valid JSON. If missing or invalid: "Run `/sdd:scope` first."
-- `currentSprint` must be set in `docs/project-state.json`. If missing: "Run `/sdd:sprint` first."
-- `docs/sprint-N.md` (where N = `currentSprint`) must exist. If missing: "Run `/sdd:sprint` first."
-- The sprint file must have at least one unchecked item (a `### ` item heading whose **Status** line contains `[ ]`). If all items are checked: "Sprint complete. Run `/sdd:iterate` to add polish work or `/sdd:reflect` to review the sprint."
+- `currentSprint` must be set in `docs/project-state.json`. If missing: "Run `/sdd:plan` first."
+- `docs/sprint-N.md` (where N = `currentSprint`) must exist. If missing: "Run `/sdd:plan` first."
+- The sprint file must have at least one unchecked item (a `### ` item heading whose **Status** line contains `[ ]`). If all items are checked: "Sprint complete. Run `/sdd:polish` to add polish work, or proceed to `/sdd:plan` for the next sprint (or `/sdd:retro` if the project is complete)."
 
 ## State Updates (immediate)
 
@@ -74,7 +74,7 @@ Read `buildMode` from `docs/project-state.json`. Branch on its value:
 - If `buildMode` is `"autonomous"`: follow the **Autonomous Mode** section below.
 - If `buildMode` is missing or unrecognized: default to step-by-step mode and inform the user.
 
-Build mode is locked for the entire sprint. Do not offer to switch modes. If the user asks to switch, explain that build mode is set during `/sdd:sprint` and locked for the sprint's duration.
+Build mode is locked for the entire sprint. Do not offer to switch modes. If the user asks to switch, explain that build mode is set during `/sdd:plan` and locked for the sprint's duration.
 
 ---
 
@@ -88,7 +88,7 @@ Read `docs/open-concerns.md`. Check for any concerns that are relevant to the cu
 
 Read the current sprint file (`docs/sprint-N.md`). Find the first `### ` item heading whose **Status** line contains `[ ]` (not started or incomplete).
 
-If no unchecked items remain: "Sprint complete. Run `/sdd:iterate` to add polish work or `/sdd:reflect` to review the sprint." Stop.
+If no unchecked items remain, route directly into the **Wrap-Up Phase** (defined below). The wrap-up phase handles the close-or-recommend-polish decision and emits the next-command recommendation — do not emit a separate "sprint complete" stop message here.
 
 Report to the user which item is next. Include the item title and a brief summary of what will be built.
 
@@ -274,17 +274,207 @@ When all items are built (or the build is stopped due to errors):
 - Summarize what was built across the entire autonomous run.
 - Note any issues encountered and how they were resolved.
 - Update `docs/open-concerns.md` with any new concerns from the build.
-- Write a build summary to `process-notes-sprint-N.md`.
 
-Tell the user: "Sprint build complete. Run `/sdd:iterate` to add polish work or `/sdd:reflect` to review the sprint."
+Step 4 does **not** write process notes for the sprint. The canonical close-sprint process notes are written by Step W10 of the **Wrap-Up Phase** (below), which is the single source of truth for the sprint's close-sprint write. Keep the bullets above as user-facing reporting only.
+
+If the autonomous run completed all sprint items (rather than stopping due to errors), proceed into the **Wrap-Up Phase** (defined below) instead of emitting a terminal stop message. The wrap-up phase emits the next-command recommendation; Step 4 no longer does. If the run was halted by errors with items still unchecked, do not enter wrap-up — leave the sprint open and stop after the summary.
 
 #### No Per-Item Process Notes
 
-In autonomous mode, do not write per-item process notes during the build. The subagents handle the work; the orchestrator keeps moving. Write a single summary to `process-notes-sprint-N.md` at the end (Step 4).
+In autonomous mode, do not write per-item process notes during the build. The subagents handle the work; the orchestrator keeps moving. The sprint's process notes are written once, at close-sprint, by Step W10 of the Wrap-Up Phase.
 
 #### Mode Is Locked
 
-Build mode cannot be switched during a sprint. If the user asks to switch to step-by-step, explain that the mode was set during `/sdd:sprint` and is locked until the next sprint.
+Build mode cannot be switched during a sprint. If the user asks to switch to step-by-step, explain that the mode was set during `/sdd:plan` and is locked until the next sprint.
+
+---
+
+## Wrap-Up Phase
+
+The wrap-up phase runs immediately after the final sprint checklist item's **Status** flips to `[x]`. It applies in both step-by-step and autonomous modes and replaces the prior "Sprint complete. Run `/sdd:polish`..." stop message in each.
+
+- **Step-by-step mode:** wrap-up fires after Step 7 of the item that closed the last `[ ]`. The remaining per-item steps (8 through 11) still run for that item; wrap-up follows them. Wrap-up also fires when `/sdd:build` is invoked and Step 2 finds no unchecked items remaining — that is the re-entry path into wrap-up.
+- **Autonomous mode:** wrap-up fires after Step 3 has completed the last unchecked item and before Step 4's old completion stop message. Step 4's summary still runs; wrap-up follows it and replaces the terminal "Sprint build complete..." line.
+
+Wrap-up does **not** commit changes. This is consistent with the `/sdd:build` no-auto-commit posture defined in `docs/spec.md > Command Skills > /sdd:build` and AGENTS.md. Any files wrap-up writes are left for the user to commit.
+
+### Step W1: Surface Iteration Candidates
+
+Before asking the satisfaction question, scan `process-notes-sprint-N.md` (where N is `currentSprint` from `docs/project-state.json`) for `[iteration-candidate]` entries written **before wrap-up began** — entries written during checklist execution, not entries the wrap-up itself might write. Use the `[iteration-candidate]` parser documented in `skills/sdd-guide/references/sprint-tags.md`; refer to it by name rather than redefining the regex.
+
+For each matched entry, capture a brief one-line summary suitable for surfacing alongside the satisfaction question. If no `[iteration-candidate]` entries exist in the file, the candidate list is empty and only the satisfaction question is emitted in the next step.
+
+### Step W2: Emit the Satisfaction Question
+
+Emit the literal text below as a single message. Do **not** paraphrase, reword, or change punctuation — this exact string is required:
+
+```
+Satisfied with this sprint, or items to iterate on?
+```
+
+If Step W1 found one or more iteration candidates, surface them in the same message: a short header line, then one bullet per candidate with its one-line summary. The literal satisfaction question still appears verbatim in the same message. If Step W1 found no candidates, emit just the satisfaction question alone — do not invent a placeholder list or mention that none were found.
+
+Wait for the user's answer before proceeding. One question at a time per shared behavior.
+
+### Step W3: Route on the Satisfaction Answer
+
+Interpret the user's response:
+
+- **"items to iterate"** (or equivalent — the user wants to iterate before closing the sprint): recommend running `/sdd:polish`. The sprint stays open. **No close-sprint actions are performed.** Wrap-up exits here.
+- **"satisfied"** (or equivalent — the user is done with this sprint): if Step W1 surfaced one or more candidates, proceed to Step W4 (per-candidate disposition). If no candidates were surfaced, proceed directly to the close-sprint actions handoff at the end of this section.
+
+If the user's answer is ambiguous, ask a single clarifying question before routing — do not guess.
+
+### Step W4: Per-Candidate Disposition
+
+This step only runs if Step W1 surfaced one or more iteration candidates **and** the user answered "satisfied" in Step W3.
+
+For each surfaced candidate, ask the user to choose one disposition from this set:
+
+- `discard` — the candidate will not be acted on; record the discard decision for the close-sprint note.
+- `capture as tech-debt` — the candidate will be recorded as a tech-debt entry in `process-notes-sprint-N.md` during close-sprint actions.
+- `actually iterate` — the candidate is real iteration work; the sprint should not close yet.
+
+Ask one question per candidate. Do **not** batch (one question at a time per shared behavior). Record each disposition decision in working memory for the close-sprint actions that follow this section — the actual writes to `process-notes-sprint-N.md` happen during close-sprint.
+
+### Step W5: Route on Disposition Outcomes
+
+After all dispositions are collected, evaluate the set:
+
+- **Any candidate assigned `actually iterate`:** switch to the "items to iterate" branch — recommend running `/sdd:polish`, leave the sprint open, and perform **no** close-sprint actions. The recorded `discard` / `capture as tech-debt` decisions for the other candidates are not acted on in this run; if the user later closes the sprint, wrap-up runs again and the surviving candidates are re-evaluated. Wrap-up exits here.
+- **No candidate assigned `actually iterate`** (every disposition is `discard` or `capture as tech-debt`, or no candidates existed): proceed to close-sprint actions. The recorded dispositions are handed off to the close-sprint actions section, which performs the actual `process-notes-sprint-N.md` writes for tech-debt entries and discard notes.
+
+After all dispositions are collected and no `actually iterate` was chosen, proceed to close-sprint actions (defined below in this same `## Wrap-Up Phase` section).
+
+### Step W6: PRD AC Checkoff
+
+Close-sprint actions begin here. This step writes the PRD AC checkoff for every closed sprint item in the current sprint file (`docs/sprint-N.md` where N = `currentSprint` from `docs/project-state.json`).
+
+Use the `[PRD: ...]` parser documented in `skills/sdd-guide/references/sprint-tags.md`; refer to it by name rather than redefining the regex. Use the AC line format (also documented there) when locating and updating AC checkboxes in `docs/prd.md`.
+
+For each closed (`[x]`) item in the current sprint file:
+
+1. Parse the item's `[PRD: id1, id2, ...]` tag. If the item carries `[unmapped]` instead, skip it — no PRD ACs to check off.
+2. For each referenced PRD AC ID, decide whether to check it off using the rules below.
+
+**Non-split case.** The sprint item maps fully to a story and no story-splitting occurred for that story across any sprint. Check off every PRD AC the item references in `docs/prd.md`. (Satisfies `aaad`.)
+
+**Cross-cutting case.** An AC is referenced by sprint items across multiple sprint files. Scan every `docs/sprint-*.md` file for the AC ID. Check the AC off in `docs/prd.md` only when every sprint-item reference to that AC across every sprint file is closed (`[x]`). If any unchecked reference remains in any sprint file, leave the AC unchecked. (Satisfies `aaae` for the partial case; satisfies `aaaf` when this sprint's close is the final-completer.)
+
+**Update format.** Change `- [ ] \`abcd\` …` to `- [x] \`abcd\` …` in `docs/prd.md` for each newly-checked AC. Preserve the rest of the line verbatim.
+
+**Bookkeeping.** Record every AC ID newly checked off in this step in working memory under "PRD ACs checked" for the close-sprint manifest assembled in Step W10.
+
+After the pass completes, no AC referenced by an entirely-closed mapping should remain unchecked. (Satisfies `aaag`.) This entire step is the close-sprint mechanism for PRD AC checkoff. (Satisfies `aaeq`.)
+
+### Step W7: Story Splits for Unfinished Items
+
+Identify every sprint item in the current sprint file whose **Status** line still contains `[ ]`. In autonomous mode this set is normally empty (wrap-up fires only after the last item closes), but the wrap-up may be re-entered from a different state — handle the unfinished-items case robustly even when it is expected to be empty.
+
+For each unfinished item, in order:
+
+1. Emit a single prompt asking the user whether to split the story off for a future sprint. **One question per item — do not batch.**
+2. Wait for the user's answer before moving to the next item.
+
+**On user confirmation (split this item):**
+
+- Move the unfinished item's unchecked PRD ACs to a new story in `docs/prd.md`. Use a clear new-story anchor that conveys the carry-forward intent.
+- Generate fresh 4-char lowercase alphabetic IDs (`[a-z]{4}` pattern, per `references/sprint-tags.md`) for any new ACs introduced by the split. **Collision-check against existing PRD IDs before settling** — do not reuse retired IDs.
+- ACs that move unchanged from the original story to the new story keep their existing IDs (IDs are stable across reorders per `references/sprint-tags.md`).
+- Sprint-file marking choice for this SKILL: leave the unfinished item's `[ ]` checkbox as-is in the sprint file. The unfinished status is the clearest signal that the item did not close, and the close-sprint manifest's "Story splits" line is the canonical record of where the work moved. The split is recorded in process notes (Step W10) and the manifest, not by mutating the sprint-file line. Future readers locate the split via the manifest.
+- Record the split as `<original-story-anchor> → <new-story-anchor>: <ac-ids>` in working memory for the close-sprint manifest assembled in Step W10.
+
+**On user rejection (do not split):**
+
+- Leave the item exactly as-is in the sprint checklist (`[ ]` Status preserved). It carries forward to a future sprint via normal sprint-loop mechanisms; no PRD changes are made for this item.
+
+(Satisfies `aaer`.)
+
+### Step W8: "Anything Notable?" Prompt
+
+Emit **exactly one** prompt covering quality concerns, tech debt, and surprises. A single open-ended question — not three separate questions, not a multi-part question split across messages. Suggested phrasing:
+
+```
+Anything notable from this sprint — quality concerns, tech debt, or surprises?
+```
+
+Wait for the user's response. Capture the answer verbatim for the process-notes write in Step W10. (Satisfies `aaes`.)
+
+### Step W9: v2-verification Row Updates
+
+This step is sdd-plugin-specific. It runs **before** the process-notes write (Step W10) because the manifest's `v2-verification rows updated` field carries the FB-IDs touched here.
+
+**Activation gate.** Check whether `docs/v2-verification.md` exists in the running project's `docs/` directory. If the file is **absent: skip this step entirely. No warning, no fallback write, no auto-creation.** The file's presence in the current project is the sole activation signal. When this step is skipped, the manifest's `v2-verification rows updated` line in Step W10 reads `(none)`. (Satisfies `aahv`.)
+
+**When the file exists**, for each closed (`[x]`) sprint item in the current sprint file (`docs/sprint-N.md` where N = `currentSprint`) that carries a `[FB: FB-NNN]` tag (use the `[FB: ...]` parser documented in `skills/sdd-guide/references/sprint-tags.md`; refer to it by name rather than redefining the regex):
+
+1. For each `FB-NNN` ID in the tag's payload, locate the row in `docs/v2-verification.md` whose `ID` column matches `FB-NNN`. The full column schema is documented in `docs/spec.md > Plugin-Project-Specific Artifacts > docs/v2-verification.md`; refer to it by name rather than restating the schema.
+2. Append `sprint N, item M` to that row's `Shipped (sprint/item)` column, where:
+   - N is `currentSprint` from `docs/project-state.json`.
+   - M is the sprint-item ordinal: the 1-based count of the closed item among the sprint file's `### Item M:` headings (or whatever item-numbering convention the sprint file uses — match the file's own numbering).
+   - If the column already contains a value (e.g. a prior sprint's cross-sprint contribution), append with a `; ` separator. Example: `sprint 4, item 2; sprint 5, item 1`. (Satisfies `aahk`.)
+3. The `Notes` column **may** receive a brief auto-note (e.g., the closed sprint item's title or a one-line summary of what shipped). Auto-notes are optional; the user remains free to edit Notes manually before or after this write.
+4. The `Verified` column is **never written by `/sdd:build`** — not as `[ ]`, not as `[x]`, not at all. The Verified column remains `[ ]` until the user manually checks it. State this explicitly so a future reader does not misread silence as ambiguity.
+5. Record each touched `FB-NNN` ID in working memory under "v2-verification rows updated" for the close-sprint manifest assembled in Step W10.
+
+**Missing-row handling.** If a closed item's `[FB: ...]` tag references an `FB-NNN` that has no matching row in `docs/v2-verification.md`, emit a single informational warning naming the missing `FB-NNN`. Do **not** auto-create the row — row creation is `/sdd:spec` seeding territory, not `/sdd:build`'s. The warning is informational; the wrap-up continues.
+
+After this step completes, the comma-separated list of touched FB-IDs is available for Step W10's manifest field. If no items carried `[FB: ...]` tags, or the activation gate skipped the step, the list is empty and the manifest field reads `(none)`.
+
+### Step W10: Process Notes Write
+
+Append a wrap-up section to `process-notes-sprint-N.md` (where N = `currentSprint`). The append is the canonical close-sprint write for this sprint; it is not duplicated by the autonomous-mode Step 4 summary.
+
+Include the following content, in this order:
+
+- **Decisions made during the sprint** and their rationale.
+- **Pushback** from either side (user or agent) during the sprint.
+- **Surprises** encountered during execution.
+- **Notable items** captured from the Step W8 "anything notable?" response.
+- **Tech-debt entries** for every candidate assigned `capture as tech-debt` in Step W4. Format each entry so future commands (e.g., `/sdd:plan`'s carry-forward read) can locate them. Use either an inline `### Tech-debt` header introducing a sub-list of entries, or one `[tech-debt]` line marker per entry — keep it human-readable and machine-locatable.
+- **Discard decisions** for every candidate assigned `discard` in Step W4. One brief line each, e.g. `- Discarded: <one-line candidate summary> — reason (if user gave one).`
+- **The structured `[close-sprint-manifest]` block** per `docs/spec.md > Cross-Cutting Mechanisms > Close-Sprint Manifest`. The full block format is documented in `references/sprint-tags.md`; follow it exactly. Use this literal layout:
+
+  ```
+  [close-sprint-manifest] timestamp: <ISO-8601 timestamp>
+  - PRD ACs checked: <comma-separated AC IDs from W6>
+  - Story splits: <original-story-anchor> → <new-story-anchor>: <ac-ids>; ... (semicolon-separated for multiples; "(none)" if no splits)
+  - Iteration candidate dispositions: <candidate-summary>: <discard|tech-debt|iterate>; ... ("(none)" if no candidates were surfaced)
+  - Tech-debt entries: <count> (informational)
+  - v2-verification rows updated: <comma-separated FB-IDs> (informational; comma-separated FB-IDs from the preceding v2-verification step, or "(none)" when no rows were touched)
+  [/close-sprint-manifest]
+  ```
+
+  Body-line rules:
+  - When a field has no entries (no splits, no candidates, no PRD ACs checked, etc.), write `(none)` as the value — **do not omit the line**. This keeps the manifest format stable for `/sdd:polish` re-open parsing.
+  - The opening anchor carries the timestamp on the same line; the closing anchor `[/close-sprint-manifest]` sits on its own line.
+  - Exactly one manifest block is written per sprint close.
+
+(Satisfies `aaet` and the unnumbered AC requiring the `[close-sprint-manifest]` block.)
+
+### Step W11: Next-Command Recommendation
+
+This is the final wrap-up output. After the process-notes write completes (Step W10, including the manifest block), emit a next-command recommendation based on PRD state.
+
+**Re-read `docs/prd.md`'s current state.** The state used for routing is the **post-checkoff state** — that is, the state of `docs/prd.md` AFTER Step W6's PRD AC checkoff and any splits performed in Step W7. Do not route on the pre-checkoff state.
+
+**Determine the recommendation** by inspecting the post-checkoff PRD:
+
+- **All PRD ACs checked AND the Unvetted section is empty:** recommend `/sdd:retro` (project-close path). This is the **only** branch that recommends `/sdd:retro` from `/sdd:build`'s wrap-up. (Satisfies `aafa` — `/sdd:build`'s wrap-up recommends `/sdd:retro` only when its PRD checkoff causes every AC to be checked AND Unvetted is empty.)
+- **The Unvetted section contains one or more items:** recommend `/sdd:refine`. The Unvetted backlog should be processed before the next sprint plans.
+- **Neither of the above** (some PRD ACs remain unchecked AND the Unvetted section is empty): recommend `/sdd:plan` (continue the sprint loop).
+
+**Emit the recommendation using the End-of-Command Handoff template** from `docs/spec.md > Cross-Cutting Mechanisms > End-of-Command Handoff` — refer to it by name rather than restating the full template. The standard form is a one-line outcome summary followed by the verbatim handoff sentence:
+
+```
+Sprint N closed.
+
+Run `/clear`, then `/sdd:[next-command]` to continue.
+```
+
+The outcome summary is a single line — suggested phrasing `Sprint N closed.` (substitute the current sprint number); author's call on exact wording, but keep it to one line. The handoff sentence **Run `/clear`, then `/sdd:[next-command]` to continue.** is verbatim per the End-of-Command Handoff template — do not paraphrase it. Substitute `[next-command]` with the routed target (`/sdd:plan`, `/sdd:refine`, or `/sdd:retro`).
+
+(Satisfies `aaeu`.)
 
 ---
 
@@ -323,7 +513,7 @@ The sprint checklist adapts when plans meet reality. Revising it is not failure 
 - **Surgical context loading is non-negotiable.** Never load the full spec or full PRD during build. Load only the section referenced by the current item. This is the entire point of the spec-ref and PRD-ref fields in the sprint checklist.
 - **One item at a time in step-by-step mode.** Build one item, verify it, check it off, then tell the user to `/clear` and `/sdd:build` again. Never batch multiple items in step-by-step mode.
 - **Wait for user confirmation before checking off an item.** Step 6 presents what was built; the user must confirm before Step 7 marks it complete.
-- **Build mode is locked.** If the user asks to switch modes mid-sprint, explain that the mode was set during `/sdd:sprint` and cannot be changed until the next sprint.
+- **Build mode is locked.** If the user asks to switch modes mid-sprint, explain that the mode was set during `/sdd:plan` and cannot be changed until the next sprint.
 - **One question at a time.** If you need user input during a build step, ask one question and wait for the response.
 - **First-run explanation only on the very first `/sdd:build` in the project.** Check `commandExplanationsShown.build` — do not show it on subsequent builds or sprints.
 - **Re-entry is the normal path.** In step-by-step mode, most `/sdd:build` invocations are re-entries after `/clear`. The re-entry load order is optimized for this — follow it exactly.

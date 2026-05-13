@@ -62,7 +62,7 @@ Organize requirements as user stories grouped into epics:
 - **User stories** are list items under each epic, written in the standard format: "As a [user], I want [capability] so that [benefit]."
 - **Acceptance criteria** are checkboxes under each story. Every criterion must be testable — specific, observable, and verifiable. No vague criteria like "works well" or "is intuitive."
 
-**Heading stability matters.** Epic names and story descriptions become addresses that `/sdd:sprint` references when pulling work into sprints. Once a heading is written, it should not change unless the requirement itself changes. Choose clear, stable names.
+**Heading stability matters.** Epic names and story descriptions become addresses that `/sdd:plan` references when pulling work into sprints. Once a heading is written, it should not change unless the requirement itself changes. Choose clear, stable names.
 
 ### Epic Count Monitoring
 
@@ -125,7 +125,7 @@ Tell the user the PRD has been written and to run `/sdd:spec` when ready.
 - One question at a time. Never ask multiple questions in a single message.
 - Free-form questions only. No multiple choice for interview or planning questions.
 - Acceptance criteria must be testable. Specific, observable, verifiable. This is non-negotiable.
-- Heading names are stable addresses. `/sdd:sprint` references them. Do not use generic names like "Miscellaneous" or "Other."
+- Heading names are stable addresses. `/sdd:plan` references them. Do not use generic names like "Miscellaneous" or "Other."
 - The Unvetted section must exist and be empty in the initial PRD. It is where new items land during sprints.
 - The PRD is both a requirements document and a progress tracker. Checkboxes get checked during sprints as work is completed.
 - Edge cases and "what if" questions should be resolved during the conversation, not deferred to a later phase unless they genuinely belong elsewhere.

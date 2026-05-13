@@ -44,23 +44,24 @@ Output the following as plain text. This is NOT a question — do not wait for a
 SDD (Spec-Driven Development) is a structured, interview-driven process for planning and building software. Here's how it works:
 
 **Planning Phase:**
-- `/sdd:scope` — Collaborative brainstorm that produces a scope document. We'll interview you about your idea, push back on vague thinking, and distill it into a clear project definition.
+- `/sdd:discovery` — Open exploration before structural decisions. Reads files placed in `docs/refs/` and runs an interview to capture "what is this?"
+- `/sdd:scope` — Defines the project boundary — what's in, what's out. We'll interview you, push back on vague thinking, and distill it into a clear project definition.
 - `/sdd:prd` — Translates your scope into precise, testable product requirements organized as user stories with acceptance criteria.
 - `/sdd:spec` — Designs the technical architecture: stack, file structure, data flow, testing strategy. Produces CLAUDE.md and AGENTS.md for AI agents to build from.
 
 **Sprint Loop:**
-- `/sdd:sprint` — Pulls a logical batch of work from the PRD into a buildable sprint checklist with spec references and verification steps.
-- `/sdd:build` — Executes the sprint checklist. Supports step-by-step (one item per session) or autonomous (works through multiple items with checkpoints) modes.
-- `/sdd:iterate` — Optional polish after a sprint is complete. Bugs, features, UX improvements — scoped and appended to the sprint.
-- `/sdd:reflect` — Sprint retrospective covering process and product. Splits partial stories, recommends next steps.
+- `/sdd:plan` — Pulls a logical batch of work from the PRD into a buildable sprint checklist with spec references and verification steps.
+- `/sdd:build` — Executes the sprint checklist. Supports step-by-step (one item per session) or autonomous (works through multiple items with checkpoints) modes. Closes the sprint in its wrap-up phase (PRD checkoff, story splitting, "anything notable?" beat).
+- `/sdd:polish` — Optional post-sprint cleanup. Bugs, features, UX improvements — scoped and appended to the sprint.
 - `/sdd:refine` — Runs unvetted PRD items through a compressed planning interview before the next sprint.
 
-Then loop back to `/sdd:sprint` for the next cycle.
+Then loop back to `/sdd:plan` for the next cycle.
 
 **Project Close:**
-- `/sdd:retro` — Project-level retrospective across all sprints. Synthesizes what worked, what didn't, and how to improve.
+- `/sdd:retro` — Project-level retrospective across all sprints. Synthesizes what worked, what didn't, and how to improve. Captures cross-project patterns to your user profile.
 
 **Anytime:**
+- `/sdd:pause` and `/sdd:unpause` — Suspend and resume the current command across sessions.
 - `/sdd:feedback` — Quickly flag something the plugin could do better. Captures your note with context and returns immediately.
 
 ---
@@ -111,7 +112,7 @@ Write `~/.claude/sdd-user-profile.json` with the following schema:
 }
 ```
 
-Confirm to the user that their profile has been saved and tell them to run `/sdd:scope` to start their first project.
+Confirm to the user that their profile has been saved and tell them to run `/sdd:discovery` to start their first project.
 
 ## Important Reminders
 

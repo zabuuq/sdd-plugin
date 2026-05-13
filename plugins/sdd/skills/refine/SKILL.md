@@ -223,7 +223,7 @@ Tell the user:
 1. Which items were refined and moved from unvetted to vetted.
 2. Which documents were updated (and which were not).
 3. How many unvetted items remain (if any).
-4. The recommended next command — typically `/sdd:sprint` if vetted items are ready, or `/sdd:refine` again if unvetted items remain.
+4. The recommended next command — typically `/sdd:plan` if vetted items are ready, or `/sdd:refine` again if unvetted items remain.
 
 ## Important Reminders
 
@@ -235,4 +235,4 @@ Tell the user:
 - **PRD health thresholds are fixed.** 10+ epics triggers a phase-splitting recommendation. 5+ unvetted items triggers a scope creep flag. Do not adjust these thresholds.
 - **First-run explanation only on the very first `/sdd:refine` in the project.** Check `commandExplanationsShown.refine` — do not show it on subsequent runs.
 - **The user can stop at any time.** Refinement is per-item. If the user wants to stop after refining one item, let them. Do not pressure them to refine all unvetted items in a single session.
-- **Refine is the gatekeeper for document changes.** Unlike `/sdd:build` or `/sdd:iterate`, this command is authorized to make deliberate changes to the PRD, spec, AGENTS.md, and CLAUDE.md. But every change still requires user confirmation.
+- **Refine is the gatekeeper for document changes.** Unlike `/sdd:build` or `/sdd:polish`, this command is authorized to make deliberate changes to the PRD, spec, AGENTS.md, and CLAUDE.md. But every change still requires user confirmation.

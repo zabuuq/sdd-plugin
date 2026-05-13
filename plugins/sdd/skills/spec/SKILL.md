@@ -106,7 +106,7 @@ Propose the architecture section by section, mapped to PRD epics. For each archi
 
 Present each section to the user for feedback before moving to the next. Do not dump the entire architecture at once.
 
-**Critical: granular subsections.** Every architectural component gets its own `##` heading. Within each component, create `###` subsections for specific pieces (e.g., `## Frontend` > `### Search Component`, `## API` > `### GET /api/items`, `## Data Model` > `### Users Table`). These subsection headings become the addresses that `/sdd:sprint` uses to link checklist items to their spec context, and that `/sdd:build` uses to load only the relevant spec section. If subsections are too coarse, build agents will load too much irrelevant context or miss critical details.
+**Critical: granular subsections.** Every architectural component gets its own `##` heading. Within each component, create `###` subsections for specific pieces (e.g., `## Frontend` > `### Search Component`, `## API` > `### GET /api/items`, `## Data Model` > `### Users Table`). These subsection headings become the addresses that `/sdd:plan` uses to link checklist items to their spec context, and that `/sdd:build` uses to load only the relevant spec section. If subsections are too coarse, build agents will load too much irrelevant context or miss critical details.
 
 ### Step 8: File Structure
 
@@ -168,7 +168,7 @@ Generate `docs/spec.md` using the template at `skills/sdd-guide/templates/spec-t
 - Fill in every section of the template based on the interview discussion.
 - The Stack table must include a reference docs URL for every tool and library. These URLs are what `/sdd:build` agents will look up during implementation.
 - Every component section must open with a PRD epic cross-reference: "Implements `prd.md > [Epic Name]`"
-- Granular subsections (`###`) under every component (`##`) — these are critical for `/sdd:sprint` and `/sdd:build` context loading.
+- Granular subsections (`###`) under every component (`##`) — these are critical for `/sdd:plan` and `/sdd:build` context loading.
 - The file structure tree must be complete and annotated.
 - Data flow diagrams as ASCII art.
 - Key Technical Decisions table filled in with every significant choice, its rationale, and its tradeoff.
@@ -232,7 +232,7 @@ Update `lastCommand` in `docs/project-state.json` to `"/sdd:spec"` (confirming c
 
 - **One question at a time.** Never ask the user multiple questions in a single message.
 - **Free-form questions only.** No multiple-choice options for interview questions.
-- **Granular subsections are critical.** Every `##` component needs `###` subsections. These are how `/sdd:sprint` references specific spec sections and how `/sdd:build` does surgical context loading. Coarse sections break the downstream workflow.
+- **Granular subsections are critical.** Every `##` component needs `###` subsections. These are how `/sdd:plan` references specific spec sections and how `/sdd:build` does surgical context loading. Coarse sections break the downstream workflow.
 - **Cross-reference PRD epics.** Every component section cites which PRD epic it implements.
 - **Include reference doc URLs.** Every tool and library in the Stack table needs a link to its current docs. `/sdd:build` agents use these.
 - **CLAUDE.md merge logic.** Never blindly overwrite an existing CLAUDE.md. Read it, preserve relevant content, merge spec-derived instructions.

@@ -23,14 +23,15 @@ claude --plugin-dir ./plugins/sdd
 
 ## Commands
 
-SDD provides 11 commands organized into four workflow phases.
+SDD provides 13 commands organized into four workflow phases.
 
 ### Planning Phase
 
 | Command | Description |
 |---------|-------------|
 | `/sdd:onboard` | One-time setup. Creates a global user profile with your communication style, git preferences, and workflow explanation preference. |
-| `/sdd:scope` | Collaborative brainstorm that interviews you about your project idea, pushes back on vague thinking, and distills everything into a clear scope document. |
+| `/sdd:discovery` | Open exploration before structural decisions. Reads files placed in `docs/refs/` and runs an interview to capture "what is this?" |
+| `/sdd:scope` | Defines the project boundary — what's in, what's out. Narrower in v2; exploration moved to `/sdd:discovery`. |
 | `/sdd:prd` | Produces a product requirements document from the scope. User stories grouped into epics with testable acceptance criteria. |
 | `/sdd:spec` | Generates a technical specification covering architecture, data models, and file structure. Also produces CLAUDE.md and AGENTS.md for your project. |
 
@@ -38,10 +39,9 @@ SDD provides 11 commands organized into four workflow phases.
 
 | Command | Description |
 |---------|-------------|
-| `/sdd:sprint` | Pulls a logical batch of work from the PRD into a buildable sprint checklist with spec references and verification steps. |
-| `/sdd:build` | Executes the sprint checklist. Supports step-by-step mode (one item per session) and autonomous mode (multiple items with checkpoints). |
-| `/sdd:iterate` | Polish and improve what was built. Scopes bugs, features, or UX improvements through a brief interview and appends them to the sprint. |
-| `/sdd:reflect` | Sprint-level retrospective covering process and product. Splits partial stories and recommends next steps. |
+| `/sdd:plan` | Pulls a logical batch of work from the PRD into a buildable sprint checklist with spec references and verification steps. |
+| `/sdd:build` | Executes the sprint checklist. Supports step-by-step mode (one item per session) and autonomous mode (multiple items with checkpoints). Wraps up with PRD checkoff, story splitting, and a "anything notable?" beat that closes the sprint. |
+| `/sdd:polish` | Optional post-sprint cleanup. Scopes bugs, features, or UX improvements through a brief interview and appends them to the sprint. |
 | `/sdd:refine` | Runs unvetted PRD items through a compressed planning interview. Updates spec and related documents if needed. |
 
 ### Project Close
@@ -54,29 +54,31 @@ SDD provides 11 commands organized into four workflow phases.
 
 | Command | Description |
 |---------|-------------|
+| `/sdd:pause` | Distill the in-flight command's conversation into a resume file at `docs/<command>-resume.md` for multi-session resume. |
+| `/sdd:unpause` | Zero-argument resume of whatever was paused — reads `lastCommand`, loads the matching resume file, and picks up. |
 | `/sdd:feedback` | Quick flag for plugin improvement ideas. Captures your note with context and returns immediately. Usage: `/sdd:feedback [your note]` |
 
 ## Workflow
 
 ```
-Planning Phase       /sdd:onboard → /sdd:scope → /sdd:prd → /sdd:spec
+Planning Phase       /sdd:onboard → /sdd:discovery → /sdd:scope → /sdd:prd → /sdd:spec
 
-Sprint Loop          /sdd:sprint → /sdd:build → /sdd:iterate → /sdd:reflect → /sdd:refine
-                         ↑                                                          │
-                         └──────────────────── loop back ───────────────────────────┘
+Sprint Loop          /sdd:plan → /sdd:build → /sdd:polish (optional) → /sdd:refine (if unvetted items)
+                         ↑                                                                   │
+                         └──────────────────── loop back ────────────────────────────────────┘
 
 Project Close        /sdd:retro
 
-Anytime              /sdd:feedback
+Anytime              /sdd:pause, /sdd:unpause, /sdd:feedback
 ```
 
 The **planning phase** runs once per project. You move through each command in order, and each one builds on the artifacts produced by the previous command.
 
-The **sprint loop** repeats as many times as needed. Each cycle plans a batch of work, builds it, polishes it, reflects on the process, and refines any new items that emerged. After `/sdd:reflect`, you loop back to `/sdd:sprint` for the next batch.
+The **sprint loop** repeats as many times as needed. Each cycle plans a batch of work, builds it (with `/sdd:build` closing the sprint in its wrap-up phase), optionally polishes via `/sdd:polish`, and runs `/sdd:refine` against any unvetted items that emerged. After the loop, you return to `/sdd:plan` for the next batch.
 
-**/sdd:retro** runs once when the project is complete. It reads all sprint retrospectives and process notes to produce a project-level summary.
+**/sdd:retro** runs once when the project is complete. It reads all sprint process notes to produce a project-level summary and captures cross-project patterns to your user profile.
 
-**/sdd:feedback** can be used at any point to flag ideas for improving the plugin itself.
+**/sdd:pause** and **/sdd:unpause** are anytime utilities for suspending and resuming the current command across sessions. **/sdd:feedback** can be used at any point to flag ideas for improving the plugin itself.
 
 ## Quick Start
 
@@ -101,11 +103,11 @@ The **sprint loop** repeats as many times as needed. Each cycle plans a batch of
 
 5. **Enter the sprint loop:**
    ```
-   /sdd:sprint
+   /sdd:plan
    /sdd:build
    ```
 
-6. **Iterate and reflect** after each sprint, then loop back for the next one.
+6. **Optionally polish and refine** after each sprint, then loop back to `/sdd:plan` for the next one.
 
 ## Artifacts
 
@@ -118,8 +120,8 @@ SDD creates the following files in your project:
 | `scope.md` | `/sdd:scope` |
 | `prd.md` | `/sdd:prd` |
 | `spec.md` | `/sdd:spec` |
-| `sprint-N.md` | `/sdd:sprint` |
-| `backlog.md` | `/sdd:sprint` (overflow items) |
+| `sprint-N.md` | `/sdd:plan` |
+| `backlog.md` | All planning commands (overflow items) |
 | `open-concerns.md` | `/sdd:scope` (updated by every command) |
 | `project-state.json` | `/sdd:scope` (updated by every command) |
 | `sdd-feedback.md` | `/sdd:feedback` |
@@ -133,7 +135,7 @@ SDD creates the following files in your project:
 | `AGENTS.md` | `/sdd:spec` |
 | `README.md` | `/sdd:spec` |
 | `process-notes.md` | Planning phase commands |
-| `process-notes-sprint-N.md` | `/sdd:reflect` |
+| `process-notes-sprint-N.md` | Sprint loop commands (`/sdd:plan`, `/sdd:build`, `/sdd:polish`, `/sdd:refine`) |
 
 ### Global files
 

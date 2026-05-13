@@ -16,10 +16,10 @@ v2 is a streamlining pass driven by that real-use feedback — refinement of wha
   - [ ] `aaac` When `/sdd:feedback` runs N times consecutively with no other SDD command invoked between runs, every resulting note's "After command" field equals the value of `lastCommand` that was present before the first `/sdd:feedback` invocation.
 
 - As a plugin user, I want completed sprint items to automatically check off their matching PRD acceptance criteria, so my PRD reflects actual project state without manual drift between sprint files and the PRD.
-  - [ ] `aaad` When `/sdd:build`'s wrap-up phase confirms a sprint item is fully complete and no story-split is required, it checks off every PRD acceptance criterion that sprint item references in `docs/prd.md`.
-  - [ ] `aaae` When a sprint item maps to only some of the acceptance criteria of a larger cross-cutting PRD story, only the satisfied criteria are checked; criteria requiring contributions from any sprint item across any sprint file that is still incomplete remain unchecked.
-  - [ ] `aaaf` When the final sprint item contributing to a cross-cutting PRD acceptance criterion completes, that criterion gets checked during that sprint's `/sdd:build` wrap-up.
-  - [ ] `aaag` After `/sdd:build`'s wrap-up runs on a sprint, no PRD acceptance criterion remains unchecked while every sprint-item AC across all sprint files that references it is checked.
+  - [x] `aaad` When `/sdd:build`'s wrap-up phase confirms a sprint item is fully complete and no story-split is required, it checks off every PRD acceptance criterion that sprint item references in `docs/prd.md`.
+  - [x] `aaae` When a sprint item maps to only some of the acceptance criteria of a larger cross-cutting PRD story, only the satisfied criteria are checked; criteria requiring contributions from any sprint item across any sprint file that is still incomplete remain unchecked.
+  - [x] `aaaf` When the final sprint item contributing to a cross-cutting PRD acceptance criterion completes, that criterion gets checked during that sprint's `/sdd:build` wrap-up.
+  - [x] `aaag` After `/sdd:build`'s wrap-up runs on a sprint, no PRD acceptance criterion remains unchecked while every sprint-item AC across all sprint files that references it is checked.
 
 ### /sdd:discovery Command
 
@@ -173,51 +173,51 @@ v2 is a streamlining pass driven by that real-use feedback — refinement of wha
 ### Sprint Loop
 
 - As a plugin user starting a sprint, I want `/sdd:plan` to read the previous sprint's process notes, so carry-forward items and tech-debt observations from the last `/build` wrap-up are surfaced before I plan.
-  - [ ] `aado` On startup, `/sdd:plan` reads the file `process-notes-sprint-N.md` with the highest N in the project root, if any such file exists.
-  - [ ] `aadp` `/sdd:plan` surfaces carry-forward items recorded by the previous `/sdd:build` wrap-up.
-  - [ ] `aadq` `/sdd:plan` surfaces quality concerns and tech-debt items recorded by the previous `/sdd:build` wrap-up.
-  - [ ] `aadr` When no `process-notes-sprint-N.md` file exists at startup, `/sdd:plan` proceeds to its next step without emitting a warning.
+  - [x] `aado` On startup, `/sdd:plan` reads the file `process-notes-sprint-N.md` with the highest N in the project root, if any such file exists.
+  - [x] `aadp` `/sdd:plan` surfaces carry-forward items recorded by the previous `/sdd:build` wrap-up.
+  - [x] `aadq` `/sdd:plan` surfaces quality concerns and tech-debt items recorded by the previous `/sdd:build` wrap-up.
+  - [x] `aadr` When no `process-notes-sprint-N.md` file exists at startup, `/sdd:plan` proceeds to its next step without emitting a warning.
 
 - As a plugin user starting a sprint, I want `/sdd:plan` to check the PRD's overall state, so I know whether to plan a new sprint, run `/sdd:refine`, or run `/sdd:retro`.
-  - [ ] `aads` After reading prior process notes, `/sdd:plan` scans `docs/prd.md` and determines whether every acceptance criterion is checked, whether the Unvetted section contains items, and whether unchecked criteria remain.
-  - [ ] `aadt` When every acceptance criterion is checked and the Unvetted section is empty, `/sdd:plan` recommends running `/sdd:retro` and does not proceed to sprint planning.
-  - [ ] `aadu` When the Unvetted section contains items, `/sdd:plan` recommends running `/sdd:refine` and does not proceed to sprint planning until the user acknowledges or overrides.
-  - [ ] `aadv` When neither closing condition holds, `/sdd:plan` proceeds with sprint planning.
+  - [x] `aads` After reading prior process notes, `/sdd:plan` scans `docs/prd.md` and determines whether every acceptance criterion is checked, whether the Unvetted section contains items, and whether unchecked criteria remain.
+  - [x] `aadt` When every acceptance criterion is checked and the Unvetted section is empty, `/sdd:plan` recommends running `/sdd:retro` and does not proceed to sprint planning.
+  - [x] `aadu` When the Unvetted section contains items, `/sdd:plan` recommends running `/sdd:refine` and does not proceed to sprint planning until the user acknowledges or overrides.
+  - [x] `aadv` When neither closing condition holds, `/sdd:plan` proceeds with sprint planning.
 
 - As a plugin user, I want `/sdd:plan` to validate that every sprint item carries an explicit PRD reference (or an explicit unmapped tag), so `/sdd:build`'s wrap-up can deterministically check off PRD criteria without missing references.
-  - [ ] `aadw` Every sprint-item line in `docs/sprint-N.md` written by `/sdd:plan` carries either a PRD acceptance-criterion reference tag (e.g., `[PRD: Epic / Story / AC]` or equivalent — exact syntax deferred to `/sdd:spec`) or an explicit `[unmapped]` tag.
-  - [ ] `aadx` At the end of sprint planning, before finalizing `docs/sprint-N.md`, `/sdd:plan` validates that every sprint-item line in the proposed sprint carries one of the two tag types.
-  - [ ] `aady` When any sprint-item line lacks both a PRD reference tag and an `[unmapped]` tag, `/sdd:plan` refuses to finalize the sprint file and surfaces every offending line for the user to address.
-  - [ ] `aadz` `/sdd:plan` does not write `docs/sprint-N.md` to disk until validation passes for every sprint-item line.
+  - [x] `aadw` Every sprint-item line in `docs/sprint-N.md` written by `/sdd:plan` carries either a PRD acceptance-criterion reference tag (e.g., `[PRD: Epic / Story / AC]` or equivalent — exact syntax deferred to `/sdd:spec`) or an explicit `[unmapped]` tag.
+  - [x] `aadx` At the end of sprint planning, before finalizing `docs/sprint-N.md`, `/sdd:plan` validates that every sprint-item line in the proposed sprint carries one of the two tag types.
+  - [x] `aady` When any sprint-item line lacks both a PRD reference tag and an `[unmapped]` tag, `/sdd:plan` refuses to finalize the sprint file and surfaces every offending line for the user to address.
+  - [x] `aadz` `/sdd:plan` does not write `docs/sprint-N.md` to disk until validation passes for every sprint-item line.
 
 - As a plugin user finishing `/sdd:plan`, I want a next-command recommendation, so I know what to do next without having to remember the chain.
-  - [ ] `aaea` At the end of `/sdd:plan`'s run, the command emits a recommendation naming the next command (typically `/sdd:build`).
-  - [ ] `aaeb` The recommendation includes the cross-cutting between-commands handoff (run `/clear`, then invoke the named next command).
+  - [x] `aaea` At the end of `/sdd:plan`'s run, the command emits a recommendation naming the next command (typically `/sdd:build`).
+  - [x] `aaeb` The recommendation includes the cross-cutting between-commands handoff (run `/clear`, then invoke the named next command).
 
 - As a plugin user starting a sprint, I want `/sdd:plan` to remember my preferred sprint mode, so I'm not asked to re-choose it every sprint.
-  - [ ] `aaec` When `~/.claude/sdd-user-profile.json` contains a non-empty `defaultSprintMode` field, `/sdd:plan` uses that value as the sprint mode without asking the user.
-  - [ ] `aaed` When `defaultSprintMode` is unset but `docs/project-state.json` contains a recorded mode from the previous sprint, `/sdd:plan` asks the user whether to reuse that mode and proceeds based on the answer.
-  - [ ] `aaee` When neither `defaultSprintMode` nor a recorded previous-sprint mode is available, `/sdd:plan` asks the user to select a mode.
-  - [ ] `aaef` After mode selection by any path above, `/sdd:plan` offers an "always use this mode" toggle; on user acceptance, the selected mode is written to `defaultSprintMode` in `~/.claude/sdd-user-profile.json`.
-  - [ ] `aaeg` `/sdd:plan` writes the selected mode to `docs/project-state.json` for next-sprint reference.
+  - [x] `aaec` When `~/.claude/sdd-user-profile.json` contains a non-empty `defaultSprintMode` field, `/sdd:plan` uses that value as the sprint mode without asking the user.
+  - [x] `aaed` When `defaultSprintMode` is unset but `docs/project-state.json` contains a recorded mode from the previous sprint, `/sdd:plan` asks the user whether to reuse that mode and proceeds based on the answer.
+  - [x] `aaee` When neither `defaultSprintMode` nor a recorded previous-sprint mode is available, `/sdd:plan` asks the user to select a mode.
+  - [x] `aaef` After mode selection by any path above, `/sdd:plan` offers an "always use this mode" toggle; on user acceptance, the selected mode is written to `defaultSprintMode` in `~/.claude/sdd-user-profile.json`.
+  - [x] `aaeg` `/sdd:plan` writes the selected mode to `docs/project-state.json` for next-sprint reference.
 
 - As a plugin user finishing a sprint's checklist, I want `/sdd:build` to ask whether I'm satisfied or want to iterate, so the wrap-up reflects how I actually feel about the work.
-  - [ ] `aaeh` After the final sprint checklist item is marked complete, `/sdd:build` emits the question "Satisfied with this sprint, or items to iterate on?" as the wrap-up entry point.
-  - [ ] `aaei` When `process-notes-sprint-N.md` contains entries written during checklist execution that carry the iteration-candidate marker (exact marker syntax deferred to `/sdd:spec`), `/sdd:build` surfaces those candidates alongside the question.
-  - [ ] `aaej` `/sdd:build` surfaces an iteration candidate at wrap-up only when an entry carrying the iteration-candidate marker exists in `process-notes-sprint-N.md` written before wrap-up began.
-  - [ ] `aaek` When the user answers "satisfied," `/sdd:build` proceeds with close-sprint behavior.
-  - [ ] `aael` When the user answers "items to iterate," `/sdd:build` recommends running `/sdd:polish` and leaves the sprint file open (no close-sprint actions are performed).
-  - [ ] `aaem` When the user answers "satisfied" and one or more tagged iteration candidates exist in `process-notes-sprint-N.md`, `/sdd:build` asks the user to assign a disposition for each surfaced candidate from the set {discard, capture as tech-debt, actually iterate} before proceeding with close-sprint behavior.
-  - [ ] `aaen` When the user assigns "actually iterate" to any candidate during disposition, `/sdd:build` switches to the "items to iterate" branch and does not perform close-sprint actions.
-  - [ ] `aaeo` When the user assigns "capture as tech-debt" to a candidate, `/sdd:build` records that candidate as a tech-debt entry in `process-notes-sprint-N.md` during close-sprint.
-  - [ ] `aaep` When the user assigns "discard" to a candidate, `/sdd:build` performs no further action for that candidate beyond noting the discard decision in `process-notes-sprint-N.md`.
+  - [x] `aaeh` After the final sprint checklist item is marked complete, `/sdd:build` emits the question "Satisfied with this sprint, or items to iterate on?" as the wrap-up entry point.
+  - [x] `aaei` When `process-notes-sprint-N.md` contains entries written during checklist execution that carry the iteration-candidate marker (exact marker syntax deferred to `/sdd:spec`), `/sdd:build` surfaces those candidates alongside the question.
+  - [x] `aaej` `/sdd:build` surfaces an iteration candidate at wrap-up only when an entry carrying the iteration-candidate marker exists in `process-notes-sprint-N.md` written before wrap-up began.
+  - [x] `aaek` When the user answers "satisfied," `/sdd:build` proceeds with close-sprint behavior.
+  - [x] `aael` When the user answers "items to iterate," `/sdd:build` recommends running `/sdd:polish` and leaves the sprint file open (no close-sprint actions are performed).
+  - [x] `aaem` When the user answers "satisfied" and one or more tagged iteration candidates exist in `process-notes-sprint-N.md`, `/sdd:build` asks the user to assign a disposition for each surfaced candidate from the set {discard, capture as tech-debt, actually iterate} before proceeding with close-sprint behavior.
+  - [x] `aaen` When the user assigns "actually iterate" to any candidate during disposition, `/sdd:build` switches to the "items to iterate" branch and does not perform close-sprint actions.
+  - [x] `aaeo` When the user assigns "capture as tech-debt" to a candidate, `/sdd:build` records that candidate as a tech-debt entry in `process-notes-sprint-N.md` during close-sprint.
+  - [x] `aaep` When the user assigns "discard" to a candidate, `/sdd:build` performs no further action for that candidate beyond noting the discard decision in `process-notes-sprint-N.md`.
 
 - As a plugin user closing a sprint, I want `/sdd:build` to perform a defined set of close-out actions, so the wrap-up is repeatable and nothing is left implicit.
-  - [ ] `aaeq` On close-sprint, `/sdd:build` performs PRD acceptance-criterion checkoff per the Bug Fixes epic Story 2 behavior.
-  - [ ] `aaer` On close-sprint, `/sdd:build` identifies any unfinished items in the sprint checklist, offers story-splitting with explicit user confirmation per item, and updates `docs/prd.md` to reflect each confirmed split.
-  - [ ] `aaes` On close-sprint, `/sdd:build` emits exactly one "anything notable?" prompt covering quality concerns, tech debt, and surprises.
-  - [ ] `aaet` On close-sprint, `/sdd:build` writes `process-notes-sprint-N.md` containing decisions made during the sprint, pushback from either side, surprises, notable items captured in the wrap-up, and dispositions assigned to any iteration candidates.
-  - [ ] `aaeu` On close-sprint, after writing the process notes file, `/sdd:build` emits a next-command recommendation based on the PRD state check (continue sprint loop, run `/sdd:refine`, or run `/sdd:retro`).
+  - [x] `aaeq` On close-sprint, `/sdd:build` performs PRD acceptance-criterion checkoff per the Bug Fixes epic Story 2 behavior.
+  - [x] `aaer` On close-sprint, `/sdd:build` identifies any unfinished items in the sprint checklist, offers story-splitting with explicit user confirmation per item, and updates `docs/prd.md` to reflect each confirmed split.
+  - [x] `aaes` On close-sprint, `/sdd:build` emits exactly one "anything notable?" prompt covering quality concerns, tech debt, and surprises.
+  - [x] `aaet` On close-sprint, `/sdd:build` writes `process-notes-sprint-N.md` containing decisions made during the sprint, pushback from either side, surprises, notable items captured in the wrap-up, and dispositions assigned to any iteration candidates.
+  - [x] `aaeu` On close-sprint, after writing the process notes file, `/sdd:build` emits a next-command recommendation based on the PRD state check (continue sprint loop, run `/sdd:refine`, or run `/sdd:retro`).
 
 - As a plugin user who realizes mid-`/polish` that a sprint isn't actually done, I want a re-open escape hatch, so I can correct a premature "satisfied" answer.
   - [ ] `aaev` When `/sdd:polish` is invoked and the targeted sprint's `process-notes-sprint-N.md` file exists indicating the sprint was closed, the system asks "Re-open the sprint?" before proceeding.
@@ -229,7 +229,7 @@ v2 is a streamlining pass driven by that real-use feedback — refinement of wha
 - As a plugin user finishing a project, I want `/sdd:retro` to be recommended only at project close (not every sprint), so I'm not running a retrospective ceremony that doesn't match the project state.
   - [ ] `aaey` No SDD command recommends running `/sdd:retro` at every sprint boundary.
   - [ ] `aaez` `/sdd:plan` recommends `/sdd:retro` only when its PRD state check finds every acceptance criterion checked and the Unvetted section empty.
-  - [ ] `aafa` `/sdd:build`'s wrap-up recommends `/sdd:retro` only when its PRD checkoff causes every acceptance criterion in `docs/prd.md` to be checked and the Unvetted section is empty.
+  - [x] `aafa` `/sdd:build`'s wrap-up recommends `/sdd:retro` only when its PRD checkoff causes every acceptance criterion in `docs/prd.md` to be checked and the Unvetted section is empty.
 
 - As a plugin user closing a project, I want `/sdd:retro` to capture cross-project patterns I want to carry forward, so my user profile reflects what I learned this project.
   - [ ] `aafb` `/sdd:retro` includes a final step after its retrospective interview that captures cross-project patterns the user wants to carry forward.
@@ -337,7 +337,7 @@ v2 is a streamlining pass driven by that real-use feedback — refinement of wha
 
 - As the plugin maintainer, I want `docs/v2-verification.md` to be populated by implementing commands as work ships, so the audit trail builds automatically rather than at release time.
   - [ ] `aahj` `docs/v2-verification.md` exists in the sdd-plugin project before any v2 implementation sprint begins, seeded with one row per in-scope feedback item from the v2 scope's triaged list.
-  - [ ] `aahk` When a sprint item implementing an in-scope feedback item completes, the implementing command (typically `/sdd:build` during wrap-up) writes or updates a row in `docs/v2-verification.md` for that feedback item.
+  - [x] `aahk` When a sprint item implementing an in-scope feedback item completes, the implementing command (typically `/sdd:build` during wrap-up) writes or updates a row in `docs/v2-verification.md` for that feedback item.
   - [ ] `aahl` Each row in `docs/v2-verification.md` maps to exactly one in-scope feedback item from the v2 scope's triaged list.
   - [ ] `aahm` The exact schema and column set of `docs/v2-verification.md` is deferred to `/sdd:spec`.
 
@@ -354,7 +354,7 @@ v2 is a streamlining pass driven by that real-use feedback — refinement of wha
 
 - As the plugin maintainer, I want `docs/v2-verification.md` to be sdd-plugin-specific and to persist after release, so it serves as a historical record rather than churning out of user projects.
   - [ ] `aahu` `docs/v2-verification.md` is created only in the sdd-plugin project; no SDD command creates the file in any other project.
-  - [ ] `aahv` The implementing-command write behavior described above fires only when `docs/v2-verification.md` already exists in the running project's `docs/` directory.
+  - [x] `aahv` The implementing-command write behavior described above fires only when `docs/v2-verification.md` already exists in the running project's `docs/` directory.
   - [ ] `aahw` After v2 ships, no SDD command deletes, archives, or removes `docs/v2-verification.md`.
   - [ ] `aahx` Future plugin versions (v3 and beyond) follow the same out-of-pattern allowance: `docs/<version>-verification.md` is sdd-plugin-specific and persists.
 

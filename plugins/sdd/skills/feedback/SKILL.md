@@ -26,9 +26,7 @@ If the prerequisite fails, stop immediately. Do not attempt partial execution.
 
 ## State Updates (immediate)
 
-Before doing any other work:
-
-1. Set `lastCommand` to `"/sdd:feedback"` in `docs/project-state.json`.
+**This command writes nothing to `docs/project-state.json` on startup.** In particular, it does not update `lastCommand`. Preserving `lastCommand` is what lets consecutive `/sdd:feedback` invocations correctly attribute each note to the preceding non-feedback command.
 
 Do NOT read or process `docs/open-concerns.md`. This command skips the open concerns protocol entirely to maintain instant response time.
 
@@ -72,7 +70,7 @@ Read the following from `docs/project-state.json`:
 
 - **Timestamp:** Generate an ISO-8601 timestamp for the current moment (e.g., `2026-04-09T14:32:00Z`).
 - **Current sprint number:** Read from `currentSprint`. If no sprint has been created yet, use `0`.
-- **Last command run:** Read from `lastCommand` (the value before this command updated it — use the value that was stored when the file was first read in the Loading step, before the state update).
+- **Last command run:** Read from `lastCommand` in `docs/project-state.json`. `/sdd:feedback` does not overwrite this field, so the current value is the preceding non-feedback command — exactly what the note should attribute.
 - **Project directory name:** Derive from the current working directory (the final segment of the path).
 
 ### Step 3: Append Entry to sdd-feedback.md
@@ -116,5 +114,5 @@ Do not elaborate. Do not suggest next steps. Do not ask follow-up questions. Ret
 - **No open concerns processing.** This command skips the open concerns protocol entirely.
 - **No process notes.** This command does not write process notes.
 - **No interview.** The only question this command ever asks is for the feedback note itself, and only when `$ARGUMENTS` is empty.
-- **Capture the previous lastCommand.** Read the value of `lastCommand` before overwriting it so the entry reflects what command the user ran before giving feedback.
+- **Never write `lastCommand`.** `/sdd:feedback` does not update `lastCommand` in `docs/project-state.json`. The "After command" field in each note is sourced directly from the current value of `lastCommand`, which is the preceding non-feedback command. Consecutive `/sdd:feedback` runs therefore all attribute to the same preceding command.
 - **First-run explanation only on the very first `/sdd:feedback` in the project.** Check `commandExplanationsShown.feedback` — do not show it on subsequent runs.

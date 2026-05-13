@@ -1,10 +1,10 @@
 ---
-name: iterate
+name: polish
 description: Polish and improve what was built in the current sprint. Bugs, new features, UX improvements — scoped through a brief interview and added to the sprint file.
 disable-model-invocation: true
 ---
 
-# /sdd:iterate — Iterate Command
+# /sdd:polish — Iterate Command
 
 ## Startup Sequence
 
@@ -48,7 +48,7 @@ Read `docs/sprint-N.md` where N is `currentSprint` from `docs/project-state.json
 
 **If the file does not exist**, stop immediately and output:
 
-> Run `/sdd:sprint` first.
+> Run `/sdd:plan` first.
 
 Do not proceed.
 
@@ -72,28 +72,28 @@ Do not proceed. Do not offer to skip incomplete items or work around them.
 
 Before doing any other work:
 
-1. Set `lastCommand` to `"/sdd:iterate"` in `docs/project-state.json`.
+1. Set `lastCommand` to `"/sdd:polish"` in `docs/project-state.json`.
 2. Read and process `docs/open-concerns.md` per sdd-guide open concerns protocol.
 
 ## First-Run Explanation
 
-Check `docs/project-state.json` for `commandExplanationsShown.iterate`.
+Check `docs/project-state.json` for `commandExplanationsShown.polish`.
 
-**If `iterate` has NOT been shown (or `commandExplanationsShown` does not exist):**
+**If `polish` has NOT been shown (or `commandExplanationsShown` does not exist):**
 
 Output the following as plain text. This is not a question — do not wait for acknowledgment. Output it and continue.
 
 ---
 
-**What /sdd:iterate does**
+**What /sdd:polish does**
 
 Iterate is for polishing and improving what was built in the current sprint. Bugs, new features, UX improvements — anything that makes the sprint output better. I'll do a quick review of the current state, surface any backlog items worth pulling in, and then interview you about what you want to work on. That conversation produces a mini-checklist that gets appended to the sprint file. Then you run `/sdd:build` again to execute it. You can iterate as many times as you want within a single sprint.
 
 ---
 
-After outputting, set `commandExplanationsShown.iterate` to `true` in `docs/project-state.json`.
+After outputting, set `commandExplanationsShown.polish` to `true` in `docs/project-state.json`.
 
-**If `iterate` HAS been shown:** Skip the explanation entirely. Do not mention it.
+**If `polish` HAS been shown:** Skip the explanation entirely. Do not mention it.
 
 ## Behavior
 
@@ -204,7 +204,7 @@ Tell the user:
 2. How many items are in the iteration.
 3. To run `/sdd:build` to execute the iteration items.
 
-If the user wants to add more iteration work after this, they can run `/sdd:iterate` again. Each run produces a new `## Iteration N` section. There is no limit on iteration cycles within a sprint.
+If the user wants to add more iteration work after this, they can run `/sdd:polish` again. Each run produces a new `## Iteration N` section. There is no limit on iteration cycles within a sprint.
 
 ## Important Reminders
 
@@ -215,5 +215,5 @@ If the user wants to add more iteration work after this, they can run `/sdd:iter
 - Mini-checklist size is driven by the work, not by an arbitrary cap. Do not limit iterations to a fixed number of items.
 - Follow living-documents protocol for any changes that touch the spec or PRD. Default stance is to resist direct edits and route through the backlog.
 - Selectively load spec sections. Only load what is relevant to the iteration items. Do not load the full spec, full PRD, or other sprint files.
-- First-run explanation only on the very first `/sdd:iterate` in the project. Check `commandExplanationsShown.iterate` — do not show it on subsequent runs.
-- Multiple iteration cycles are expected and normal. Each `/sdd:iterate` run is a discrete cycle that appends a new section to the sprint file.
+- First-run explanation only on the very first `/sdd:polish` in the project. Check `commandExplanationsShown.polish` — do not show it on subsequent runs.
+- Multiple iteration cycles are expected and normal. Each `/sdd:polish` run is a discrete cycle that appends a new section to the sprint file.

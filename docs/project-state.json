@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "currentSprint": 2,
+  "currentSprint": 6,
   "buildMode": "autonomous",
   "lastCommand": "/sdd:build",
   "commandExplanationsShown": {
@@ -8,12 +8,14 @@
     "prd": true,
     "spec": true,
     "sprint": true,
+    "plan": true,
     "build": true,
     "iterate": true,
+    "polish": false,
     "reflect": true,
     "refine": false,
     "retro": false,
     "feedback": true
   },
-  "notes": "SDD v2 cycle. v1 planning docs archived to docs/archive/v1/. Scope/PRD/spec phases complete. Sprint 1 complete (PRD foundation: spec-mandated PRD edits + 206 AC-ID backfill + spec.md alphanumeric scrub + open-concerns reconciliation). Sprint 2 planned (docs/sprint-2.md): shared behavior layer foundation — create 4 NEW reference files (right-sizing, pause-resume, sprint-tags, context-management), update 3 existing references (deepening-rounds, context-loading, living-documents), apply v2 additions to sdd-guide/SKILL.md. Build mode: autonomous. All 8 items unmapped (infrastructure work that enables later sprints to satisfy user-visible ACs). Sprint 3 candidate: atomic rename sweep + Bug Fix 1 + new skill stubs."
+  "notes": "SDD v2 cycle. Sprints 1-6 complete. Sprint 6 (2026-05-13): /sdd:plan full v2 implementation — 4 items, sequential, all edits to plugins/sdd/skills/plan/SKILL.md. Added 5 new top-level sections (Prior-Sprint Process Notes, PRD State Check, Sprint-Mode Resolution, Sprint-Item Tag Validation, End-of-Command Handoff), revised Step 5 (Build Mode Choice) to confirm upstream-resolved mode, added one-line gates to Step 7 (validator precondition) and Step 11 (handoff emit). Close-sprint auto-checked 19 PRD ACs (aado-aadv, aadw-aadz, aaea-aaeb, aaec-aaeg). First real dogfood of Sprint 5's /sdd:build wrap-up phase — fired clean, expected behavior. No [FB:] tags on Sprint 6 items, so no v2-verification rows updated. No iteration-candidates surfaced; no story splits; no tech-debt entries. Close-sprint manifest in process-notes-sprint-6.md. Next sprint loop: continue (unchecked ACs remain, Unvetted empty). Sprint 7 candidates: Bug Fix 1, /sdd:polish re-open, /sdd:discovery, Interview Command Behaviors, /sdd:onboard Polish, Multi-Session Resume, Cross-Project Feedback Transfer. Historical-AC backfill gap (Sprints 1-4 shipped pre-Bug-Fix-2) is PRD-hygiene, not sprint work."
 }
