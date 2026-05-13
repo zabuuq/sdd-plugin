@@ -1,6 +1,6 @@
 # Deepening Rounds
 
-**Used by:** `/sdd:scope`, `/sdd:prd`, `/sdd:spec`, `/sdd:sprint`
+**Used by:** `/sdd:discovery`, `/sdd:scope`, `/sdd:prd`, `/sdd:spec`, `/sdd:plan`, `/sdd:refine`
 
 This reference defines the two-phase interview pattern used by planning and sprint-planning commands.
 
@@ -25,7 +25,9 @@ After all mandatory questions have been answered (or covered), transition to the
 If the user chooses to proceed, generate the document. If they want another round, run a deepening round.
 
 **Each deepening round:**
-- Generate 4-5 targeted questions based on everything discussed so far.
+- Compose **5 questions by default**, based on everything discussed so far.
+- A round **may run up to 10 questions** without further explanation. The agent extends from the default 5 to as many as 10 only when the material genuinely warrants it (a thread opened mid-round, an answer surfaced a new ambiguity, etc.).
+- **Past 10 questions, stop.** Before posing the eleventh question in a round, the agent must emit a stated reason and obtain explicit user permission to continue. Example: "We've covered ten questions this round and [specific area] still feels unresolved because [reason]. Want me to keep going, or close the round here?" Do not pose question eleven until the user has said yes.
 - Questions should target:
   - **Edge cases** — scenarios the mandatory answers didn't address.
   - **Ambiguities** — places where the user's intent could be read multiple ways.
@@ -35,6 +37,21 @@ If the user chooses to proceed, generate the document. If they want another roun
 - Push for refinement and polish, not just coverage.
 - Ask these questions one at a time, same rules as Phase 1.
 
-**After each deepening round:** Offer the same choice again. The user can do as many rounds as they want. There is no cap.
+The default of 5 may be shortened (typically to 2-3) when the thinness signal fires on a small project. See `references/right-sizing.md` for the thinness signal and how it adjusts the default. The 10-question cap is unchanged by right-sizing.
+
+**End-of-round recommendation (definite framing).** After each deepening round, the agent does **not** ask a bare open prompt. The agent emits one of two literal recommendations:
+
+> "I think we should do another round, because [reason]."
+
+or
+
+> "I do not think we need another round, because [reason]."
+
+A bare prompt like "want to do another round?" is **not allowed**. The agent must take a position and justify it.
+
+- **When recommending continuation:** a **topic preview is required**. The recommendation must include an explicit list of the topics the proposed next round would cover, so the user can judge whether those topics are worth a round.
+- **When recommending closure:** **reasoning is required**. The agent may list topics a hypothetical next round would have covered, and uses them to justify why those topics do not warrant a round (already covered implicitly, low risk, deferrable to refinement, etc.).
+
+The user always has the final say. They can accept the recommendation, override it (do another round when closure was recommended, or close when continuation was recommended), or redirect the proposed topics.
 
 **Process notes:** Log the number of deepening rounds completed and what each round surfaced. This goes into the appropriate process notes file (see sdd-guide core for which file).

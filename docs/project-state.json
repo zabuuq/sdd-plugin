@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "currentSprint": 1,
+  "currentSprint": 2,
   "buildMode": "autonomous",
   "lastCommand": "/sdd:build",
   "commandExplanationsShown": {
@@ -15,5 +15,5 @@
     "retro": false,
     "feedback": true
   },
-  "notes": "SDD v2 cycle. v1 planning docs archived to docs/archive/v1/. Scope/PRD/spec phases complete. Sprint 1 planned (docs/sprint-1.md): PRD foundation — apply spec-mandated PRD edits (smallProject relocation, profile fields, pattern file name), backfill 4-char alphabetic AC IDs across docs/prd.md, scrub alphanumeric AC-ID slips from docs/spec.md, reconcile open-concerns. Build mode: autonomous. Five open-concerns resolved on sprint-1 close. Sprint 2+ will use [PRD: id1, id2] tagging against backfilled IDs."
+  "notes": "SDD v2 cycle. v1 planning docs archived to docs/archive/v1/. Scope/PRD/spec phases complete. Sprint 1 complete (PRD foundation: spec-mandated PRD edits + 206 AC-ID backfill + spec.md alphanumeric scrub + open-concerns reconciliation). Sprint 2 planned (docs/sprint-2.md): shared behavior layer foundation — create 4 NEW reference files (right-sizing, pause-resume, sprint-tags, context-management), update 3 existing references (deepening-rounds, context-loading, living-documents), apply v2 additions to sdd-guide/SKILL.md. Build mode: autonomous. All 8 items unmapped (infrastructure work that enables later sprints to satisfy user-visible ACs). Sprint 3 candidate: atomic rename sweep + Bug Fix 1 + new skill stubs."
 }

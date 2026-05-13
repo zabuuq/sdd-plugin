@@ -1,6 +1,6 @@
 # Living Documents
 
-**Used by:** `/sdd:refine`, `/sdd:build`, `/sdd:iterate`
+**Used by:** `/sdd:refine`, `/sdd:build`, `/sdd:polish`
 
 This reference defines how the SDD plugin handles updates to project documents after their initial creation.
 
@@ -26,14 +26,24 @@ When new ideas, features, or requirements surface during build or iteration:
 
 ## Update Ordering for `/sdd:refine`
 
-When `/sdd:refine` processes changes, update documents in this order:
+When `/sdd:refine` processes changes, update documents in this order. **Each step is shown to the user and confirmed before proceeding to the next.** Do not batch updates or apply them silently.
 
-1. **`docs/prd.md`** — Update stories, move items from unvetted to approved, or modify existing stories. Show the user exactly what changed and get confirmation before proceeding.
+1. **`docs/prd.md`** — Update stories, move items from unvetted to approved, or modify existing acceptance criteria. AC editing semantics:
+   - **Pure reword (same intent):** the AC's checked/unchecked state survives; confirm with the user that the intent did not shift.
+   - **Semantic change:** un-check the AC. Surface any work already shipped against the old wording as an iteration candidate — log it to the current open sprint's process notes if one exists, otherwise flag it to the user.
+   - **Split or merge:** new ACs get fresh 4-char IDs and start unchecked; old IDs are removed (not recycled). See `references/sprint-tags.md` for AC ID rules.
+   Show the user exactly what changed and get confirmation before proceeding.
 2. **`docs/spec.md`** — Update technical specifications to match the PRD changes. Show the user the changes and get confirmation.
-3. **`AGENTS.md`** — Update agent instructions if the changes affect how work is structured or delegated. Show and confirm.
-4. **`CLAUDE.md`** — Update project conventions if the changes affect coding standards, patterns, or project-wide rules. Show and confirm.
+3. **Open sprint files (if affected)** — when the PRD edit touched an AC referenced in a `[PRD: ...]` tag inside an **open** sprint file, offer to update those refs in lockstep. An open sprint file is one without a `[close-sprint-manifest]` block (see `references/sprint-tags.md` for the parser). **Closed sprint files are never touched.** Show and confirm.
+4. **`AGENTS.md`** — Update agent instructions if the changes affect how work is structured or delegated. Show and confirm.
+5. **`CLAUDE.md`** — Update project conventions if the changes affect coding standards, patterns, or project-wide rules. Show and confirm.
 
-Each update is shown to the user and confirmed before moving to the next document. Do not batch updates or apply them silently.
+## Exclusions from the Living-Documents Chain
+
+The following documents are **never updated by `/sdd:refine`**:
+
+- **`docs/v2-verification.md`** — manual audit trail, not updated by `/refine`.
+- **`docs/backlog.md`** — append-only deferral log written during planning, never edited by `/refine`.
 
 ## Re-Scoping Trigger
 
@@ -47,7 +57,7 @@ When accumulated changes — across multiple `/sdd:refine` cycles or through org
 
 Monitor the PRD for signs of scope creep or unwieldy complexity:
 
-- **10+ epics:** Recommend phase-splitting. The project is likely too large for a single development cycle. Suggest breaking it into distinct phases with clear boundaries, each with its own sprint cycle.
+- **10+ epics:** `/sdd:prd` emits a phase-split recommendation. **This does not block PRD generation** — the user may elect to keep one phase. The recommendation suggests breaking the project into distinct phases with clear boundaries, each with its own sprint cycle.
 - **5+ unvetted items:** Flag scope creep. The rate of new ideas is outpacing the rate of deliberate planning. The user should either run `/sdd:refine` to process the backlog or consciously defer items to a future project.
 
 Surface these warnings during any command that loads the PRD, not just during `/sdd:refine`.
