@@ -24,10 +24,20 @@ None. This is the first command in the SDD workflow.
 Check if `~/.claude/sdd-user-profile.json` exists.
 
 **If it exists (update flow):**
+
 - Read the file and announce: "I found an existing SDD profile."
-- Show the current preferences: communication style, git preference, workflow explanation preference.
-- Ask which preference they'd like to update. The user can update any individual preference without re-answering everything.
-- After updates, write the file back with the updated `updatedAt` timestamp.
+- Surface the user's current preferences from **two sources**, with each preference clearly **labeled by its origin** so the user can tell where it came from:
+
+  1. **From `~/.claude/sdd-user-profile.json`** — display every field present in the file, each tagged as **`originally-onboarded`** (the value was set during an `/sdd:onboard` run). Fields currently in scope: `communicationStyle`, `gitPreference`, `showWorkflowExplanation`, `feedbackLocalPath`, `handoffWarningShown`, `defaultSprintMode`. Skip any field that is absent from the file (don't display a placeholder).
+  2. **From `~/.claude/sdd-cross-project-patterns.md`** — read the file as plain markdown and surface its high-level content (entry titles or one-line summaries — whatever is structurally available). Tag each surfaced item as **`retro-written`** (the pattern was written by `/sdd:retro`, not by onboarding).
+
+  Use the literal label strings `originally-onboarded` and `retro-written` (or display them as "from your onboarding profile" / "from your cross-project retro patterns" — both phrasings are acceptable as long as the origin is unambiguous to the user).
+
+- **Silent missing-file branch:** if `~/.claude/sdd-cross-project-patterns.md` does not exist (the user has never run `/sdd:retro`), **surface only the profile preferences and say nothing about the missing patterns file.** Do not emit a warning, do not emit a "no patterns yet" header, do not mention the file. The absence is invisible to the user.
+- **Read-only on cross-project patterns:** the update flow **never writes** to `~/.claude/sdd-cross-project-patterns.md`. That file is owned by `/sdd:retro`. The update flow only reads it for display, and only ever writes back to `~/.claude/sdd-user-profile.json`.
+- Ask which preference they'd like to update. The user can update any individual preference without re-answering everything. Only profile fields are editable here — cross-project retro patterns are surfaced for context but cannot be edited in this flow.
+- After updates, apply the **seed-only-when-missing rule** from Step 6 (see "No-overwrite rule" there) for `handoffWarningShown` and `defaultSprintMode`: if either field is already present in the existing profile, preserve its current value; only seed defaults for fields that are missing.
+- Write the file back with the updated `updatedAt` timestamp.
 - Done — skip steps 2-6.
 
 **If it does not exist (full onboarding):**
@@ -86,16 +96,51 @@ Store the answer as `gitPreference` (boolean).
 
 Ask the user (one question, free-form — not multiple choice):
 
-"How do you prefer your AI collaborator to communicate? Here are some styles to consider — pick one or describe your own:
+"How do you prefer your AI collaborator to communicate? Describe it in your own words — this is your preference and it'll be applied across all SDD commands."
 
-- **Terse and direct** — minimal words, no fluff, just the essential information
-- **Conversational and collaborative** — thinks out loud together, more back-and-forth
-- **Pushes back hard** — challenges assumptions aggressively, plays devil's advocate
-- **Patient and thorough** — detailed explanations, takes time to walk through reasoning
-
-Or describe something else entirely — this is your preference and it'll be applied across all SDD commands."
+If the user asks for examples or seems unsure, you may offer a few suggestions conversationally (e.g. terse and direct, conversational and collaborative, pushes back hard, patient and thorough), but don't lead with them — the question itself stays open.
 
 Store the answer as `communicationStyle` (string — their exact words or chosen style).
+
+### Step 5a: `/sdd:feedback` Beat
+
+Output the following as plain text. This is NOT a question — do not wait for acknowledgment. Just output it and continue to step 5b.
+
+---
+
+**About `/sdd:feedback`**
+
+`/sdd:feedback` captures a feedback note along with the surrounding context — what command you were in, what was happening — and returns immediately. It does not advance the SDD chain or interrupt whatever you were doing.
+
+Use it anytime, independent of the chain, when something the plugin does feels off, surprising, or could be better. Don't save it for the end of a sprint — flag it the moment you notice it.
+
+Notes are appended to the current project's `docs/sdd-feedback.md`. If you set `feedbackLocalPath` (next question), a copy is also forwarded to `<feedbackLocalPath>/docs/sdd-feedback.md` so you can collect feedback from across every project that uses the plugin in one central place.
+
+---
+
+### Step 5b: Feedback Local Path
+
+Ask the user (one question):
+
+"Do you want `/sdd:feedback` to forward a copy of every feedback note to a separate project — typically a personal plugin-development project where you collect feedback from across all the projects you use SDD in? If so, give me the absolute path to that project's root. Leave the answer blank to skip — `/sdd:feedback` will still write to the current project's `docs/sdd-feedback.md`."
+
+Write logic:
+
+- If the answer is a non-empty path, store it as `feedbackLocalPath` (string) in the profile.
+- If the answer is empty, whitespace-only, or the user explicitly skips, omit the `feedbackLocalPath` field from the profile entirely (writing `null` is semantically equivalent per spec — either is acceptable).
+- **Do not re-ask within the same run.** A skip here is final for this onboarding pass. The user can re-run `/sdd:onboard` later to set it.
+
+### Step 5c: Plugin Update Mechanics
+
+Output the following as plain text. This is NOT a question — do not wait for acknowledgment. Just output it and continue to step 6.
+
+---
+
+**About plugin updates**
+
+In Claude Code, third-party plugin auto-update is off by default, so SDD will not pull new versions on its own unless that setting is changed. Auto-update behavior can be toggled via `/plugin` → Marketplaces. Separately, `/reload-plugins` refreshes loaded plugins from disk — handy after an out-of-band install or a local edit to a plugin source.
+
+---
 
 ### Step 6: Write User Profile
 
@@ -108,15 +153,42 @@ Write `~/.claude/sdd-user-profile.json` with the following schema:
   "updatedAt": "<current ISO-8601 timestamp>",
   "communicationStyle": "<user's chosen style>",
   "gitPreference": <true or false>,
-  "showWorkflowExplanation": <true or false>
+  "showWorkflowExplanation": <true or false>,
+  "feedbackLocalPath": "<absolute path or null>",
+  "handoffWarningShown": false,
+  "defaultSprintMode": null
 }
 ```
 
-Confirm to the user that their profile has been saved and tell them to run `/sdd:discovery` to start their first project.
+**Seed values for new v2 fields:**
+
+- `handoffWarningShown`: write the literal value `false` on profile creation. This flag is flipped to `true` later by the first interview command that emits a handoff warning to the user.
+- `defaultSprintMode`: write the literal value `null` on profile creation. (Omitting the field entirely is semantically equivalent to `null` per spec — either is acceptable.) This field can later be set to a user-chosen sprint mode by `/sdd:plan`.
+
+**No-overwrite rule (seed-only-when-missing):**
+
+When the profile **already exists** (the update flow from Step 1), do **not** overwrite `handoffWarningShown` or `defaultSprintMode` if they are already present in the file with any value. Seed defaults **only when the field is missing**.
+
+Concretely:
+
+- If `handoffWarningShown: true` has been written by a downstream command (e.g., the first interview that emitted a handoff), **leave it as `true`**. Do not reset it to `false`.
+- If `defaultSprintMode` has been set to a value by `/sdd:plan` (e.g., `"step-by-step"` or `"autonomous"`), **leave that value in place**. Do not reset it to `null`.
+- Only when a field is absent from the existing profile JSON does `/sdd:onboard` write the default (`false` or `null` respectively).
+
+This rule applies to both newly-created profiles (where all fields are absent and therefore all defaults are seeded) and to updates of existing profiles (where any already-present value wins over the default).
+
+The same no-overwrite rule does **not** apply to `communicationStyle`, `gitPreference`, `showWorkflowExplanation`, or `feedbackLocalPath` — those are the editable preferences the user explicitly chose to update in the update flow, and the update flow writes the user's new chosen value as normal.
+
+Confirm to the user that their profile has been saved at `~/.claude/sdd-user-profile.json` and mention that re-running `/sdd:onboard` at any time will update that same profile file.
+
+Then close with a heads-up that names `/sdd:discovery` as the recommended next command to start their first project, and flags that `/sdd:discovery` is an interview — not a single-prompt command — so they should expect a back-and-forth interview flow rather than a one-shot question.
 
 ## Important Reminders
 
-- Follow one-question-at-a-time from sdd-guide. Steps 3, 4, and 5 are each separate questions — ask one, wait for the answer, then ask the next.
-- The workflow explanation in step 2 is output text, not a question. Don't pause for acknowledgment.
-- For the update flow, show current values and let the user pick which to change.
+- Follow one-question-at-a-time from sdd-guide. Steps 3, 4, 5, and 5b are each separate questions — ask one, wait for the answer, then ask the next.
+- The workflow explanation in step 2, the `/sdd:feedback` beat in step 5a, and the plugin update mechanics beat in step 5c are output text, not questions. Don't pause for acknowledgment on any of them.
+- For the update flow, surface current values from **both** `~/.claude/sdd-user-profile.json` (labeled `originally-onboarded`) and `~/.claude/sdd-cross-project-patterns.md` (labeled `retro-written`), then let the user pick which profile field to change. Cross-project patterns are read-only here — `/sdd:retro` owns that file.
+- If `~/.claude/sdd-cross-project-patterns.md` does not exist, **stay silent about it** — surface only the profile preferences. No warning, no empty section, no mention.
+- For `handoffWarningShown` and `defaultSprintMode`, follow the **seed-only-when-missing** rule: write the default (`false` / `null`) only when the field is absent. Never overwrite an existing value — downstream commands (`/sdd:plan`, the first handoff-emitting interview) own those fields after the seed.
 - Accept any free-form answer for communication style — the examples are suggestions, not constraints.
+- If the user skips the `feedbackLocalPath` question in step 5b, omit the field (or write `null`) and do not re-ask in the same onboarding run.

@@ -11,9 +11,9 @@ v2 is a streamlining pass driven by that real-use feedback — refinement of wha
 ### Bug Fixes
 
 - As a plugin user, I want consecutive `/sdd:feedback` notes to retain the real preceding-command context, so batched feedback accurately attributes each note to the work I was actually doing.
-  - [ ] `aaaa` `/sdd:feedback`'s startup sequence contains no step that writes to `lastCommand` in `docs/project-state.json`.
-  - [ ] `aaab` The "After command" field in each feedback note is sourced from the value of `lastCommand` at the moment `/sdd:feedback` is invoked.
-  - [ ] `aaac` When `/sdd:feedback` runs N times consecutively with no other SDD command invoked between runs, every resulting note's "After command" field equals the value of `lastCommand` that was present before the first `/sdd:feedback` invocation.
+  - [x] `aaaa` `/sdd:feedback`'s startup sequence contains no step that writes to `lastCommand` in `docs/project-state.json`.
+  - [x] `aaab` The "After command" field in each feedback note is sourced from the value of `lastCommand` at the moment `/sdd:feedback` is invoked.
+  - [x] `aaac` When `/sdd:feedback` runs N times consecutively with no other SDD command invoked between runs, every resulting note's "After command" field equals the value of `lastCommand` that was present before the first `/sdd:feedback` invocation.
 
 - As a plugin user, I want completed sprint items to automatically check off their matching PRD acceptance criteria, so my PRD reflects actual project state without manual drift between sprint files and the PRD.
   - [x] `aaad` When `/sdd:build`'s wrap-up phase confirms a sprint item is fully complete and no story-split is required, it checks off every PRD acceptance criterion that sprint item references in `docs/prd.md`.
@@ -137,38 +137,38 @@ v2 is a streamlining pass driven by that real-use feedback — refinement of wha
 ### /sdd:onboard Polish
 
 - As a plugin user filling out my communication style during onboarding, I want a single open-ended prompt and no example menu, so my answer reflects how I actually want the agent to speak with me rather than the nearest option in a list.
-  - [ ] `aacw` `/sdd:onboard`'s communication-style question is delivered as a single open-ended prompt with no bulleted examples in the question text.
-  - [ ] `aacx` `/sdd:onboard` writes the user's free-form answer directly into the `communicationStyle` field of `~/.claude/sdd-user-profile.json`.
+  - [x] `aacw` `/sdd:onboard`'s communication-style question is delivered as a single open-ended prompt with no bulleted examples in the question text.
+  - [x] `aacx` `/sdd:onboard` writes the user's free-form answer directly into the `communicationStyle` field of `~/.claude/sdd-user-profile.json`.
 
 - As a new SDD user, I want `/sdd:onboard` to tell me where my preferences live and how to change them, so I know how to update them without re-onboarding from scratch.
-  - [ ] `aacy` `/sdd:onboard` outputs the literal path `~/.claude/sdd-user-profile.json` at least once during its run.
-  - [ ] `aacz` `/sdd:onboard` outputs a sentence stating that re-running `/sdd:onboard` updates the same profile file.
+  - [x] `aacy` `/sdd:onboard` outputs the literal path `~/.claude/sdd-user-profile.json` at least once during its run.
+  - [x] `aacz` `/sdd:onboard` outputs a sentence stating that re-running `/sdd:onboard` updates the same profile file.
 
 - As a new SDD user, I want `/sdd:onboard` to cover `/sdd:feedback` before ending, so I know how to log feedback during a project without hunting for instructions later.
-  - [ ] `aada` `/sdd:onboard` includes a dedicated `/sdd:feedback` beat before the command ends.
-  - [ ] `aadb` The beat covers what `/sdd:feedback` does, when to use it, and where notes go (the current project's `docs/sdd-feedback.md` plus optional forwarding via `feedbackLocalPath`).
+  - [x] `aada` `/sdd:onboard` includes a dedicated `/sdd:feedback` beat before the command ends.
+  - [x] `aadb` The beat covers what `/sdd:feedback` does, when to use it, and where notes go (the current project's `docs/sdd-feedback.md` plus optional forwarding via `feedbackLocalPath`).
 
 - As a new SDD user, I want an optional `feedbackLocalPath` question that I can skip without friction, so I'm not forced to commit to a path I don't have or want yet.
-  - [ ] `aadc` `/sdd:onboard` poses a single question for `feedbackLocalPath`.
-  - [ ] `aadd` The question text explains what `feedbackLocalPath` is for.
-  - [ ] `aade` When the user provides a non-empty answer, `/sdd:onboard` writes that value to the `feedbackLocalPath` field of `~/.claude/sdd-user-profile.json`.
-  - [ ] `aadf` When the user provides an empty answer or skips the question, `/sdd:onboard` omits the `feedbackLocalPath` field from the profile or writes `null` to it, and does not re-ask within the same run.
+  - [x] `aadc` `/sdd:onboard` poses a single question for `feedbackLocalPath`.
+  - [x] `aadd` The question text explains what `feedbackLocalPath` is for.
+  - [x] `aade` When the user provides a non-empty answer, `/sdd:onboard` writes that value to the `feedbackLocalPath` field of `~/.claude/sdd-user-profile.json`.
+  - [x] `aadf` When the user provides an empty answer or skips the question, `/sdd:onboard` omits the `feedbackLocalPath` field from the profile or writes `null` to it, and does not re-ask within the same run.
 
 - As a new SDD user, I want `/sdd:onboard` to explain third-party plugin auto-update mechanics, so I know how plugin updates work without being pushed to flip a setting.
-  - [ ] `aadg` `/sdd:onboard` outputs a paragraph covering: third-party plugin update defaults in Claude Code, how to toggle auto-update via `/plugin` → Marketplaces, and what `/reload-plugins` does.
-  - [ ] `aadh` The paragraph contains no recommendation language regarding whether to enable auto-update (e.g., no "you should" phrasing about turning auto-update on or off).
+  - [x] `aadg` `/sdd:onboard` outputs a paragraph covering: third-party plugin update defaults in Claude Code, how to toggle auto-update via `/plugin` → Marketplaces, and what `/reload-plugins` does.
+  - [x] `aadh` The paragraph contains no recommendation language regarding whether to enable auto-update (e.g., no "you should" phrasing about turning auto-update on or off).
 
 - As a new SDD user finishing onboarding, I want a heads-up that `/sdd:discovery` is an interview rather than a one-shot prompt, so I know what to expect when I run it.
-  - [ ] `aadi` `/sdd:onboard` ends with a message that names `/sdd:discovery` as the recommended next command.
-  - [ ] `aadj` The message states that `/sdd:discovery` is an interview, not a single-prompt command.
+  - [x] `aadi` `/sdd:onboard` ends with a message that names `/sdd:discovery` as the recommended next command.
+  - [x] `aadj` The message states that `/sdd:discovery` is an interview, not a single-prompt command.
 
 - As a plugin user re-running `/sdd:onboard`, I want to see both my original onboarding preferences and any cross-project preferences `/sdd:retro` has written, so I have a complete view of what's currently set.
-  - [ ] `aadk` When `/sdd:onboard` runs and `~/.claude/sdd-user-profile.json` already exists, it surfaces both originally-onboard-set preferences and `/sdd:retro`-written cross-project preferences.
-  - [ ] `aadl` The on-screen display labels each preference with its source (originally-onboarded vs. retro-written).
+  - [x] `aadk` When `/sdd:onboard` runs and `~/.claude/sdd-user-profile.json` already exists, it surfaces both originally-onboard-set preferences and `/sdd:retro`-written cross-project preferences.
+  - [x] `aadl` The on-screen display labels each preference with its source (originally-onboarded vs. retro-written).
 
 - As a plugin user, I want `/sdd:onboard` to seed the new v2 profile fields, so downstream commands have the slots they expect.
-  - [ ] `aadm` `/sdd:onboard` writes `handoffWarningShown: false` to `~/.claude/sdd-user-profile.json` when creating or updating the profile.
-  - [ ] `aadn` `/sdd:onboard` writes `defaultSprintMode: null` to `~/.claude/sdd-user-profile.json` when creating or updating the profile (or omits the field with semantic equivalence to `null`).
+  - [x] `aadm` `/sdd:onboard` writes `handoffWarningShown: false` to `~/.claude/sdd-user-profile.json` when creating or updating the profile.
+  - [x] `aadn` `/sdd:onboard` writes `defaultSprintMode: null` to `~/.claude/sdd-user-profile.json` when creating or updating the profile (or omits the field with semantic equivalence to `null`).
 
 ### Sprint Loop
 
@@ -242,23 +242,23 @@ v2 is a streamlining pass driven by that real-use feedback — refinement of wha
 *Convention used by this epic: `feedbackLocalPath` is the **root directory of the local plugin clone**, not the full path to the feedback file. The command appends `/docs/sdd-feedback.md` to it.*
 
 - As a plugin user, I want `/sdd:feedback` to write each note both locally and to my plugin clone (if configured), so feedback gathered while working on real projects reaches the plugin's feedback pile.
-  - [ ] `aaff` `/sdd:feedback` writes each feedback note to the current project's `docs/sdd-feedback.md` file.
-  - [ ] `aafg` When `feedbackLocalPath` is set in `~/.claude/sdd-user-profile.json`, `/sdd:feedback` also writes the note to `<feedbackLocalPath>/docs/sdd-feedback.md`.
-  - [ ] `aafh` Both writes use identical note formatting.
-  - [ ] `aafi` When `feedbackLocalPath` is unset or `null`, `/sdd:feedback` writes only to the current project's `docs/sdd-feedback.md` and emits no warning or prompt.
+  - [x] `aaff` `/sdd:feedback` writes each feedback note to the current project's `docs/sdd-feedback.md` file.
+  - [x] `aafg` When `feedbackLocalPath` is set in `~/.claude/sdd-user-profile.json`, `/sdd:feedback` also writes the note to `<feedbackLocalPath>/docs/sdd-feedback.md`.
+  - [x] `aafh` Both writes use identical note formatting.
+  - [x] `aafi` When `feedbackLocalPath` is unset or `null`, `/sdd:feedback` writes only to the current project's `docs/sdd-feedback.md` and emits no warning or prompt.
 
 - As a plugin user working inside my plugin clone, I want `/sdd:feedback` to avoid double-writing the same note, so the feedback pile stays clean.
-  - [ ] `aafj` `/sdd:feedback` compares the current working directory to the configured `feedbackLocalPath` value.
-  - [ ] `aafk` When the current working directory equals `feedbackLocalPath` or is a descendant of it, `/sdd:feedback` performs only the local write — no additional write to `<feedbackLocalPath>/docs/sdd-feedback.md`.
-  - [ ] `aafl` When the current working directory is neither equal to nor a descendant of `feedbackLocalPath`, `/sdd:feedback` performs both the local write and the forwarding write.
-  - [ ] `aafm` Path normalization details (case sensitivity by OS, trailing slashes, symlinks) are deferred to `/sdd:spec`.
+  - [x] `aafj` `/sdd:feedback` compares the current working directory to the configured `feedbackLocalPath` value.
+  - [x] `aafk` When the current working directory equals `feedbackLocalPath` or is a descendant of it, `/sdd:feedback` performs only the local write — no additional write to `<feedbackLocalPath>/docs/sdd-feedback.md`.
+  - [x] `aafl` When the current working directory is neither equal to nor a descendant of `feedbackLocalPath`, `/sdd:feedback` performs both the local write and the forwarding write.
+  - [x] `aafm` Path normalization details (case sensitivity by OS, trailing slashes, symlinks) are deferred to `/sdd:spec`.
 
 - As a plugin user with a misconfigured `feedbackLocalPath`, I want `/sdd:feedback` to never lose my note and to warn me once per session, so I can fix the path without my feedback evaporating.
-  - [ ] `aafn` When `feedbackLocalPath` is set but invalid (path does not exist, write fails, or equivalent), `/sdd:feedback` completes the local write to the current project's `docs/sdd-feedback.md`.
-  - [ ] `aafo` On any forwarding-write failure, `/sdd:feedback` emits a single warning containing the failure reason and the instruction "Run `/sdd:onboard` to update."
-  - [ ] `aafp` `/sdd:feedback` does not retry the forwarding write within the same invocation.
-  - [ ] `aafq` `/sdd:feedback` does not exit with an error status when the forwarding write fails — the command completes after the local write.
-  - [ ] `aafr` When subsequent `/sdd:feedback` invocations within the same session encounter the same forwarding-write failure, no additional warning is emitted.
+  - [x] `aafn` When `feedbackLocalPath` is set but invalid (path does not exist, write fails, or equivalent), `/sdd:feedback` completes the local write to the current project's `docs/sdd-feedback.md`.
+  - [x] `aafo` On any forwarding-write failure, `/sdd:feedback` emits a single warning containing the failure reason and the instruction "Run `/sdd:onboard` to update."
+  - [x] `aafp` `/sdd:feedback` does not retry the forwarding write within the same invocation.
+  - [x] `aafq` `/sdd:feedback` does not exit with an error status when the forwarding write fails — the command completes after the local write.
+  - [x] `aafr` When subsequent `/sdd:feedback` invocations within the same session encounter the same forwarding-write failure, no additional warning is emitted.
 
 ### Automatic Backlog Generation
 

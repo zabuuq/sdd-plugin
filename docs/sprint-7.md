@@ -32,16 +32,16 @@
      - Names the literal path `~/.claude/sdd-user-profile.json` at least once during the command's run.
      - States that re-running `/sdd:onboard` updates the same profile file (so the user knows the update flow exists and how to use it).
 - **Acceptance criteria:**
-  - [ ] `aacw` `/sdd:onboard`'s communication-style question is delivered as a single open-ended prompt with no bulleted examples in the question text.
-  - [ ] `aacx` `/sdd:onboard` writes the user's free-form answer directly into the `communicationStyle` field of `~/.claude/sdd-user-profile.json`.
-  - [ ] `aacy` `/sdd:onboard` outputs the literal path `~/.claude/sdd-user-profile.json` at least once during its run.
-  - [ ] `aacz` `/sdd:onboard` outputs a sentence stating that re-running `/sdd:onboard` updates the same profile file.
+  - [x] `aacw` `/sdd:onboard`'s communication-style question is delivered as a single open-ended prompt with no bulleted examples in the question text.
+  - [x] `aacx` `/sdd:onboard` writes the user's free-form answer directly into the `communicationStyle` field of `~/.claude/sdd-user-profile.json`.
+  - [x] `aacy` `/sdd:onboard` outputs the literal path `~/.claude/sdd-user-profile.json` at least once during its run.
+  - [x] `aacz` `/sdd:onboard` outputs a sentence stating that re-running `/sdd:onboard` updates the same profile file.
 - **Verification:**
   - Read the updated SKILL.md and confirm Step 5's question text contains no bulleted-list characters inside the prompt body (a top-line bare prompt only; examples removed from inside the quoted question).
   - Confirm the literal path `~/.claude/sdd-user-profile.json` appears in the SKILL.md as agent-emitted output (not just in code-fenced schema examples).
   - Confirm a "re-running `/sdd:onboard` updates the same profile" sentence appears in the SKILL.md as agent-emitted output.
   - Confirm the `communicationStyle` write target is unchanged (it's already the right field).
-- **Status:** [ ] Not started
+- **Status:** [x] Complete
 
 ---
 
@@ -64,19 +64,19 @@
        - Empty answer or skip → omit the `feedbackLocalPath` field from the profile (or write `null` — semantically equivalent). Do NOT re-ask within the same run.
      - One-question-at-a-time per sdd-guide: this is a separate question from communication style, git preference, etc.
 - **Acceptance criteria:**
-  - [ ] `aada` `/sdd:onboard` includes a dedicated `/sdd:feedback` beat before the command ends.
-  - [ ] `aadb` The beat covers what `/sdd:feedback` does, when to use it, and where notes go (the current project's `docs/sdd-feedback.md` plus optional forwarding via `feedbackLocalPath`).
-  - [ ] `aadc` `/sdd:onboard` poses a single question for `feedbackLocalPath`.
-  - [ ] `aadd` The question text explains what `feedbackLocalPath` is for.
-  - [ ] `aade` When the user provides a non-empty answer, `/sdd:onboard` writes that value to the `feedbackLocalPath` field of `~/.claude/sdd-user-profile.json`.
-  - [ ] `aadf` When the user provides an empty answer or skips the question, `/sdd:onboard` omits the `feedbackLocalPath` field from the profile or writes `null` to it, and does not re-ask within the same run.
+  - [x] `aada` `/sdd:onboard` includes a dedicated `/sdd:feedback` beat before the command ends.
+  - [x] `aadb` The beat covers what `/sdd:feedback` does, when to use it, and where notes go (the current project's `docs/sdd-feedback.md` plus optional forwarding via `feedbackLocalPath`).
+  - [x] `aadc` `/sdd:onboard` poses a single question for `feedbackLocalPath`.
+  - [x] `aadd` The question text explains what `feedbackLocalPath` is for.
+  - [x] `aade` When the user provides a non-empty answer, `/sdd:onboard` writes that value to the `feedbackLocalPath` field of `~/.claude/sdd-user-profile.json`.
+  - [x] `aadf` When the user provides an empty answer or skips the question, `/sdd:onboard` omits the `feedbackLocalPath` field from the profile or writes `null` to it, and does not re-ask within the same run.
 - **Verification:**
   - Read the updated SKILL.md and confirm the `/sdd:feedback` beat appears as plain output text (no question prompt embedded).
   - Confirm the beat covers all three required topics (what / when / where).
   - Confirm `feedbackLocalPath` is asked as a single question with explanatory text, not bundled with another question.
   - Confirm the SKILL.md describes both write branches (non-empty → write value; empty/skip → omit or null), and explicitly forbids re-asking in the same run.
   - Confirm the profile schema example in the SKILL.md (Step 6 / Write User Profile) includes the `feedbackLocalPath` field with appropriate placeholder.
-- **Status:** [ ] Not started
+- **Status:** [x] Complete
 
 ---
 
@@ -98,16 +98,16 @@
        - States that `/sdd:discovery` is an interview, not a single-prompt command — so the user knows to expect an interview flow when they run it.
      - This wording is separate from the standard end-of-command handoff (which `/sdd:onboard` emits per sdd-guide's `## End-of-Command Handoff` template). The heads-up is the substantive content of the handoff's outcome-summary line.
 - **Acceptance criteria:**
-  - [ ] `aadg` `/sdd:onboard` outputs a paragraph covering: third-party plugin update defaults in Claude Code, how to toggle auto-update via `/plugin` → Marketplaces, and what `/reload-plugins` does.
-  - [ ] `aadh` The paragraph contains no recommendation language regarding whether to enable auto-update (e.g., no "you should" phrasing about turning auto-update on or off).
-  - [ ] `aadi` `/sdd:onboard` ends with a message that names `/sdd:discovery` as the recommended next command.
-  - [ ] `aadj` The message states that `/sdd:discovery` is an interview, not a single-prompt command.
+  - [x] `aadg` `/sdd:onboard` outputs a paragraph covering: third-party plugin update defaults in Claude Code, how to toggle auto-update via `/plugin` → Marketplaces, and what `/reload-plugins` does.
+  - [x] `aadh` The paragraph contains no recommendation language regarding whether to enable auto-update (e.g., no "you should" phrasing about turning auto-update on or off).
+  - [x] `aadi` `/sdd:onboard` ends with a message that names `/sdd:discovery` as the recommended next command.
+  - [x] `aadj` The message states that `/sdd:discovery` is an interview, not a single-prompt command.
 - **Verification:**
   - Read the updated SKILL.md and confirm the auto-update paragraph covers all three required topics.
   - Confirm the paragraph contains no "you should," "we recommend," "best practice," or equivalent steering language about whether to enable auto-update.
   - Confirm the closing message names `/sdd:discovery` explicitly.
   - Confirm the closing message describes `/sdd:discovery` as an interview (not a single-prompt command).
-- **Status:** [ ] Not started
+- **Status:** [x] Complete
 
 ---
 
@@ -129,10 +129,10 @@
      - Update the profile schema example in the SKILL.md to include both fields.
      - When the profile already exists and the field is present, do not overwrite (e.g., if `handoffWarningShown: true` has been flipped by a downstream command, leave it). Only write when the field is missing.
 - **Acceptance criteria:**
-  - [ ] `aadk` When `/sdd:onboard` runs and `~/.claude/sdd-user-profile.json` already exists, it surfaces both originally-onboard-set preferences and `/sdd:retro`-written cross-project preferences.
-  - [ ] `aadl` The on-screen display labels each preference with its source (originally-onboarded vs. retro-written).
-  - [ ] `aadm` `/sdd:onboard` writes `handoffWarningShown: false` to `~/.claude/sdd-user-profile.json` when creating or updating the profile.
-  - [ ] `aadn` `/sdd:onboard` writes `defaultSprintMode: null` to `~/.claude/sdd-user-profile.json` when creating or updating the profile (or omits the field with semantic equivalence to `null`).
+  - [x] `aadk` When `/sdd:onboard` runs and `~/.claude/sdd-user-profile.json` already exists, it surfaces both originally-onboard-set preferences and `/sdd:retro`-written cross-project preferences.
+  - [x] `aadl` The on-screen display labels each preference with its source (originally-onboarded vs. retro-written).
+  - [x] `aadm` `/sdd:onboard` writes `handoffWarningShown: false` to `~/.claude/sdd-user-profile.json` when creating or updating the profile.
+  - [x] `aadn` `/sdd:onboard` writes `defaultSprintMode: null` to `~/.claude/sdd-user-profile.json` when creating or updating the profile (or omits the field with semantic equivalence to `null`).
 - **Verification:**
   - Read the updated SKILL.md and confirm Step 1's update-flow logic reads from both the profile JSON and the cross-project-patterns markdown.
   - Confirm the SKILL.md describes the source-label display ("originally-onboarded" vs. "retro-written") explicitly.
@@ -140,7 +140,7 @@
   - Confirm Step 6's write step covers both `handoffWarningShown: false` and `defaultSprintMode: null` (or omits the latter with documented semantic equivalence).
   - Confirm the schema example block in the SKILL.md includes both new fields.
   - Confirm the no-overwrite rule is documented: when the profile already has a value (e.g., `handoffWarningShown: true`), the field is preserved, not reset.
-- **Status:** [ ] Not started
+- **Status:** [x] Complete
 
 ---
 

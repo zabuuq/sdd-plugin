@@ -1,8 +1,8 @@
 {
   "version": 1,
-  "currentSprint": 7,
+  "currentSprint": 8,
   "buildMode": "autonomous",
-  "lastCommand": "/sdd:sprint",
+  "lastCommand": "/sdd:build",
   "commandExplanationsShown": {
     "scope": true,
     "prd": true,
@@ -17,5 +17,5 @@
     "retro": false,
     "feedback": true
   },
-  "notes": "SDD v2 cycle. Sprints 1-6 complete; Sprint 7 planned (2026-05-13) via cached v1 /sdd:sprint (v2 /sdd:plan source exists but plugin cache reinstall pending). Sprint 7 theme: /sdd:onboard Polish full v2 implementation — 4 items, sequential, all edits to plugins/sdd/skills/onboard/SKILL.md. Items: (1) Comm-style open prompt + profile path + re-run sentence [PRD: aacw-aacz, 4 ACs], (2) /sdd:feedback beat + feedbackLocalPath question [PRD: aada-aadf, 6 ACs], (3) Auto-update paragraph + /sdd:discovery heads-up [PRD: aadg-aadj, 4 ACs], (4) Profile re-surface + new-field seeding [PRD: aadk-aadn, 4 ACs]. 18 ACs total. Build mode: autonomous (defaulted via no-clarifying-questions directive, matching Sprints 5-6). No [FB:] tags on Sprint 7 items. Sprint 5's /sdd:build wrap-up fires on Sprint 7 close — expected to auto-check 18 PRD ACs. After Sprint 7: Bug Fix 1, /sdd:polish re-open, Interview Command Behaviors (largest, 24 ACs cross-cutting), /sdd:discovery, Multi-Session Resume, Cross-Project Feedback Transfer, Automatic Backlog Generation, Process Notes Growth, v1-v2 Migration verification, /sdd:retro project-close still remaining. Historical-AC backfill gap (Sprints 1-4 shipped pre-Bug-Fix-2) is PRD-hygiene, not sprint work."
+  "notes": "SDD v2 cycle. Sprints 1-8 complete (Sprint 8 closed 2026-05-13 with 16 PRD ACs checked: aaaa-aaac, aaff-aafr). /sdd:feedback v2 feature-complete: dual-write infrastructure, inside-clone detection with 7-step path normalization, single-warn-per-session failure handling. First sprint with [FB:] tags — docs/v2-verification.md rows FB-001 (sprint 8, item 1), FB-030 (sprint 8, item 2), FB-031 (sprint 8, item 3), FB-032 (sprint 8, item 4) shipped (Verified column stays manual). New mechanics ship to disk but are not live as slash commands until plugin cache reinstall — same caveat as Sprints 5/6/7. First /sdd:plan v2 dogfood still pending reinstall. Recommended Sprint 9: Interview Command Behaviors + Context Management (aabh-aacv, ~34 ACs, biggest cross-cutting payoff, unblocks /sdd:discovery per aaaj). Alternatives: /sdd:polish re-open mechanism (aaev-aaex, 3 ACs); Multi-Session Resume (aaar-aabg, 17 ACs, two new commands /sdd:pause + /sdd:unpause); Automatic Backlog Generation (aafs-aagd, 9 ACs cross-cutting); Process Notes Growth (aage-aagn, 10 ACs cross-cutting); v1-v2 Migration (aago-aahi, 13 ACs, MIGRATION-v1-to-v2.md); v2 Release Verification (~11 ACs remaining); /sdd:retro project-close. Historical-AC backfill gap (Sprints 1-4 work shipped pre-Bug-Fix-2) remains for ACs beyond aaaa-aaac — Item 1 closed the Bug Fix 1 subset; the rest remains maintainer PRD-hygiene. Sprint 7 FB-tag gap (Sprint 7 items map to FB-017 through FB-023 but were planned without [FB:] tags) is a candidate for /sdd:polish re-open or PRD-hygiene maintenance."
 }

@@ -24,7 +24,7 @@ The `Shipped (sprint/item)` column is auto-written by `/sdd:build` wrap-up when 
 
 | ID | Source | Summary | Shipped (sprint/item) | Verified | Notes |
 |----|--------|---------|-----------------------|----------|-------|
-| FB-001 | Event Planning App | `/sdd:feedback` never updates `lastCommand` (back-to-back feedback bug) | | `[ ]` | |
+| FB-001 | Event Planning App | `/sdd:feedback` never updates `lastCommand` (back-to-back feedback bug) | sprint 8, item 1 | `[ ]` | |
 | FB-002 | fiver-gigs | PRD state-tracking checks off non-split sprint items at `/sdd:build` wrap-up | | `[ ]` | |
 | FB-003 | sdd-plugin self-use | New `/sdd:prd` command owns `docs/prd.md` (non-tech + tech requirements) | | `[ ]` | |
 | FB-004 | sdd-plugin self-use | New `/sdd:pause` distills in-flight command into `<command>-resume.md` (dogfooded schema, distill-not-dump) | | `[ ]` | |
@@ -53,9 +53,9 @@ The `Shipped (sprint/item)` column is auto-written by `/sdd:build` wrap-up when 
 | FB-027 | sdd-plugin self-use | `/sdd:retro` fires only at project close (when all PRD criteria checked); no longer recommended per-sprint | | `[ ]` | |
 | FB-028 | sdd-plugin self-use | `/sdd:retro` cross-project-patterns step writes preferences to `~/.claude/sdd-user-profile.json` for future `/sdd:onboard` to read | | `[ ]` | |
 | FB-029 | sdd-plugin self-use | New `feedbackLocalPath` field in `~/.claude/sdd-user-profile.json`, collected during `/sdd:onboard` (skip-friendly) | | `[ ]` | |
-| FB-030 | sdd-plugin self-use | `/sdd:feedback` writes locally AND forwards to `<feedbackLocalPath>/docs/sdd-feedback.md` when set | | `[ ]` | |
-| FB-031 | sdd-plugin self-use | `/sdd:feedback` inside-clone detection: cwd == `feedbackLocalPath` (or descendant) → local write IS the forward, no double-write | | `[ ]` | |
-| FB-032 | sdd-plugin self-use | `/sdd:feedback` failure handling: invalid path → save locally, warn once per session, never lose note, no retry | | `[ ]` | |
+| FB-030 | sdd-plugin self-use | `/sdd:feedback` writes locally AND forwards to `<feedbackLocalPath>/docs/sdd-feedback.md` when set | sprint 8, item 2 | `[ ]` | |
+| FB-031 | sdd-plugin self-use | `/sdd:feedback` inside-clone detection: cwd == `feedbackLocalPath` (or descendant) → local write IS the forward, no double-write | sprint 8, item 3 | `[ ]` | |
+| FB-032 | sdd-plugin self-use | `/sdd:feedback` failure handling: invalid path → save locally, warn once per session, never lose note, no retry | sprint 8, item 4 | `[ ]` | |
 | FB-033 | sdd-plugin self-use | All four planning commands (`/sdd:discovery`, `/sdd:scope`, `/sdd:prd`, `/sdd:spec`) and `/sdd:plan` write to `docs/backlog.md` on user-confirmed deferral | | `[ ]` | |
 | FB-034 | sdd-plugin self-use | Rejected-idea drops live in process notes only (no second tracker) | | `[ ]` | |
 | FB-035 | sdd-plugin self-use | Backlog entry schema: Title / What / Why deferred / Trigger to revisit / Dependencies / Source | | `[ ]` | |

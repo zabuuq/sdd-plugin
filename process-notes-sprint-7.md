@@ -116,3 +116,80 @@ None of these rise to "Open concern" status — each has a documented resolution
 | Deepening rounds | None | Pre-vetted ACs, fully specified `/sdd:onboard` in spec, structurally well-understood; no exploratory thread |
 | `[FB: ...]` tagging on Sprint 7 items | None | `/sdd:onboard` mechanics are sdd-plugin-internal architecture, not surfaced feedback items in v2-verification.md |
 | User input | Single AskUserQuestion checkpoint (4 options including 3 alternatives) | Per the "no clarifying questions" directive; user accepted recommended option; can still redirect by editing sprint-7.md before build |
+
+## Build Session — 2026-05-13
+
+### Context
+
+Sprint 7 build kicked off immediately after planning, same calendar day. Autonomous mode locked. Cached `/sdd:build` is still v1, but the v2 wrap-up behavior shipped in Sprint 5 is the documented intent for close-sprint — so the build orchestrator followed v2 wrap-up semantics (PRD AC checkoff on close, close-sprint manifest in this file, no `[FB:]` rows since no FB tags on items) rather than the cached v1's lighter Step 4 summary. Same dogfooding-state caveat as Sprint 6's wrap-up: the v2 source is what's authoritative, the cache is what's invoked.
+
+All four items dispatched sequentially to general-purpose subagents per autonomous-mode protocol. Each subagent received the full item description, the relevant spec subsection (`spec.md > Command Skills > /sdd:onboard`), the PRD epic, and AGENTS.md / CLAUDE.md conventions including the explicit no-auto-commit rule.
+
+### Per-item execution
+
+**Item 1 — Communication-style open prompt + profile path + re-run sentence** (4 ACs: `aacw`–`aacz`)
+
+Subagent rewrote Step 5's question to a single open-ended prompt with no bulleted menu inside the question body. Added line 91 permitting conversational examples on user request — preserves the suggestion knowledge without violating `aacw`. Modified Step 6's confirmation line (line 110) to emit the literal path `~/.claude/sdd-user-profile.json` and the re-running-updates-the-same-profile sentence. `communicationStyle` write target untouched.
+
+Notable: the subagent flagged the "conversational examples on request" line as a small extension beyond the literal sprint description, with rationale ("preserves the original suggestion knowledge without violating the bulleted-examples ban"). Kept as-is — it's a reasonable clarification of the agent's runtime behavior and doesn't bake examples into the question body.
+
+**Item 2 — `/sdd:feedback` beat + `feedbackLocalPath` question** (6 ACs: `aada`–`aadf`)
+
+Subagent chose Step 5a / Step 5b labeling (avoided renumbering Step 6 because Item 4 also touches Step 6). New Step 5a delivers the `/sdd:feedback` beat as plain output text, mirroring Step 2's "NOT a question — do not wait for acknowledgment" convention. Body covers all three required topics (what/when/where) including the forwarding-via-`feedbackLocalPath` mention. New Step 5b asks the `feedbackLocalPath` question with explicit skip-friendly phrasing and a triple-branch write logic (non-empty → write, empty/whitespace/skip → omit, no re-ask same run). Schema example in Step 6 gained `"feedbackLocalPath": "<absolute path or null>"`.
+
+Notable: the choice to use 5a/5b sublabels rather than renumber to Steps 6 and 7 was the right call — Item 4's Step 6 edits land cleanly with Step 6 still being Step 6.
+
+**Item 3 — Plugin auto-update paragraph + `/sdd:discovery` heads-up** (4 ACs: `aadg`–`aadj`)
+
+Subagent added Step 5c with a single factual paragraph: "third-party plugin auto-update is off by default" + "toggle via `/plugin` → Marketplaces" + "`/reload-plugins` refreshes loaded plugins from disk." Subagent ran a grep across the paragraph for steering vocabulary (should/recommend/best practice/might want/consider turning) — zero hits, satisfying `aadh`. Split Step 6's closing into two sentences: profile-saved confirmation + a closing heads-up that names `/sdd:discovery` explicitly and flags it as "an interview — not a single-prompt command."
+
+Notable: the only `recommend*` match in the file is line 153 referring to `/sdd:discovery` as the "recommended next command" — which satisfies `aadi` and does not concern auto-update.
+
+**Item 4 — Profile re-surface + new-field seeding** (4 ACs: `aadk`–`aadn`)
+
+Subagent rewrote Step 1's update-flow logic. Now reads both `~/.claude/sdd-user-profile.json` (fields tagged `originally-onboarded`) and `~/.claude/sdd-cross-project-patterns.md` (entries tagged `retro-written`). Missing-file branch for the patterns file is explicitly silent — no warning, no empty section, no mention. Step 6 schema gained `handoffWarningShown: false` and `defaultSprintMode: null`. Added a "Seed values for new v2 fields" subsection and a "No-overwrite rule (seed-only-when-missing)" subsection with concrete examples (`handoffWarningShown: true` from a downstream command must survive; a user-set `defaultSprintMode` must survive). Subagent also added an explicit carve-out that the no-overwrite rule does NOT apply to the editable preferences — flagged this as a small extension beyond the sprint description but defensible as disambiguation.
+
+Notable: the carve-out is welcome — without it a future agent could mis-apply the seed rule to the editable preferences and ignore the user's update.
+
+### Outcome
+
+All 18 ACs (`aacw`–`aadn`) closed and checked off in `docs/prd.md` per Bug Fix 2's PRD-state-tracking behavior. `plugins/sdd/skills/onboard/SKILL.md` grew from 123 lines (pre-Sprint-7) to 195 lines, reorganized to:
+
+```
+Step 1   Check for Existing Profile (now dual-source: profile JSON + cross-project-patterns)
+Step 2   Workflow Explanation (plain text — unchanged)
+Step 3   Workflow Explanation Preference (question — unchanged)
+Step 4   Git Preference (question — unchanged)
+Step 5   Communication Style (now single open-ended prompt; reminder line added)
+Step 5a  /sdd:feedback Beat (NEW — plain text)
+Step 5b  Feedback Local Path (NEW — question, skip-friendly)
+Step 5c  Plugin Update Mechanics (NEW — plain text, no steering)
+Step 6   Write User Profile (schema now has feedbackLocalPath, handoffWarningShown, defaultSprintMode; no-overwrite rule documented; closing heads-up names /sdd:discovery as an interview)
+         Important Reminders block (expanded — covers new beats and seed rule)
+```
+
+### Anything notable
+
+- **Dogfooding-state caveat persists.** The cached marketplace plugin is still v1, so this updated `/sdd:onboard` SKILL.md is dormant on disk until the maintainer reinstalls. The first real dogfood of Sprint 7's work happens at next reinstall + next `/sdd:onboard` run.
+- **Sprint 6's `/sdd:plan` v2 source already references `defaultSprintMode` and `handoffWarningShown`.** Until the reinstall, the cached `/sdd:sprint` v1 doesn't read either field, so the seeded fields sit in the profile without consumers in this session. Post-reinstall, the chain becomes coherent: `/sdd:onboard` seeds → `/sdd:plan` reads/writes `defaultSprintMode`; the first interview command flips `handoffWarningShown`.
+- **No iteration candidates were observed or recorded** during the build. Each item's spec was fully grounded in the existing `docs/spec.md > Command Skills > /sdd:onboard` and the four items had no design ambiguity that surfaced mid-build. Subagents flagged two small extensions beyond literal sprint descriptions (Item 1's "conversational examples on request" line and Item 4's editable-preferences carve-out); both were defensible disambiguations and kept.
+- **No tech-debt entries.** No surprises. No deviations that warrant a `[iteration-candidate]` marker.
+- **No `[FB:]` row updates** because Sprint 7 carried no `[FB: ...]` tags — `/sdd:onboard` Polish ACs are sdd-plugin-internal architecture, not entries on the triaged v2 feedback list. `docs/v2-verification.md` untouched.
+
+### Close-sprint manifest
+
+[close-sprint-manifest] timestamp: 2026-05-13
+- PRD ACs checked: aacw, aacx, aacy, aacz, aada, aadb, aadc, aadd, aade, aadf, aadg, aadh, aadi, aadj, aadk, aadl, aadm, aadn
+- Story splits: none
+- Iteration candidate dispositions: none (no candidates surfaced)
+- Tech-debt entries: 0
+- v2-verification rows updated: none (no `[FB:]` tags on Sprint 7 items)
+[/close-sprint-manifest]
+
+### Next-command recommendation
+
+PRD state after Sprint 7 close: ~58 ACs checked of 206 total. Unvetted section empty. Project is not at close — many epics still untouched (Bug Fix 1, /sdd:discovery, Interview Command Behaviors cross-cutting, Multi-Session Resume, Cross-Project Feedback Transfer, /sdd:polish re-open, Automatic Backlog Generation, Process Notes Growth, v1→v2 Migration, /sdd:retro at Project Close, plus the remaining v2 Release Verification ACs).
+
+Recommended next: run `/sdd:plan` to plan Sprint 8. Strong candidates remain (a) Bug Fix 1 (small, 3 ACs, latent bug fix in `/sdd:feedback`); (b) Interview Command Behaviors cross-cutting (large, 24 ACs, biggest payoff — unblocks `/sdd:discovery` per AC `aaaj`); (c) `/sdd:polish` re-open mechanism (small, 3 ACs); (d) Cross-Project Feedback Transfer (medium, 11 ACs — now seeded by Sprint 7's `feedbackLocalPath` write). Bug Fix 1 + `/sdd:polish` re-open could combine into a "small fixes" sprint. Interview Command Behaviors deserves its own large sprint. The maintainer chooses at the next `/sdd:plan` run.
+
+**Caveat:** the next `/sdd:plan` invocation still hits the cached v1 `/sdd:sprint` unless the plugin is reinstalled first. Reinstall would turn the next planning run into the first dogfood of Sprint 6's `/sdd:plan` v2 work — a meaningful verification event.
