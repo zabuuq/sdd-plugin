@@ -1,8 +1,8 @@
 {
   "version": 1,
-  "currentSprint": 6,
+  "currentSprint": 7,
   "buildMode": "autonomous",
-  "lastCommand": "/sdd:build",
+  "lastCommand": "/sdd:sprint",
   "commandExplanationsShown": {
     "scope": true,
     "prd": true,
@@ -17,5 +17,5 @@
     "retro": false,
     "feedback": true
   },
-  "notes": "SDD v2 cycle. Sprints 1-6 complete. Sprint 6 (2026-05-13): /sdd:plan full v2 implementation — 4 items, sequential, all edits to plugins/sdd/skills/plan/SKILL.md. Added 5 new top-level sections (Prior-Sprint Process Notes, PRD State Check, Sprint-Mode Resolution, Sprint-Item Tag Validation, End-of-Command Handoff), revised Step 5 (Build Mode Choice) to confirm upstream-resolved mode, added one-line gates to Step 7 (validator precondition) and Step 11 (handoff emit). Close-sprint auto-checked 19 PRD ACs (aado-aadv, aadw-aadz, aaea-aaeb, aaec-aaeg). First real dogfood of Sprint 5's /sdd:build wrap-up phase — fired clean, expected behavior. No [FB:] tags on Sprint 6 items, so no v2-verification rows updated. No iteration-candidates surfaced; no story splits; no tech-debt entries. Close-sprint manifest in process-notes-sprint-6.md. Next sprint loop: continue (unchecked ACs remain, Unvetted empty). Sprint 7 candidates: Bug Fix 1, /sdd:polish re-open, /sdd:discovery, Interview Command Behaviors, /sdd:onboard Polish, Multi-Session Resume, Cross-Project Feedback Transfer. Historical-AC backfill gap (Sprints 1-4 shipped pre-Bug-Fix-2) is PRD-hygiene, not sprint work."
+  "notes": "SDD v2 cycle. Sprints 1-6 complete; Sprint 7 planned (2026-05-13) via cached v1 /sdd:sprint (v2 /sdd:plan source exists but plugin cache reinstall pending). Sprint 7 theme: /sdd:onboard Polish full v2 implementation — 4 items, sequential, all edits to plugins/sdd/skills/onboard/SKILL.md. Items: (1) Comm-style open prompt + profile path + re-run sentence [PRD: aacw-aacz, 4 ACs], (2) /sdd:feedback beat + feedbackLocalPath question [PRD: aada-aadf, 6 ACs], (3) Auto-update paragraph + /sdd:discovery heads-up [PRD: aadg-aadj, 4 ACs], (4) Profile re-surface + new-field seeding [PRD: aadk-aadn, 4 ACs]. 18 ACs total. Build mode: autonomous (defaulted via no-clarifying-questions directive, matching Sprints 5-6). No [FB:] tags on Sprint 7 items. Sprint 5's /sdd:build wrap-up fires on Sprint 7 close — expected to auto-check 18 PRD ACs. After Sprint 7: Bug Fix 1, /sdd:polish re-open, Interview Command Behaviors (largest, 24 ACs cross-cutting), /sdd:discovery, Multi-Session Resume, Cross-Project Feedback Transfer, Automatic Backlog Generation, Process Notes Growth, v1-v2 Migration verification, /sdd:retro project-close still remaining. Historical-AC backfill gap (Sprints 1-4 shipped pre-Bug-Fix-2) is PRD-hygiene, not sprint work."
 }
