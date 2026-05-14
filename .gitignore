@@ -1,0 +1,36 @@
+# Claude Code local state — permissions, project-local settings, credentials.
+# If you later want to share specific files (e.g., team-wide .claude/settings.json
+# or .claude/commands/), negate them: `!.claude/settings.json`.
+.claude/
+
+# OS metadata
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor and IDE local state
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.bak
+
+# Environment files and credentials — defensive even for a markdown-only plugin.
+# Public repo + installable plugin: an accidental commit here is hard to revoke.
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+credentials.json
+secrets.json
+id_rsa
+id_rsa.pub
+id_ed25519
+id_ed25519.pub
+
+# Logs and temp files
+*.log
+*.tmp

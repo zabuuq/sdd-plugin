@@ -18,6 +18,8 @@ Read `skills/sdd-guide/SKILL.md` and follow all rules defined there (tone, inter
 
 Read `skills/sdd-guide/references/living-documents.md`. This defines the protocol for updating living documents during refinement, including the update ordering that this command must follow. The `/sdd:refine` command is the primary mechanism for making deliberate changes to project documents — unlike other commands, it does not default to resisting changes. It is the gatekeeper that makes changes legitimate.
 
+Read `skills/sdd-guide/references/context-management.md`. Refine does not run formal deepening rounds, but it works through unvetted items one-at-a-time with natural transition points between items (and between document updates inside Step 6). At those transitions, the agent may emit the three-tier between-rounds context recommendation (continue / `/compact` / `/clear`) when warranted — this is discretionary for refine, not round-by-round mandatory. Use the reference's triggers and signals to judge whether a recommendation is appropriate at a given transition.
+
 ### 3. Read user profile
 
 Read `~/.claude/sdd-user-profile.json`.
@@ -72,6 +74,12 @@ Before doing any other work:
 
 1. Set `lastCommand` to `"/sdd:refine"` in `docs/project-state.json`.
 2. Read and process `docs/open-concerns.md` per sdd-guide open concerns protocol.
+
+## Read `smallProject` (startup)
+
+After the `lastCommand` state update, read the top-level `smallProject` value from `docs/project-state.json`. If the key is absent or `null`, treat it as "no judgment yet" — standard cadence applies. See `skills/sdd-guide/references/right-sizing.md > ## The smallProject field` for what the value means and how it shapes downstream behavior.
+
+Per `skills/sdd-guide/references/right-sizing.md > ## The smallProject field > Authoring lifecycle`, `/sdd:refine` **may re-write `smallProject` if observed signals contradict the current value** — this is permissive, not mandated. The right-sizing reference's authoring lifecycle does not require `/sdd:refine` to re-evaluate; it only requires `/sdd:prd`, `/sdd:spec`, and `/sdd:plan` to do so. If during refinement the items surfaced make the current judgment plainly wrong (e.g., refinement reveals a previously-hidden third-party integration on a `smallProject: true` project, or trims a `false` project down to one focused feature), the agent may write the new value to `docs/project-state.json` and append a one-line entry to `process-notes-sprint-N.md` noting the flip direction and rationale. Confirm = no-op. Bias toward humility — when in doubt, leave the value alone and proceed with standard cadence.
 
 ## First-Run Explanation
 
@@ -216,14 +224,42 @@ Capture:
 - PRD health check results if any thresholds were triggered.
 - Concerns raised, resolved, or deferred.
 
-### Step 11: Wrap Up
+### Step 11: Delete docs/refine-resume.md
+
+After the Step 6 document-update cycle completes — whichever of `docs/prd.md`, `docs/spec.md`, `AGENTS.md`, or `CLAUDE.md` were updated have all been written and confirmed — delete `docs/refine-resume.md` if it exists. The single resume file applies to `/sdd:refine` regardless of which documents the refinement cycle touched. A missing file is not an error — continue silently. Per `skills/sdd-guide/references/pause-resume.md > ## Cleanup`, the resumed command owns this deletion; `/sdd:pause` is the only writer.
+
+### Step 12: Wrap Up
 
 Tell the user:
 
 1. Which items were refined and moved from unvetted to vetted.
 2. Which documents were updated (and which were not).
 3. How many unvetted items remain (if any).
-4. The recommended next command — typically `/sdd:sprint` if vetted items are ready, or `/sdd:refine` again if unvetted items remain.
+
+Then emit the handoff per `## End-of-Command Handoff` below.
+
+## End-of-Command Handoff
+
+Runs as the final step after `## Step 12: Wrap Up` (process notes, open concerns, document updates, PRD health check, and the resume-file cleanup have all completed).
+
+Emit the handoff per the canonical template in `skills/sdd-guide/SKILL.md > ## End-of-Command Handoff`. That template defines the two-line standard form, the first-handoff explanation paragraph (prepended exactly once per user), and the `handoffWarningShown` tracking convention in `~/.claude/sdd-user-profile.json`. Do not restate that mechanism here.
+
+### Next-command target
+
+The `[next-command]` slot is determined by PRD state at the point the handoff fires:
+
+- **Unvetted items remain in `docs/prd.md`:** `[next-command]` is `/sdd:refine`. Another refinement pass is warranted before sprint planning.
+- **Unvetted section is empty (all refined items now vetted, no items left unrefined):** `[next-command]` is `/sdd:plan`. The PRD is ready for the sprint loop.
+
+Read `docs/prd.md`'s Unvetted/Proposed section as the final action before emitting the handoff to determine which target to name. The recommendation is definite — name one command, not a choice — based on actual PRD state, not user preference.
+
+### Outcome-summary line
+
+Use a one-line outcome summary in the form `Refinement complete. N items refined.` Substitute the actual count. If unvetted items remain, extend with a clause noting the remainder (e.g., `Refinement complete. 3 items refined. 2 unvetted remaining.`). Keep the shape declarative and single-line.
+
+### Unconditional emission
+
+The handoff fires unconditionally at completion, including when the user stops refinement early with unvetted items remaining. No context-weight heuristic, spec-impact signal, or PRD health-check outcome causes it to be skipped.
 
 ## Important Reminders
 
@@ -235,4 +271,4 @@ Tell the user:
 - **PRD health thresholds are fixed.** 10+ epics triggers a phase-splitting recommendation. 5+ unvetted items triggers a scope creep flag. Do not adjust these thresholds.
 - **First-run explanation only on the very first `/sdd:refine` in the project.** Check `commandExplanationsShown.refine` — do not show it on subsequent runs.
 - **The user can stop at any time.** Refinement is per-item. If the user wants to stop after refining one item, let them. Do not pressure them to refine all unvetted items in a single session.
-- **Refine is the gatekeeper for document changes.** Unlike `/sdd:build` or `/sdd:iterate`, this command is authorized to make deliberate changes to the PRD, spec, AGENTS.md, and CLAUDE.md. But every change still requires user confirmation.
+- **Refine is the gatekeeper for document changes.** Unlike `/sdd:build` or `/sdd:polish`, this command is authorized to make deliberate changes to the PRD, spec, AGENTS.md, and CLAUDE.md. But every change still requires user confirmation.

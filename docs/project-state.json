@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "currentSprint": 18,
+  "buildMode": "autonomous",
+  "lastCommand": "/sdd:build",
+  "commandExplanationsShown": {
+    "scope": true,
+    "prd": true,
+    "spec": true,
+    "sprint": true,
+    "plan": true,
+    "build": true,
+    "iterate": true,
+    "polish": false,
+    "reflect": true,
+    "refine": false,
+    "retro": false,
+    "feedback": true
+  },
+  "notes": "SDD v2 cycle. Sprints 1-17 complete; Sprint 18 planned 2026-05-14 (autonomous, sequential, 4 items, 21 ACs aago-aahi — v1→v2 Migration epic closeout). Item 1: author plugins/sdd/MIGRATION-v1-to-v2.md narrative sections (13 ACs aago/aagp/aagq/aagv/aagw/aagx/aagy/aagz/aaha/aahc/aahd/aahe/aahi) — opening framing, rename pairs, resume-file renames, scope-narrowing, legacy process-notes handling + optional split, archive-untouched statement, pause/unpause + feedbackLocalPath + discovery-is-new sections, no-alias statement. Item 2: state-aware migration table with locked 5-column schema (v1 lastCommand | Stay on mid-flight | Next v2 after completion | One-time action | Notes) per Round 1 Q1; mid-reflect/post-reflect get separate rows per aagt with content locked in Round 1 Q2 (4 ACs aagr/aags/aagt/aagu). Item 3: verify-and-check archive index note already on disk satisfying aahb (1 AC). Item 4: v1 command name sweep across locked scope per Round 1 Q4 (included: plugins/sdd/skills/, plugin README, manifest JSON, docs/discovery/scope/prd/spec/v2-verification/backlog/open-concerns, AGENTS.md, repo CLAUDE.md, sdd-feedback.md; excluded: docs/archive/v1/ + MIGRATION-v1-to-v2.md + sprint-N.md + process-notes-*.md), with migration-context exception heuristic per Round 1 Q5 (historical/comparative prose + quoted feedback + backlog v1-origin notes legitimate; live behavioral instructions stale) (3 ACs aahf/aahg/aahh). Closes v1→v2 Migration epic in full; post-sprint projection: zero unchecked ACs across entire v2 PRD — all 5 v2 epics close, v2 feature-complete pending release mechanics (version bumps, tag, marketplace cutover — out of sprint loop). No [FB: ...] tags this sprint (v1→v2 Migration is GA-eve meta-infrastructure, not v1-feedback-derived). Unvetted section empty. Open concern still targets /sdd:refine. Cached marketplace caveat: Sprint 18 edits don't change live agent behavior until plugin reinstall — migration guide is written for users landing on v2 post-reinstall. PRD checkoff watch carried forward."
+}

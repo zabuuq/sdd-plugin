@@ -105,3 +105,10 @@
 <!-- Unresolved technical questions that surfaced during spec writing. -->
 <!-- These feed back into docs/open-concerns.md. -->
 <!-- Format: bullet list with brief description and which phase should resolve it. -->
+<!-- Open Issues is NOT a deferred-items section — entries here are in-spec unresolved questions for the spec author's attention, not items punted to the backlog. The conditional backlog pointer below is the deferred-items hook for this template. -->
+
+## Out of Scope
+
+<!-- Conditional pointer block. Emitted only when docs/backlog.md exists and contains at least one entry (per skills/sdd-guide/references/backlog.md > Parser note). When emitted, the section body is exactly the single line below, verbatim. When the backlog is absent or empty, omit the entire section heading and body — do not leave an empty section behind. Do not inline-list deferred items here; the backlog is the single source of truth. -->
+
+Deferred items: see `docs/backlog.md`.
