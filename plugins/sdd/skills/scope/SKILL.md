@@ -18,6 +18,8 @@ Read `skills/sdd-guide/SKILL.md` and follow all rules defined there (tone, inter
 
 Read `skills/sdd-guide/references/deepening-rounds.md`. This defines the two-phase interview pattern used later in this command.
 
+Read `skills/sdd-guide/references/context-management.md`. This defines the three-tier between-rounds context recommendation (continue / `/compact` / `/clear`) emitted alongside the end-of-round content recommendation.
+
 ### 3. Read user profile
 
 Read `~/.claude/sdd-user-profile.json`.
@@ -162,15 +164,11 @@ Signs a project is too large:
 
 ## Interview — Phase 2: Deepening Rounds
 
-Follow the deepening rounds protocol defined in `skills/sdd-guide/references/deepening-rounds.md`.
+Follow the deepening rounds protocol defined in `skills/sdd-guide/references/deepening-rounds.md` — including the Phase 1 → Phase 2 transition, the per-round question count (5 default, up to 10 with explicit reason+permission past the cap), and the structured end-of-round content recommendation (continue-with-topic-preview or close-with-reasoning). Do not emit a bare transition prompt; the reference defines the recommendation wording.
 
-Transition prompt after mandatory questions are covered:
+After the end-of-round content recommendation fires, emit the three-tier between-rounds context recommendation per `skills/sdd-guide/references/context-management.md`. Order is fixed: content recommendation first, then context recommendation, in the same end-of-round message group. The two are separate and independent.
 
-> I've got enough to generate your scope document. Want another round to sharpen things, or ready to proceed?
-
-If the user wants another round, generate 4-5 targeted questions based on everything discussed so far. Focus on edge cases, ambiguities, thin areas, hidden assumptions, and unexplored angles. Ask them one at a time.
-
-After each deepening round, offer the same choice again. There is no cap on rounds.
+Deepening questions for scope should target edge cases, ambiguities, thin areas, hidden assumptions, and unexplored angles. Ask them one at a time per the reference.
 
 Log the number of deepening rounds completed and what each round surfaced in process notes.
 
@@ -226,6 +224,22 @@ Set `lastCommand` to `"scope"` in `docs/project-state.json` (if not already set 
 
 ### Next step
 
-Tell the user the next command in the chain:
+Emit the handoff per `## End-of-Command Handoff` below.
 
-> Scope is locked. When you're ready, run `/sdd:prd` to turn this into a product requirements document.
+## End-of-Command Handoff
+
+Runs as the final step after `## Wrap-Up` (process notes, state update, and any scope/backlog writes have completed).
+
+Emit the handoff per the canonical template in `skills/sdd-guide/SKILL.md > ## End-of-Command Handoff`. That template defines the two-line standard form, the first-handoff explanation paragraph (prepended exactly once per user), and the `handoffWarningShown` tracking convention in `~/.claude/sdd-user-profile.json`. Do not restate that mechanism here.
+
+### Next-command target
+
+The `[next-command]` slot in the template is always `/sdd:prd` for `/sdd:scope`.
+
+### Outcome-summary line
+
+Use a one-line outcome summary in the form `Scope locked.` Substitute project-specific phrasing only if it preserves the one-line, declarative shape (e.g., `Scope locked. Project split into two phases.` when the size assessment forced a split).
+
+### Unconditional emission
+
+The handoff fires unconditionally at completion. No context-weight heuristic, deepening-rounds outcome, or seed-file presence causes it to be skipped.

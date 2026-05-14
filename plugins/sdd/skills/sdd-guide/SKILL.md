@@ -24,6 +24,8 @@ The user's communication style preference is authoritative. On startup, read `~/
 
 4. **Clarifying questions never advance the interview.** When the user responds to an interview question with a clarifying question of their own (e.g., "what do you mean by X?", "can you give an example?"), answer only the clarification. Do not treat your own answer or recommendation as if it were the user's response. Do not record an answer to the open question. Do not move the interview pointer forward. The interview advances only after the user provides an explicit answer to the question that was actually asked. This rule applies to every interview command.
 
+5. **Active prompting at the end of every beat and every topic.** At the end of each Phase 1 beat and at the end of each deepening-round topic, the agent emits an explicit invitation for additional user input before advancing. Suggested phrasings: "anything else on this?", "did I miss anything?", "anything else you'd add before we move on?", or any equivalent open-ended prompt — the phrasings are illustrative, not enumerated. Do **not** advance to the next beat or topic before the user has had an opportunity to respond to the invitation: emit the invitation, then wait for a user message. The user may respond with substantive content (the agent then processes that input as part of the current beat or topic — it is not deferred to a later beat) or with an explicit "no, move on" (the agent then advances the pointer). This rule applies to every interview command and covers both Phase 1 (mandatory questions, per `references/deepening-rounds.md`) and Phase 2 (deepening rounds).
+
 ## Guard Rails
 
 Every command checks its prerequisites before doing any real work. If prerequisites are not met, name the command the user should run instead and stop. Do not attempt to recover, improvise, or partially execute.
@@ -105,6 +107,14 @@ Interview commands that offer optional deepening rounds (additional question pas
 **Definite end-of-round recommendation with topic preview.** At the end of every deepening round, the agent makes a clear recommendation — never a blank prompt like "want another round?". Phrased as either "I think we should do another round, because [reason; list of topics another round would cover]" or "I do not think we need another round, because [reason; topics a next round would have covered]." The user always knows what is on the table before deciding.
 
 See `references/deepening-rounds.md` for full detail — the mechanism, the literal recommendation wording, and the permission-prompt template for going past the hard cap.
+
+## Between-Rounds Context Recommendation
+
+After the end-of-round content recommendation above, the agent emits a **second**, separate recommendation choosing one of three context-management tiers: **continue**, **`/compact`**, or **`/clear`**. Order is fixed: content recommendation first, context recommendation second, same message group. The two are independent — the user may want another round and still need a `/compact` between them.
+
+The context recommendation is always definite — a named tier plus the agent's reasoning. Never a bare prompt like "want to compact?". The agent does **not** programmatically invoke `/compact` or `/clear`; both are user-run. The agent recommends; the user executes.
+
+See `references/context-management.md` for full detail — tier definitions, triggers, signals, the tier-mapping rules, failure-mode mitigation, examples, and the `/clear`-branch consolidation with `references/pause-resume.md`.
 
 ## End-of-Command Handoff
 

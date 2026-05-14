@@ -18,11 +18,9 @@ Each command defines a set of mandatory questions — the minimum needed to prod
 
 After all mandatory questions have been answered (or covered), transition to the deepening phase.
 
-**Transition prompt:** Offer the user a clear choice:
+**Transition into Phase 2.** Once Phase 1 has finished, the agent emits the structured end-of-round recommendation (defined below under **End-of-round recommendation**) before running any deepening rounds and before generating the document. The recommendation fires at every round-decision point — including the Phase 1 → Phase 2 transition, even though no deepening round has run yet. A bare prompt ("want another round?" / "ready to proceed?") is **not allowed** at this transition; the agent takes a position with reasoning, exactly as it would at end-of-round.
 
-> "I've got enough to generate your [document name]. Want another round to sharpen things, or ready to proceed?"
-
-If the user chooses to proceed, generate the document. If they want another round, run a deepening round.
+If the user accepts the close-recommendation, the agent generates the document. If the user accepts (or overrides to) the continue-recommendation, the agent runs a deepening round. The user can elect as many rounds as they want — the structured recommendation fires before every one.
 
 **Each deepening round:**
 - Compose **5 questions by default**, based on everything discussed so far.

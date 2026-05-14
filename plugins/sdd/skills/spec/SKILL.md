@@ -10,6 +10,8 @@ Read `skills/sdd-guide/SKILL.md` for shared behavior before executing this comma
 
 Read `skills/sdd-guide/references/deepening-rounds.md` for the two-phase interview pattern used in this command.
 
+Read `skills/sdd-guide/references/context-management.md` for the three-tier between-rounds context recommendation (continue / `/compact` / `/clear`) emitted alongside the end-of-round content recommendation.
+
 ## Loading
 
 - Load: `docs/scope.md`, `docs/prd.md` (read both in full)
@@ -151,13 +153,11 @@ Skip this step for monolithic architectures.
 
 ### Step 12: Deepening Rounds (Phase 2)
 
-Transition to the deepening phase from `deepening-rounds.md`:
+Follow the deepening rounds protocol defined in `skills/sdd-guide/references/deepening-rounds.md` — including the Phase 1 → Phase 2 transition, the per-round question count (5 default, up to 10 with explicit reason+permission past the cap), and the structured end-of-round content recommendation (continue-with-topic-preview or close-with-reasoning). Do not emit a bare transition prompt; the reference defines the recommendation wording.
 
-> "I've got enough to generate your technical specification. Want another round to sharpen things, or ready to proceed?"
+After the end-of-round content recommendation fires, emit the three-tier between-rounds context recommendation per `skills/sdd-guide/references/context-management.md`. Order is fixed: content recommendation first, then context recommendation, in the same end-of-round message group. The two are separate and independent.
 
-If the user wants another round, generate 4-5 targeted questions about edge cases, ambiguities, thin areas, hidden assumptions, and unexplored angles in the architecture. Ask one at a time.
-
-After each round, offer the choice again. No cap on rounds.
+Deepening questions for the spec should target edge cases, ambiguities, thin areas, hidden assumptions, and unexplored angles in the architecture. Ask them one at a time per the reference.
 
 ### Step 13: Generate `docs/spec.md`
 
@@ -227,6 +227,28 @@ Update `docs/open-concerns.md`:
 ### Step 18: Update State
 
 Update `lastCommand` in `docs/project-state.json` to `"/sdd:spec"` (confirming completion). Ensure `commandExplanationsShown.spec` is `true`.
+
+### Step 19: End-of-Command Handoff
+
+Emit the handoff per `## End-of-Command Handoff` below.
+
+## End-of-Command Handoff
+
+Runs as the final step after Step 18 (process notes, open concerns, state update, and any CLAUDE.md / AGENTS.md writes have completed).
+
+Emit the handoff per the canonical template in `skills/sdd-guide/SKILL.md > ## End-of-Command Handoff`. That template defines the two-line standard form, the first-handoff explanation paragraph (prepended exactly once per user), and the `handoffWarningShown` tracking convention in `~/.claude/sdd-user-profile.json`. Do not restate that mechanism here.
+
+### Next-command target
+
+The `[next-command]` slot in the template is always `/sdd:plan` for `/sdd:spec`.
+
+### Outcome-summary line
+
+Use a one-line outcome summary in the form `Spec generated.` Substitute project-specific phrasing only if it preserves the one-line, declarative shape (e.g., `Spec generated. CLAUDE.md and AGENTS.md updated.`).
+
+### Unconditional emission
+
+The handoff fires unconditionally at completion. No context-weight heuristic, deepening-rounds outcome, or multi-service-architecture branch causes it to be skipped.
 
 ## Important Reminders
 

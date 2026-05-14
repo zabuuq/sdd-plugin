@@ -18,6 +18,8 @@ Read `skills/sdd-guide/SKILL.md` and follow all rules defined there (tone, inter
 
 Read `skills/sdd-guide/references/living-documents.md`. This defines the protocol for updating living documents during iteration. Follow its default stance: resist changes to scope, PRD, and spec. New ideas surface through the backlog or unvetted section, not through direct edits.
 
+Read `skills/sdd-guide/references/context-management.md`. Polish does not run formal deepening rounds, but the iteration interview (Step 5) and the end-of-iteration wrap (Step 10) are natural transition points. At those points, the agent may emit the three-tier between-rounds context recommendation (continue / `/compact` / `/clear`) when warranted — this is discretionary for polish, not round-by-round mandatory. Use the reference's triggers and signals to judge whether a recommendation is appropriate at a given transition.
+
 ### 3. Read user profile
 
 Read `~/.claude/sdd-user-profile.json`.
@@ -202,9 +204,28 @@ Tell the user:
 
 1. Iteration N has been appended to `docs/sprint-N.md`.
 2. How many items are in the iteration.
-3. To run `/sdd:build` to execute the iteration items.
+
+Then emit the handoff per `## End-of-Command Handoff` below.
 
 If the user wants to add more iteration work after this, they can run `/sdd:polish` again. Each run produces a new `## Iteration N` section. There is no limit on iteration cycles within a sprint.
+
+## End-of-Command Handoff
+
+Runs as the final step after Step 10 (the iteration checklist has been appended to the sprint file, open concerns have been updated, and process notes have been written).
+
+Emit the handoff per the canonical template in `skills/sdd-guide/SKILL.md > ## End-of-Command Handoff`. That template defines the two-line standard form, the first-handoff explanation paragraph (prepended exactly once per user), and the `handoffWarningShown` tracking convention in `~/.claude/sdd-user-profile.json`. Do not restate that mechanism here.
+
+### Next-command target
+
+The `[next-command]` slot in the template is always `/sdd:build` for `/sdd:polish`. The iteration checklist needs to be executed before any further polish or planning.
+
+### Outcome-summary line
+
+Use a one-line outcome summary in the form `Polish iteration N appended.` Substitute the actual iteration number determined in Step 6 (e.g., `Polish iteration 2 appended. 4 items.`). Keep the shape declarative and single-line.
+
+### Unconditional emission
+
+The handoff fires unconditionally at completion. No context-weight heuristic, backlog-presence signal, or iteration-size threshold causes it to be skipped.
 
 ## Important Reminders
 

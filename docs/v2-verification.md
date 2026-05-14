@@ -30,15 +30,15 @@ The `Shipped (sprint/item)` column is auto-written by `/sdd:build` wrap-up when 
 | FB-004 | sdd-plugin self-use | New `/sdd:pause` distills in-flight command into `<command>-resume.md` (dogfooded schema, distill-not-dump) | | `[ ]` | |
 | FB-005 | sdd-plugin self-use | New `/sdd:unpause` reads `lastCommand`, loads resume file + source SKILL, picks up (no flag/path/name) | | `[ ]` | |
 | FB-006 | sdd-plugin self-use | Pause file cleanup: resumed command deletes its own resume file when underlying work completes | | `[ ]` | |
-| FB-007 | Event Planning App, fiver-gigs | Clarifying questions never advance the interview (hold position, no agent-substituted answers) | | `[ ]` | |
-| FB-008 | fiver-gigs | 5 suggested / 10 hard cap questions per round; past 10 requires explicit user permission | | `[ ]` | |
-| FB-009 | Event Planning App | Definite end-of-round recommendation with reasoning (never a blank "continue?" prompt) | | `[ ]` | |
-| FB-010 | Event Planning App | Deepening-round previews: agent previews topics the next round would cover | | `[ ]` | |
+| FB-007 | Event Planning App, fiver-gigs | Clarifying questions never advance the interview (hold position, no agent-substituted answers) | sprint 9, item 1 | `[ ]` | sdd-guide Interaction Rule #4 (cross-cutting via transitive load) |
+| FB-008 | fiver-gigs | 5 suggested / 10 hard cap questions per round; past 10 requires explicit user permission | sprint 9, item 2 | `[ ]` | deepening-rounds.md Phase 2 (5 default, up to 10 silent, 11+ requires reason + explicit permission) |
+| FB-009 | Event Planning App | Definite end-of-round recommendation with reasoning (never a blank "continue?" prompt) | sprint 9, item 3 | `[ ]` | deepening-rounds.md end-of-round structured form (continue with topic preview / close with reasoning); Phase 2 transition bare prompt removed |
+| FB-010 | Event Planning App | Deepening-round previews: agent previews topics the next round would cover | sprint 9, item 3 | `[ ]` | Same as FB-009 — topic-preview requirement on the continue branch |
 | FB-011 | sdd-plugin self-use | Right-size detection across interview commands with small-project hint propagated downstream | | `[ ]` | |
-| FB-012 | fiver-gigs | Interview commands actively prompt for additional user input during scope work | | `[ ]` | |
+| FB-012 | fiver-gigs | Interview commands actively prompt for additional user input during scope work | sprint 9, item 4 | `[ ]` | sdd-guide Interaction Rule #5 (active prompting at end of every Phase 1 beat and every deepening-round topic) |
 | FB-013 | sdd-plugin self-use | File uploads supported during `/sdd:discovery` (designated location, agent reads as context) | | `[ ]` | |
-| FB-014 | Event Planning App, fiver-gigs | Between-rounds three-tier context model (continue / `/compact` / `/clear`) with definite recommendation + reasoning | | `[ ]` | |
-| FB-015 | sdd-plugin self-use | Between-commands default-`/clear` handoff message (plugin emits, user runs) | | `[ ]` | |
+| FB-014 | Event Planning App, fiver-gigs | Between-rounds three-tier context model (continue / `/compact` / `/clear`) with definite recommendation + reasoning | sprint 9, item 5 | `[ ]` | sdd-guide `## Between-Rounds Context Recommendation` section + load directive in all six interview commands; reference home is `references/context-management.md` |
+| FB-015 | sdd-plugin self-use | Between-commands default-`/clear` handoff message (plugin emits, user runs) | sprint 9, item 6 | `[ ]` | sdd-guide `## End-of-Command Handoff` template (standard form + first-handoff explanation + next-command map + out-of-pattern exceptions); each of the six interview commands has its own `## End-of-Command Handoff` section pointing at the canonical template |
 | FB-016 | sdd-plugin self-use | Recognition heuristic signals for round-length / artifact-vs-conversation coverage / noise ratio | | `[ ]` | |
 | FB-017 | sdd-plugin self-use | `/sdd:onboard` communication-style question is fully open-ended (no bulleted example menu) | | `[ ]` | |
 | FB-018 | sdd-plugin self-use | `/sdd:onboard` surfaces preferences location (`~/.claude/sdd-user-profile.json`) and re-run updates them | | `[ ]` | |

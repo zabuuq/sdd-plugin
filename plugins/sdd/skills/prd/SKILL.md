@@ -10,10 +10,13 @@ Read `skills/sdd-guide/SKILL.md` for shared behavior before executing this comma
 
 Read `skills/sdd-guide/references/deepening-rounds.md` for the two-phase interview pattern used by this command.
 
+Read `skills/sdd-guide/references/context-management.md` for the three-tier between-rounds context recommendation (continue / `/compact` / `/clear`) emitted alongside the end-of-round content recommendation.
+
 ## Loading
 
 - Load: `skills/sdd-guide/SKILL.md` (core behavior)
 - Load: `skills/sdd-guide/references/deepening-rounds.md` (interview pattern)
+- Load: `skills/sdd-guide/references/context-management.md` (between-rounds context recommendation)
 - Load: `docs/scope.md` in full
 
 ## Prerequisites
@@ -72,12 +75,11 @@ Present this as a recommendation, not a gate. The user decides whether to split.
 
 ### Deepening Rounds
 
-After the section-by-section walkthrough is complete, follow the deepening rounds pattern from `skills/sdd-guide/references/deepening-rounds.md`:
+After the section-by-section walkthrough is complete, follow the deepening rounds protocol defined in `skills/sdd-guide/references/deepening-rounds.md` — including the Phase 1 → Phase 2 transition, the per-round question count (5 default, up to 10 with explicit reason+permission past the cap), and the structured end-of-round content recommendation (continue-with-topic-preview or close-with-reasoning). Do not emit a bare transition prompt; the reference defines the recommendation wording.
 
-1. Offer the user a choice: "I've got enough to generate your PRD. Want another round to sharpen things, or ready to proceed?"
-2. If they want another round, generate 4-5 targeted questions covering edge cases, ambiguities, thin areas, hidden assumptions, and unexplored angles.
-3. Ask questions one at a time. After the round, offer the choice again.
-4. Repeat as many times as the user wants.
+After the end-of-round content recommendation fires, emit the three-tier between-rounds context recommendation per `skills/sdd-guide/references/context-management.md`. Order is fixed: content recommendation first, then context recommendation, in the same end-of-round message group. The two are separate and independent.
+
+Deepening questions for the PRD should target edge cases, ambiguities, thin areas, hidden assumptions, and unexplored angles. Ask them one at a time per the reference.
 
 ## Document Generation
 
@@ -118,7 +120,27 @@ Append any new concerns that arose during the PRD conversation to `docs/open-con
 
 Confirm `lastCommand` is set to `/sdd:prd` in `docs/project-state.json`.
 
-Tell the user the PRD has been written and to run `/sdd:spec` when ready.
+### Next step
+
+Emit the handoff per `## End-of-Command Handoff` below.
+
+## End-of-Command Handoff
+
+Runs as the final step after `## Wrap-Up` (process notes appended, open concerns updated, and `lastCommand` confirmed).
+
+Emit the handoff per the canonical template in `skills/sdd-guide/SKILL.md > ## End-of-Command Handoff`. That template defines the two-line standard form, the first-handoff explanation paragraph (prepended exactly once per user), and the `handoffWarningShown` tracking convention in `~/.claude/sdd-user-profile.json`. Do not restate that mechanism here.
+
+### Next-command target
+
+The `[next-command]` slot in the template is always `/sdd:spec` for `/sdd:prd`.
+
+### Outcome-summary line
+
+Use a one-line outcome summary in the form `PRD generated.` Substitute project-specific phrasing only if it preserves the one-line, declarative shape (e.g., `PRD generated. N epics, M stories.`).
+
+### Unconditional emission
+
+The handoff fires unconditionally at completion. No context-weight heuristic, deepening-rounds outcome, or epic-count signal causes it to be skipped.
 
 ## Important Reminders
 
