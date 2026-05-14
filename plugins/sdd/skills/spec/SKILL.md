@@ -12,12 +12,15 @@ Read `skills/sdd-guide/references/deepening-rounds.md` for the two-phase intervi
 
 Read `skills/sdd-guide/references/context-management.md` for the three-tier between-rounds context recommendation (continue / `/compact` / `/clear`) emitted alongside the end-of-round content recommendation.
 
+Read `skills/sdd-guide/references/backlog.md` for the defer-to-backlog vs drop confirmation prompt, the 6-field entry schema, and the bootstrap rule for `docs/backlog.md`.
+
 ## Loading
 
 - Load: `docs/scope.md`, `docs/prd.md` (read both in full)
 - Load: `docs/open-concerns.md` (if it exists)
 - Load: `docs/project-state.json` (if it exists)
 - Load: `~/.claude/sdd-user-profile.json` (for communication style and experience context)
+- Load: `skills/sdd-guide/references/backlog.md` (defer-to-backlog write trigger and entry format)
 
 ## Prerequisites
 
@@ -34,6 +37,19 @@ Do not proceed if prerequisites are not met.
 ### Step 1: Update State
 
 Update `lastCommand` in `docs/project-state.json` to `"/sdd:spec"`. Create the file if it does not exist.
+
+### Step 1a: Read and Re-Evaluate `smallProject`
+
+After the `lastCommand` update, read the top-level `smallProject` value from `docs/project-state.json`. If the key is absent or `null`, treat it as "no judgment yet" — standard cadence applies. See `skills/sdd-guide/references/right-sizing.md > ## The smallProject field` for what the value means and how it shapes downstream behavior.
+
+Then re-evaluate per `skills/sdd-guide/references/right-sizing.md > ## The smallProject field > Authoring lifecycle`. Apply the signals from that reference's `## Signals for the heuristic judgment` section against the material this command has access to at startup (`docs/scope.md` and `docs/prd.md` already loaded, plus `docs/open-concerns.md` if present). Do not restate the signal list or rule of thumb here — the reference is canonical.
+
+Outcomes:
+
+- **Re-evaluation confirms the prior value:** no-op. Do not write `docs/project-state.json`. Do not append to process notes.
+- **Re-evaluation flips the value (`true` → `false` or `false` → `true`):** write the new value to `docs/project-state.json` under the top-level `smallProject` key, and append a one-line entry to `process-notes-spec.md` at the project root noting the flip direction and a brief rationale (which signal or signals tipped the judgment). If `process-notes-spec.md` does not yet exist, create it on this append.
+
+Bias toward humility — when in doubt, leave the value alone and proceed with standard cadence.
 
 ### Step 2: First-Run Explanation
 
@@ -61,6 +77,13 @@ Read `docs/open-concerns.md`. Follow the open concerns protocol from sdd-guide:
 ### Step 4: Tech Preferences Interview (Phase 1 — Mandatory Questions)
 
 This is the mandatory question phase from the deepening rounds pattern. Ask questions one at a time, free-form only. Adapt the depth and vocabulary to the user's experience level (inferred from their profile and prior responses).
+
+**Small-project right-sizing (conditional, governs the Phase 1 mandatory beats in Steps 4–7 and 11).** Consult the `smallProject` value read and re-evaluated at startup (Step 1a above).
+
+- **When `smallProject` is `true`:** the Phase 1 beats designated in `skills/sdd-guide/references/right-sizing.md > ## Skippable Phase 1 beats per command > ### \`/sdd:spec\`` default to skipped. The designated beats may map into any of the mandatory-beat steps below (Steps 4, 5, 7, and 11 in particular). Do not restate the beat list here — the reference is canonical.
+- **When `smallProject` is `false`, `null`, or absent:** run every Phase 1 mandatory beat as normal.
+
+These beats are **skippable, not required-skipped**. If the user explicitly raises a designated topic (e.g., names a security or observability concern) or earlier material leaves a designated beat genuinely open, ask about it anyway. Per the reference, open-concerns capture remains in full regardless of `smallProject`.
 
 **Mandatory topics to cover** (adapt phrasing and order to the conversation flow — skip any topic the user already addressed in scope or PRD):
 
@@ -151,6 +174,10 @@ If the architecture involves multiple services (microservices, separate frontend
 
 Skip this step for monolithic architectures.
 
+### Step 11a: Deferrals
+
+When a topic surfaces during the spec interview that the user explicitly wants to push off — something that doesn't belong in `Open Issues` (which stays in `docs/spec.md` for the spec author's attention) and isn't being folded into any architectural section — route the decision through the defer-to-backlog vs drop prompt defined in `skills/sdd-guide/references/backlog.md > ## Write trigger`. An affirmative defer answer appends an entry to `docs/backlog.md` per the schema in that reference; a drop answer (or any non-affirmative response) writes no entry and records the drop in `process-notes-spec.md` only.
+
 ### Step 12: Deepening Rounds (Phase 2)
 
 Follow the deepening rounds protocol defined in `skills/sdd-guide/references/deepening-rounds.md` — including the Phase 1 → Phase 2 transition, the per-round question count (5 default, up to 10 with explicit reason+permission past the cap), and the structured end-of-round content recommendation (continue-with-topic-preview or close-with-reasoning). Do not emit a bare transition prompt; the reference defines the recommendation wording.
@@ -172,7 +199,8 @@ Generate `docs/spec.md` using the template at `skills/sdd-guide/templates/spec-t
 - The file structure tree must be complete and annotated.
 - Data flow diagrams as ASCII art.
 - Key Technical Decisions table filled in with every significant choice, its rationale, and its tradeoff.
-- Open Issues section populated with any unresolved technical questions.
+- Open Issues section populated with any unresolved technical questions. Open Issues is NOT a deferred-items section — entries here are in-spec unresolved questions for the spec author's attention. Items the user chose to defer rather than carry forward live in `docs/backlog.md`, surfaced via the conditional pointer below.
+- `## Out of Scope` — conditional backlog pointer. Before writing the artifact, check `docs/backlog.md` against the heading-scan rule in `skills/sdd-guide/references/backlog.md > ## Parser note` — if the file exists and has at least one entry by that rule, emit the section heading and the literal line `Deferred items: see \`docs/backlog.md\`.`. Otherwise omit both the heading and the body. Do not inline-list deferred items here; the backlog is the single source of truth. Do not restate the parser rule inline; the reference is canonical.
 
 Present the generated spec to the user for review. Incorporate feedback before finalizing.
 
@@ -208,13 +236,15 @@ Present the generated spec to the user for review. Incorporate feedback before f
 
 ### Step 16: Append to Process Notes
 
-Append to `process-notes.md` in the project root. Capture:
+Append to `process-notes-spec.md` in the project root. Capture:
 
 - Key architectural decisions and the discussion that led to them.
 - Pushback from either side and how it was resolved.
 - Stack choices that were debated and why the final choice won.
 - Number of deepening rounds completed and what each surfaced.
 - Any concerns or doubts that arose during the spec process.
+
+If `process-notes-spec.md` does not yet exist at the project root, create it on the first append.
 
 ### Step 17: Update Open Concerns
 
@@ -228,13 +258,17 @@ Update `docs/open-concerns.md`:
 
 Update `lastCommand` in `docs/project-state.json` to `"/sdd:spec"` (confirming completion). Ensure `commandExplanationsShown.spec` is `true`.
 
-### Step 19: End-of-Command Handoff
+### Step 19: Delete docs/spec-resume.md
+
+After `docs/spec.md` has been written (per Step 13 above), delete `docs/spec-resume.md` if it exists. A missing file is not an error — continue silently. Per `skills/sdd-guide/references/pause-resume.md > ## Cleanup`, the resumed command owns this deletion; `/sdd:pause` is the only writer.
+
+### Step 20: End-of-Command Handoff
 
 Emit the handoff per `## End-of-Command Handoff` below.
 
 ## End-of-Command Handoff
 
-Runs as the final step after Step 18 (process notes, open concerns, state update, and any CLAUDE.md / AGENTS.md writes have completed).
+Runs as the final step after Step 19 (process notes, open concerns, state update, any CLAUDE.md / AGENTS.md writes, and the resume-file cleanup have all completed).
 
 Emit the handoff per the canonical template in `skills/sdd-guide/SKILL.md > ## End-of-Command Handoff`. That template defines the two-line standard form, the first-handoff explanation paragraph (prepended exactly once per user), and the `handoffWarningShown` tracking convention in `~/.claude/sdd-user-profile.json`. Do not restate that mechanism here.
 

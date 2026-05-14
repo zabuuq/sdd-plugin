@@ -31,27 +31,27 @@ Entry format:
 
 ### One-time PRD AC ID backfill for this project
 - **Source:** /sdd:spec — Beat 2 (PRD-AC reference tag syntax).
-- **Resolved by:** /sdd:sprint (sprint-1)
+- **Resolved by:** /sdd:plan (sprint-1)
 - **Resolution:** Sprint-1 Item 4 backfilled unique 4-char lowercase alphabetic IDs (`aaaa` through `aahx`) onto every AC line in `docs/prd.md` — 206 ACs, all conforming to the `[a-z]{4}` pattern, all unique.
 
 ### PRD edit for smallProject detection relocation
 - **Source:** /sdd:spec — Beat 4 (right-size detection).
-- **Resolved by:** /sdd:sprint (sprint-1)
+- **Resolved by:** /sdd:plan (sprint-1)
 - **Resolution:** Sprint-1 Item 1 removed the small-project detection story from the `/sdd:discovery Command` epic and added an equivalent `/sdd:scope`-scoped story under `Interview Command Behaviors` covering Phase 1 detection, authoritative write of `smallProject` to `docs/project-state.json` at end of Phase 1, and signals defined in `references/right-sizing.md`.
 
 ### New profile fields to add to /sdd:onboard schema
 - **Source:** /sdd:spec — Beats 6 and 9 (handoff warning + sprint-mode memory).
-- **Resolved by:** /sdd:sprint (sprint-1)
+- **Resolved by:** /sdd:plan (sprint-1)
 - **Resolution:** Sprint-1 Item 2 added a new story under `/sdd:onboard Polish` enumerating both new profile fields: `handoffWarningShown: false` (seeded by /sdd:onboard) and `defaultSprintMode: null` (or omitted with semantic equivalence).
 
 ### Cross-project pattern file name in PRD
 - **Source:** /sdd:spec — Round 2 Q1.
-- **Resolved by:** /sdd:sprint (sprint-1)
+- **Resolved by:** /sdd:plan (sprint-1)
 - **Resolution:** Sprint-1 Item 3 rewrote the relevant AC under `/sdd:retro at Project Close` to name `~/.claude/sdd-cross-project-patterns.md` explicitly as the destination file, removing the "deferred to /sdd:spec" phrasing.
 
 ### AC-ID notation form
 - **Source:** /sdd:spec — Beat 2 / spec write.
-- **Resolved by:** /sdd:sprint (sprint-1)
+- **Resolved by:** /sdd:plan (sprint-1)
 - **Resolution:** Sprint-1 Item 4 adopted the strict `[a-z]{4}` form across the project: the PRD backfill used sequential alphabetic IDs, and the alphanumeric examples (`a7kp`, `b3mq`, `c1xw`) in `docs/spec.md` were replaced with valid alphabetic examples. The interview-era correction note flagging the slip was also removed since it no longer has surrounding text to correct.
 
 ### Post-sprint command ceremony
@@ -81,17 +81,17 @@ Entry format:
 
 ### /sdd:scope seed file detection
 - **Source:** /sdd:spec — New Issues From Spec.
-- **Resolved by:** /sdd:sprint (sprint-1 planning)
+- **Resolved by:** /sdd:plan (sprint-1 planning)
 - **Resolution:** Convention — look for `docs/seed.md` in the project directory. If found, read it as starting context. Embedded as acceptance criterion in sprint-1 Item 5.
 
 ### Plugin-level CLAUDE.md content
 - **Source:** /sdd:spec — New Issues From Spec.
-- **Resolved by:** /sdd:sprint (sprint-1 planning)
+- **Resolved by:** /sdd:plan (sprint-1 planning)
 - **Resolution:** Minimal pointer — instructs Claude to load sdd-guide when a command is invoked. Behavioral detail lives in sdd-guide, not the plugin CLAUDE.md. Embedded as acceptance criterion in sprint-1 Item 1.
 
 ### Communication style enforcement
 - **Source:** /sdd:spec — New Issues From Spec.
-- **Resolved by:** /sdd:sprint (sprint-1 planning)
+- **Resolved by:** /sdd:plan (sprint-1 planning)
 - **Resolution:** sdd-guide core reads communication style from user profile and treats it as authoritative — the user's preference overrides the default tone. Embedded as acceptance criterion in sprint-1 Item 2.
 
 ### Spec/runtime duplication

@@ -32,8 +32,9 @@
 
 ## What We'd Add With More Time
 
-- [Nice-to-have feature deliberately excluded from current scope]
-- [Nice-to-have feature deliberately excluded from current scope]
+<!-- Conditional pointer block. Emitted only when docs/backlog.md exists and contains at least one entry (per skills/sdd-guide/references/backlog.md > Parser note). When emitted, the section body is exactly the single line below, verbatim. When the backlog is absent or empty, omit the entire section heading and body — do not leave an empty section behind. Do not inline-list deferred items here; the backlog is the single source of truth. -->
+
+Deferred items: see `docs/backlog.md`.
 
 ## Non-Goals
 

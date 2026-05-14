@@ -20,11 +20,12 @@ On startup, load the following in order:
 2. `skills/sdd-guide/references/deepening-rounds.md`
 3. `skills/sdd-guide/references/context-management.md`
 4. `skills/sdd-guide/references/context-loading.md`
-5. `docs/project-state.json` — read `currentSprint`, `commandExplanationsShown`, and `buildMode`
-6. Most recent `process-notes-sprint-N.md` in project root, if any — see `## Prior-Sprint Process Notes` below for selection rule and extraction.
-7. `docs/prd.md` — scan for incomplete and unvetted items only. Do not load completed stories.
-8. `docs/spec.md`
-9. `docs/open-concerns.md`
+5. `skills/sdd-guide/references/backlog.md` (defer-to-backlog write trigger and entry format)
+6. `docs/project-state.json` — read `currentSprint`, `commandExplanationsShown`, and `buildMode`
+7. Most recent `process-notes-sprint-N.md` in project root, if any — see `## Prior-Sprint Process Notes` below for selection rule and extraction.
+8. `docs/prd.md` — scan for incomplete and unvetted items only. Do not load completed stories.
+9. `docs/spec.md`
+10. `docs/open-concerns.md`
 
 ## Prerequisites
 
@@ -40,6 +41,19 @@ Before doing any other work:
 
 1. Set `lastCommand` to `"/sdd:plan"` in `docs/project-state.json`.
 2. Read and process `docs/open-concerns.md` per sdd-guide open concerns protocol.
+
+## Read and Re-Evaluate `smallProject` (startup)
+
+After the `lastCommand` state update, read the top-level `smallProject` value from `docs/project-state.json`. If the key is absent or `null`, treat it as "no judgment yet" — standard cadence applies. See `skills/sdd-guide/references/right-sizing.md > ## The smallProject field` for what the value means and how it shapes downstream behavior.
+
+Then re-evaluate per `skills/sdd-guide/references/right-sizing.md > ## The smallProject field > Authoring lifecycle`. Apply the signals from that reference's `## Signals for the heuristic judgment` section against the material this command has access to at startup (`docs/prd.md`, `docs/spec.md`, `docs/open-concerns.md`, and any prior `process-notes-sprint-N.md`). Do not restate the signal list or rule of thumb here — the reference is canonical.
+
+Outcomes:
+
+- **Re-evaluation confirms the prior value:** no-op. Do not write `docs/project-state.json`. Do not append to process notes.
+- **Re-evaluation flips the value (`true` → `false` or `false` → `true`):** write the new value to `docs/project-state.json` under the top-level `smallProject` key, and append a one-line entry to `process-notes-sprint-N.md` (where N is the sprint number this `/sdd:plan` run will produce — `currentSprint + 1`, or `1` if `currentSprint` is unset) at the project root noting the flip direction and a brief rationale (which signal or signals tipped the judgment). If `process-notes-sprint-N.md` does not yet exist, create it on this append.
+
+Bias toward humility — when in doubt, leave the value alone and proceed with standard cadence.
 
 ## First-Run Explanation
 
@@ -84,6 +98,8 @@ This read is informational. It does not modify the prior process-notes file.
 
 Runs after Prior-Sprint Process Notes, before `## Behavior`. Single read-and-evaluate of `docs/prd.md`. This check does not modify the PRD.
 
+This section is the authoritative recommendation-timing gate for `/sdd:plan`. `/sdd:plan` performs no PRD edits during its run, so PRD state is fixed for the duration of the command and the routing decision computed here is the same decision that would be computed at end-of-command — placement upstream avoids dead-code re-evaluation while still emitting the recommendation via the standard `## End-of-Command Handoff` template.
+
 Determine three signals:
 
 - Is every `- [ ] \`abcd\`` acceptance criterion line now `- [x]`?
@@ -93,7 +109,7 @@ Determine three signals:
 Apply routing rules in priority order — first matching rule wins:
 
 1. **Unvetted contains items:** Recommend running `/sdd:refine` first. Pause sprint planning and ask whether to proceed with sprint planning anyway or exit to run `/refine`. On user election to proceed, continue to `## Behavior`. On user election to run `/refine`, exit gracefully using the standard end-of-command handoff naming `/sdd:refine`.
-2. **All ACs checked AND Unvetted empty:** Recommend running `/sdd:retro` instead. Exit gracefully using the standard end-of-command handoff naming `/sdd:retro`. Do not proceed to sprint planning.
+2. **All ACs checked AND Unvetted empty:** Recommend running `/sdd:retro` instead. Exit gracefully using the standard end-of-command handoff naming `/sdd:retro`. Do not proceed to sprint planning. (Satisfies `aaez` — `/sdd:plan` recommends `/sdd:retro` only when this PRD state check finds every acceptance criterion checked AND the Unvetted section empty. The parallel project-close gate on `/sdd:build`'s wrap-up lives at `plugins/sdd/skills/build/SKILL.md > Step W11` and satisfies `aafa`.)
 3. **Neither (unchecked ACs remain, Unvetted empty):** Proceed to `## Behavior`.
 
 ## Sprint-Mode Resolution
@@ -153,13 +169,13 @@ The validator is a precondition, not a post-hoc check. `/sdd:plan` does not writ
 
 ## End-of-Command Handoff
 
-Runs as the final step after `## Behavior` Step 11 (Wrap Up), after the sprint file write and the project-state.json update.
+Runs as the final step after `## Behavior` Step 12 (Wrap Up), after the sprint file write, the project-state.json update, and the resume-file cleanup.
 
 Emit the handoff per the canonical template in `skills/sdd-guide/SKILL.md > ## End-of-Command Handoff`. That template defines the two-line form, the first-handoff explanation paragraph (prepended exactly once per user), and the `handoffWarningShown` tracking convention in `~/.claude/sdd-user-profile.json`. Do not restate that mechanism here.
 
 ### Next-command target
 
-The `[next-command]` slot in the template is always `/sdd:build` for `/sdd:plan`. Routing exits to `/sdd:refine` or `/sdd:retro` were already handled upstream by `## PRD State Check`; by the time execution reaches this section, the project state is "proceed with sprint loop," so the next command is unambiguously `/sdd:build`.
+The `[next-command]` slot in the template is always `/sdd:build` for `/sdd:plan`. Routing exits to `/sdd:refine` or `/sdd:retro` were already handled upstream by `## PRD State Check` — the `/sdd:retro` exit (Rule 2 there) is the `aaez`-satisfying gate and is the only path on which `/sdd:plan` recommends `/sdd:retro`. By the time execution reaches this section, the project state is "proceed with sprint loop," so the next command is unambiguously `/sdd:build`. No additional end-of-command retro check fires here; the upstream gate is authoritative.
 
 ### Outcome-summary line
 
@@ -190,6 +206,13 @@ In addition to the recommendation above, flag scope creep per the living-documen
 
 ### Step 3: Propose Sprint Grouping
 
+**Small-project right-sizing (conditional).** Consult the `smallProject` value read and re-evaluated at startup (`## Read and Re-Evaluate \`smallProject\` (startup)` above).
+
+- **When `smallProject` is `true`:** the Phase 1 beats designated in `skills/sdd-guide/references/right-sizing.md > ## Skippable Phase 1 beats per command > ### \`/sdd:plan\`` default to skipped while proposing the grouping. Do not restate that list here — the reference is canonical.
+- **When `smallProject` is `false`, `null`, or absent:** apply the full grouping rubric below.
+
+These beats are **skippable, not required-skipped**. If the user's PRD or earlier answers expose hidden dependencies or genuine multi-sprint sequencing questions, raise them anyway. The skip is the default behavior at `smallProject=true`, not a prohibition on inquiry. Per the reference, sprint-item generation and PRD tag-back remain in full regardless of `smallProject`.
+
 Analyze the incomplete, vetted PRD items and propose a grouping for the next sprint. Base the grouping on:
 
 - **Dependencies and relatedness:** Items that depend on each other or share infrastructure belong together.
@@ -212,6 +235,10 @@ The user makes the final call on what goes in the sprint. They can:
 Ask the user one question: whether the proposed grouping works or what they want to change. Do not present multiple-choice options.
 
 Iterate until the user confirms the sprint contents.
+
+### Step 4a: Deferrals
+
+When an item surfaces during sprint planning that the user wants to push off rather than fit into the current sprint — and the item is not already living in the PRD Unvetted section, not already an open backlog entry, and not a checked AC — route the decision through the defer-to-backlog vs drop prompt defined in `skills/sdd-guide/references/backlog.md > ## Write trigger`. An affirmative defer answer appends an entry to `docs/backlog.md` per the schema in that reference; a drop answer (or any non-affirmative response) writes no entry and records the drop in `process-notes-sprint-N.md` (where N is the sprint number this run will produce) only. Items that already live in PRD Unvetted or in `docs/backlog.md` from a prior planning run are not re-deferred — the prompt does not fire for them.
 
 ### Step 5: Build Mode Choice
 
@@ -254,6 +281,8 @@ For each checklist item:
 
 PRD ref and spec ref are critical. They enable surgical context loading during build — without them, `/sdd:build` would need to load the entire PRD and spec for every item, wasting context window.
 
+After the checklist items, emit the conditional `## Out of Scope` backlog pointer block from `skills/sdd-guide/templates/sprint-template.md`. Before writing the artifact, check `docs/backlog.md` against the heading-scan rule in `skills/sdd-guide/references/backlog.md > ## Parser note` — if the file exists and has at least one entry by that rule, emit the section heading and the literal line `Deferred items: see \`docs/backlog.md\`.`. Otherwise omit both the heading and the body. Do not inline-list deferred items here; the backlog is the single source of truth. Do not restate the parser rule inline; the reference is canonical. A brief "Out of scope:" prose beat in the sprint theme paragraph (if present) is fine; enumeration of deferred items still lives in `docs/backlog.md`.
+
 ### Step 8: Update Project State
 
 Update `docs/project-state.json`:
@@ -281,7 +310,11 @@ Capture:
 - Number of deepening rounds and what they surfaced.
 - Any concerns raised or deferred.
 
-### Step 11: Wrap Up
+### Step 11: Delete docs/plan-resume.md
+
+After `docs/sprint-N.md` has been written (per Step 7 above), delete `docs/plan-resume.md` if it exists. The single resume file applies to `/sdd:plan` regardless of which sprint number was generated. A missing file is not an error — continue silently. Per `skills/sdd-guide/references/pause-resume.md > ## Cleanup`, the resumed command owns this deletion; `/sdd:pause` is the only writer.
+
+### Step 12: Wrap Up
 
 Confirm to the user:
 - Sprint N has been generated at `docs/sprint-N.md`.

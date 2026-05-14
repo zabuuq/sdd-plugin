@@ -78,6 +78,10 @@ Planning phases and sprint cycles produce process notes that capture the human s
 
 Write notes in real time as the conversation progresses. Do not wait until the end of a command to dump a summary.
 
+**Append-only within a phase.** Each phase's command writes real-time entries to its process-notes file in the order they happen and does not modify or remove its own entries after writing. End-of-phase state is the accumulated real-time entries — nothing is pruned, edited, or summarized in place by the writing command. The history of decisions stays intact for `/sdd:retro` and for the maintainer reviewing the project later.
+
+**Mid-phase summarization.** When the user needs a mid-phase summary for multi-session continuity, the responsibility belongs to `/sdd:pause` — it writes a structured resume file (`docs/<command>-resume.md`) per `references/pause-resume.md`. Phase commands do not produce mid-phase summaries by editing their own process-notes files. If a phase is long enough that scrollback is fading, the user runs `/sdd:pause` to capture state into the resume file, then `/clear` and `/sdd:unpause` to resume.
+
 ## State Tracking
 
 Every command updates the `lastCommand` field in `docs/project-state.json` on startup, before doing any other work. This records which command is currently executing and enables other commands to understand where the project left off.

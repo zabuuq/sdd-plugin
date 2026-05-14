@@ -10,22 +10,23 @@ Everything else — PRD acceptance criteria IDs, spec structure, sprint-tag conv
 
 ## State-aware migration table
 
-Find the value of `lastCommand` in your `docs/project-state.json`. Use the row below to decide which v2 command to invoke next. The "mid-flight" column applies when the v1 command had not finished its phase; the "completed" column applies when it had.
+Find the value of `lastCommand` in your `docs/project-state.json`. Use the row below to decide which v2 command to invoke next. The **Stay on (mid-flight)** column applies when the v1 command had not finished its phase; the **Next v2 command (after completion)** column applies when it had. The **One-time action** column lists any file rename or migration step required at the transition.
 
-| v1 `lastCommand` | If mid-flight | If completed |
-|---|---|---|
-| `/sdd:onboard` | n/a (single-session) | `/sdd:discovery` |
-| `/sdd:scope` | `/sdd:scope` (continue; v2 scope is narrower — exploration belongs in `/sdd:discovery` if you want it captured) | `/sdd:prd` |
-| `/sdd:prd` | `/sdd:prd` (continue) | `/sdd:spec` |
-| `/sdd:spec` | `/sdd:spec` (continue) | `/sdd:plan` |
-| `/sdd:sprint` | `/sdd:plan` (renamed; `sprint-N.md` preserved) | `/sdd:build` |
-| `/sdd:build` | `/sdd:build` (continue; v2 wrap-up fires on final item check) | `/sdd:plan` |
-| `/sdd:iterate` | `/sdd:polish` (renamed) | `/sdd:build` (resume sprint with appended items) |
-| `/sdd:reflect` (mid-reflect) | `/sdd:build` (v2 wrap-up absorbed reflect's work — re-enter `/build`) | — |
-| `/sdd:reflect` (post-reflect) | — | `/sdd:plan` (sprint closed; plan next sprint, or run `/sdd:retro` if at project close) |
-| `/sdd:refine` | `/sdd:refine` (continue) | `/sdd:plan` |
-| `/sdd:retro` | `/sdd:retro` if at project close in v2's sense (all PRD ACs checked + Unvetted empty); otherwise abandon — v2 doesn't fire `/retro` per-sprint | Project complete OR `/sdd:plan` if per-sprint use in v1 (project still has work) |
-| `/sdd:feedback` | n/a | Re-orient: real state before `/feedback` is lost in v1 due to the `lastCommand` bug — check sprint file presence or just enter `/sdd:plan` |
+| v1 `lastCommand` | Stay on (mid-flight) | Next v2 command (after completion) | One-time action | Notes |
+|---|---|---|---|---|
+| `/sdd:onboard` | `/sdd:onboard` | `/sdd:discovery` | none | v2 adds `/sdd:discovery` to the chain after onboard. Onboarding is single-session in practice. |
+| `/sdd:scope` | `/sdd:scope` | `/sdd:prd` | none | `/sdd:scope` is narrower in v2 — boundary-drawing only. If exploration content is still pending, run `/sdd:discovery` before re-running `/sdd:scope`. |
+| `/sdd:prd` | `/sdd:prd` | `/sdd:spec` | none | Unchanged in v2. |
+| `/sdd:spec` | `/sdd:spec` | `/sdd:plan` | none | Unchanged in v2. Successor in the chain renamed from `/sdd:sprint` to `/sdd:plan`. |
+| `/sdd:sprint` | `/sdd:plan` (renamed) | `/sdd:build` | Rename `docs/sprint-resume.md` → `docs/plan-resume.md` if it exists. | v1's `/sdd:sprint` is now `/sdd:plan`. v1 names are not aliased. |
+| `/sdd:build` | `/sdd:build` | `/sdd:polish` (sprint polish), `/sdd:plan` (next sprint), or `/sdd:retro` (project close) — depends on wrap-up branch. | none | `/sdd:build` grew a wrap-up phase in v2 that absorbed `/sdd:reflect`'s responsibilities. |
+| `/sdd:iterate` | `/sdd:polish` (renamed) | `/sdd:build` | Rename `docs/iterate-resume.md` → `docs/polish-resume.md` if it exists. | v1's `/sdd:iterate` is now `/sdd:polish`. v1 names are not aliased. |
+| `/sdd:reflect` (mid-flight) | `/sdd:build` if the sprint isn't closed (build's wrap-up absorbed reflect's PRD-checkoff + tech-debt-capture responsibilities); `/sdd:plan` if the sprint was already closed before reflect started. | Depends on the absorbing path — follow the absorbing command's Next column. | none | `/sdd:reflect` does not exist in v2. Any in-flight reflect work is abandoned; the absorbing command picks up the responsibilities. |
+| `/sdd:reflect` (post-completion) | n/a (already complete) | `/sdd:plan` for the next sprint. | none | Anything reflect wrote to disk in v1 persists as historical record. v2 does not re-run or alter it. |
+| `/sdd:refine` | `/sdd:refine` | `/sdd:plan` | none | Unchanged in v2. |
+| `/sdd:retro` | `/sdd:retro` | Project terminal (no next command). | none | `/sdd:retro` only fires at project close in v2 and adds a cross-project-pattern-capture step. The per-sprint retro posture from v1 is gone. |
+| `/sdd:feedback` | `/sdd:feedback` | Returns to the prior `lastCommand`'s next step (feedback is instant-return). | none | In v2, `/sdd:feedback` does not clobber `lastCommand` (v1 bug fixed). `feedbackLocalPath` profile field enables cross-project forwarding. |
+| unset / empty `lastCommand` | n/a | `/sdd:onboard` (first-time user) or `/sdd:discovery` (returning user who already onboarded). | none | Covers brand-new projects and users who never recorded a command. |
 
 ## Renamed commands and resume files
 

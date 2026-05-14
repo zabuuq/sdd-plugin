@@ -20,6 +20,8 @@ Read `skills/sdd-guide/references/deepening-rounds.md`. This defines the two-pha
 
 Read `skills/sdd-guide/references/context-management.md`. This defines the three-tier between-rounds context recommendation (continue / `/compact` / `/clear`) emitted alongside the end-of-round content recommendation.
 
+Read `skills/sdd-guide/references/backlog.md`. This defines the defer-to-backlog vs drop confirmation prompt, the 6-field entry schema, and the bootstrap rule for `docs/backlog.md`.
+
 ### 3. Read user profile
 
 Read `~/.claude/sdd-user-profile.json`.
@@ -60,6 +62,12 @@ If `docs/project-state.json` does not exist, create it with this content:
 ```
 
 If `docs/project-state.json` already exists, update `lastCommand` to `"scope"`.
+
+### 4a. Read `smallProject`
+
+After the `lastCommand` update, read the top-level `smallProject` value from `docs/project-state.json`. If the key is absent or `null`, treat it as "no judgment yet" — standard cadence applies for this startup phase. See `skills/sdd-guide/references/right-sizing.md > ## The smallProject field` for what the value means.
+
+`/sdd:scope` does not perform a separate startup re-evaluation. Per `skills/sdd-guide/references/right-sizing.md > ## The smallProject field > Authoring lifecycle`, the authoritative write at end of Phase 1 (see `## End of Phase 1: Authoritative smallProject Write` below) **is** this command's re-evaluation step — on a re-run, the Phase 1 write overwrites the prior value based on the fresh answers. The startup read here is informational so any pre-Phase-1 behavior (e.g., prompt framing) can honor an existing judgment, but no separate flip-and-log step fires at startup.
 
 ### 5. First-run explanation
 
@@ -116,6 +124,15 @@ If `docs/seed.md` does not exist, proceed directly to the interview with no star
 
 The interview covers these beats. Ask one question at a time. All questions are free-form — never present multiple choice. Stay adaptive: skip beats the user has already covered (including content from the seed file), and follow threads that matter more than the scripted sequence.
 
+### Small-project right-sizing (conditional)
+
+Consult the `smallProject` value read at startup (see `### 4a. Read \`smallProject\`` above).
+
+- **When `smallProject` is `true`:** the beats designated in `skills/sdd-guide/references/right-sizing.md > ## Skippable Phase 1 beats per command > ### \`/sdd:scope\`` default to skipped. Do not restate that list here — the reference is canonical.
+- **When `smallProject` is `false`, `null`, or absent:** run every beat below as normal.
+
+These beats are **skippable, not required-skipped**. If the user's earlier answers (including seed-file content) leave a designated beat genuinely open, ask it anyway. The skip is the default behavior at `smallProject=true`, not a prohibition on inquiry.
+
 ### Beats to cover:
 
 1. **The idea** — What are you building? Get a plain-language description. Push back if it's vague. "An app that helps people" is not enough — what does it actually do?
@@ -138,6 +155,27 @@ The interview covers these beats. Ask one question at a time. All questions are 
 - Follow unexpected threads. If the user reveals something important that isn't in the script, explore it before returning to the beats.
 - Reference seed file content when relevant. Don't re-ask questions the seed already answered — instead, confirm or probe deeper on what it said.
 
+### Small-project signal observation (during Phase 1):
+
+While the mandatory beats above are being answered, observe the small-project signals defined in `skills/sdd-guide/references/right-sizing.md > ## Signals for the heuristic judgment`. Do not restate the signal list here — the reference is canonical. Track which signals are present, which are absent, and whether any is strongly contradicted by what the user says. This observation feeds the authoritative write in the next section; do not surface the judgment to the user during Phase 1 questioning, and do not write `smallProject` until the mandatory beats have all landed.
+
+---
+
+## End of Phase 1: Authoritative `smallProject` Write
+
+Runs exactly once per `/sdd:scope` invocation, immediately after the Phase 1 mandatory beats have all landed and before the Project Size Assessment, Phase 2 deepening rounds, or any document generation. Fires unconditionally — do not skip this step even if Phase 1 was abbreviated, the seed file was rich, or the user's answers came quickly. If a prior `/sdd:scope` run in the same project already wrote a value, this run overwrites it with a fresh judgment based on the answers just gathered.
+
+Apply the heuristic defined in `skills/sdd-guide/references/right-sizing.md > ## Signals for the heuristic judgment` against the signals observed during Phase 1. Use the rule of thumb stated in that section (four or more of the six signals present, with none strongly contradicted → `true`; three or fewer, or any single strong contradiction such as the user explicitly naming external paying customers → `false`).
+
+Write the result to `docs/project-state.json` under the top-level `smallProject` key:
+
+- **Signals present → `"smallProject": true`.** The project is judged small. Downstream commands will right-size their interviews per `right-sizing.md`.
+- **Signals absent or any strong contradiction → `"smallProject": false`.** Standard cadence applies downstream. (Omitting the key is also acceptable — `null` / absent is treated the same as `false` for cadence purposes per `right-sizing.md > ## The smallProject field`. Prefer writing `false` explicitly so the judgment is visible in the project state.)
+
+This is the authoritative initial value per `skills/sdd-guide/references/right-sizing.md > ## The smallProject field > Authoring lifecycle`. `/sdd:prd`, `/sdd:spec`, and `/sdd:plan` may re-evaluate on startup and flip the value if their material contradicts it; this write is the baseline they read from.
+
+Do not announce the value to the user as a separate beat. If you want to acknowledge the judgment briefly in the natural flow of the conversation (e.g., when transitioning into the Project Size Assessment), that is fine, but the write itself is silent infrastructure.
+
 ---
 
 ## Project Size Assessment
@@ -158,7 +196,7 @@ Signs a project is too large:
 2. Propose specific boundaries for splitting. Don't just say "break it up" — suggest where the cuts should be, based on what the user told you.
 3. The user makes the final call on how to split. Do not override their decision.
 4. The scope document captures the full vision AND what is being built now vs. later.
-5. Write deferred pieces to `docs/backlog.md` with full context — enough detail that a future `/sdd:scope` session could pick them up without re-interviewing the user.
+5. For each deferred piece, route the decision through the defer-to-backlog vs drop prompt defined in `skills/sdd-guide/references/backlog.md > ## Write trigger`. On an affirmative "defer to backlog" answer, append an entry to `docs/backlog.md` using the schema in that reference, with enough context that a future `/sdd:scope` session could pick the item up without re-interviewing the user. On a drop answer (or any non-affirmative response), write no entry to `docs/backlog.md` and record the drop in `process-notes-scope.md` only. The file location and entry format are unchanged from prior behavior; the new addition is that every write is gated by the prompt.
 
 ---
 
@@ -190,7 +228,7 @@ Fill in every section based on what was discussed in the interview:
 - **Inspiration & References:** List anything the user mentioned. Include links if they provided them.
 - **Goals:** List the concrete goals that emerged from the interview.
 - **What "Done" Looks Like:** Describe the finish line in the user's terms.
-- **What's Explicitly Cut:** If the project was scoped down during the size assessment, list what was cut. If nothing was cut, remove this section entirely.
+- **What's Explicitly Cut:** This section is the conditional backlog pointer. Before writing the artifact, check `docs/backlog.md` against the heading-scan rule in `skills/sdd-guide/references/backlog.md > ## Parser note` — if the file exists and has at least one entry by that rule, emit the section heading and the literal line `Deferred items: see \`docs/backlog.md\`.`. Otherwise omit both the heading and the body. Do not inline-list cut items here; deferred items live in `docs/backlog.md` and are the single source of truth. Do not restate the parser rule inline; the reference is canonical.
 - **Loose Implementation Notes:** Capture any technical hunches, constraints, or architecture leanings the user mentioned. These are not commitments.
 
 Present the scope document to the user for review. Ask if anything needs to change. Iterate until they approve.
@@ -203,20 +241,28 @@ Add any unresolved questions or concerns that surfaced during the interview as e
 
 ### Backlog (if applicable)
 
-If the project was split during size assessment, write `docs/backlog.md` with deferred pieces. Each entry should have enough context to be picked up later without re-interviewing.
+If the project was split during size assessment, the deferred pieces are written to `docs/backlog.md` via the defer-to-backlog vs drop prompt described in `## Project Size Assessment` above (item 5). The prompt, entry schema, and bootstrap behavior are defined in `skills/sdd-guide/references/backlog.md`. Items the user chooses to drop are not written to `docs/backlog.md`; the drop decision is recorded in `process-notes-scope.md` only.
+
+Additionally, if a non-split topic surfaced during the interview that the user explicitly wanted to push off rather than fold into the scope document, route that decision through the same prompt — `skills/sdd-guide/references/backlog.md > ## Write trigger` is the single gate for any write to `docs/backlog.md` from this command.
 
 ---
 
 ## Wrap-Up
 
+### Delete docs/scope-resume.md
+
+After `docs/scope.md` has been written (per `## Document Generation` above), delete `docs/scope-resume.md` if it exists. A missing file is not an error — continue silently. Per `skills/sdd-guide/references/pause-resume.md > ## Cleanup`, the resumed command owns this deletion; `/sdd:pause` is the only writer.
+
 ### Process notes
 
-Append to `process-notes.md` in the project root. Capture:
+Append to `process-notes-scope.md` in the project root. Capture:
 - Key decisions made during the interview and the rationale behind them.
 - Any pushback (from either side) and how it was resolved.
 - Questions that were difficult or revealing.
 - Number of deepening rounds and what they surfaced.
 - Whether the project was split and why.
+
+If `process-notes-scope.md` does not yet exist at the project root, create it on the first append.
 
 ### Update project state
 

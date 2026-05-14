@@ -75,6 +75,12 @@ Before doing any other work:
 1. Set `lastCommand` to `"/sdd:refine"` in `docs/project-state.json`.
 2. Read and process `docs/open-concerns.md` per sdd-guide open concerns protocol.
 
+## Read `smallProject` (startup)
+
+After the `lastCommand` state update, read the top-level `smallProject` value from `docs/project-state.json`. If the key is absent or `null`, treat it as "no judgment yet" — standard cadence applies. See `skills/sdd-guide/references/right-sizing.md > ## The smallProject field` for what the value means and how it shapes downstream behavior.
+
+Per `skills/sdd-guide/references/right-sizing.md > ## The smallProject field > Authoring lifecycle`, `/sdd:refine` **may re-write `smallProject` if observed signals contradict the current value** — this is permissive, not mandated. The right-sizing reference's authoring lifecycle does not require `/sdd:refine` to re-evaluate; it only requires `/sdd:prd`, `/sdd:spec`, and `/sdd:plan` to do so. If during refinement the items surfaced make the current judgment plainly wrong (e.g., refinement reveals a previously-hidden third-party integration on a `smallProject: true` project, or trims a `false` project down to one focused feature), the agent may write the new value to `docs/project-state.json` and append a one-line entry to `process-notes-sprint-N.md` noting the flip direction and rationale. Confirm = no-op. Bias toward humility — when in doubt, leave the value alone and proceed with standard cadence.
+
 ## First-Run Explanation
 
 Check `docs/project-state.json` for `commandExplanationsShown.refine`.
@@ -218,7 +224,11 @@ Capture:
 - PRD health check results if any thresholds were triggered.
 - Concerns raised, resolved, or deferred.
 
-### Step 11: Wrap Up
+### Step 11: Delete docs/refine-resume.md
+
+After the Step 6 document-update cycle completes — whichever of `docs/prd.md`, `docs/spec.md`, `AGENTS.md`, or `CLAUDE.md` were updated have all been written and confirmed — delete `docs/refine-resume.md` if it exists. The single resume file applies to `/sdd:refine` regardless of which documents the refinement cycle touched. A missing file is not an error — continue silently. Per `skills/sdd-guide/references/pause-resume.md > ## Cleanup`, the resumed command owns this deletion; `/sdd:pause` is the only writer.
+
+### Step 12: Wrap Up
 
 Tell the user:
 
@@ -230,7 +240,7 @@ Then emit the handoff per `## End-of-Command Handoff` below.
 
 ## End-of-Command Handoff
 
-Runs as the final step after `## Step 11: Wrap Up` (process notes, open concerns, document updates, and PRD health check have all completed).
+Runs as the final step after `## Step 12: Wrap Up` (process notes, open concerns, document updates, PRD health check, and the resume-file cleanup have all completed).
 
 Emit the handoff per the canonical template in `skills/sdd-guide/SKILL.md > ## End-of-Command Handoff`. That template defines the two-line standard form, the first-handoff explanation paragraph (prepended exactly once per user), and the `handoffWarningShown` tracking convention in `~/.claude/sdd-user-profile.json`. Do not restate that mechanism here.
 

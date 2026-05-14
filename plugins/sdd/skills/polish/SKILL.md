@@ -18,7 +18,7 @@ Read `skills/sdd-guide/SKILL.md` and follow all rules defined there (tone, inter
 
 Read `skills/sdd-guide/references/living-documents.md`. This defines the protocol for updating living documents during iteration. Follow its default stance: resist changes to scope, PRD, and spec. New ideas surface through the backlog or unvetted section, not through direct edits.
 
-Read `skills/sdd-guide/references/context-management.md`. Polish does not run formal deepening rounds, but the iteration interview (Step 5) and the end-of-iteration wrap (Step 10) are natural transition points. At those points, the agent may emit the three-tier between-rounds context recommendation (continue / `/compact` / `/clear`) when warranted — this is discretionary for polish, not round-by-round mandatory. Use the reference's triggers and signals to judge whether a recommendation is appropriate at a given transition.
+Read `skills/sdd-guide/references/context-management.md`. Polish does not run formal deepening rounds, but the iteration interview (Step 5) and the end-of-iteration wrap (Step 11) are natural transition points. At those points, the agent may emit the three-tier between-rounds context recommendation (continue / `/compact` / `/clear`) when warranted — this is discretionary for polish, not round-by-round mandatory. Use the reference's triggers and signals to judge whether a recommendation is appropriate at a given transition.
 
 ### 3. Read user profile
 
@@ -60,7 +60,20 @@ Read `CLAUDE.md` in the project root. This provides project conventions and codi
 
 If the file does not exist, skip this step without error.
 
+### 7. Detect closed-sprint state (re-open escape hatch)
+
+Scan `process-notes-sprint-N.md` for `[close-sprint-manifest] ... [/close-sprint-manifest]` blocks using the parser documented in `skills/sdd-guide/references/sprint-tags.md > [close-sprint-manifest] / [/close-sprint-manifest] block`. The sprint is "closed" iff at least one such block exists.
+
+**Branch:**
+
+- **No manifest present** → fall through to the `## Prerequisites` block unchanged. This is the open-sprint path.
+- **Manifest present** → run the re-open flow in `## Re-Open Flow` below. The `## Prerequisites` "all items complete" check does NOT fire on this path. If multiple manifests exist (the sprint has been opened and re-closed before), the **most recent** manifest is authoritative; earlier manifests stay as history but do not drive re-open logic.
+
+The end-to-end mechanism is specified in `docs/spec.md > Cross-Cutting Mechanisms > Close-Sprint Manifest > Re-open behavior`. Follow it exactly.
+
 ## Prerequisites
+
+This block fires only on the open-sprint path (no `[close-sprint-manifest]` block in `process-notes-sprint-N.md`). On the closed-sprint path, `## Re-Open Flow` runs instead.
 
 All checklist items in the current sprint file must be complete (all status checkboxes checked). Scan every item under `## Checklist` and any existing `## Iteration N` sections.
 
@@ -70,12 +83,76 @@ All checklist items in the current sprint file must be complete (all status chec
 
 Do not proceed. Do not offer to skip incomplete items or work around them.
 
+## Re-Open Flow
+
+Runs in place of `## Prerequisites` when Step 7 detected a `[close-sprint-manifest]` block in `process-notes-sprint-N.md`. Reverses (selectively) the effects of a prior `/sdd:build` close-sprint so the iteration interview can proceed against a re-opened sprint.
+
+The end-to-end mechanism is documented in `docs/spec.md > Cross-Cutting Mechanisms > Close-Sprint Manifest > Re-open behavior`. Steps below describe the user-facing flow; do not re-derive the manifest or marker formats here.
+
+### Step A. Ask to re-open
+
+Emit the literal prompt:
+
+> Re-open the sprint?
+
+One question. Wait for the user's response. (Satisfies `aaev`.)
+
+### Step B. On rejection
+
+If the user answers no, declines, or exits, stop immediately. Emit a single-line message:
+
+> Re-opening the sprint is required to proceed with `/sdd:polish` on a closed sprint.
+
+Do not run the iteration interview. Do not modify any files. Exit `/sdd:polish`. (Satisfies `aaex`.)
+
+### Step C. On confirmation — surface the manifest's checked ACs
+
+Parse the most recent `[close-sprint-manifest]` block (per `skills/sdd-guide/references/sprint-tags.md > [close-sprint-manifest]`). Read its `PRD ACs checked: ...` line and surface that list to the user verbatim.
+
+Then ask a single open-ended question:
+
+> Which (if any) should be re-opened?
+
+Free-form response. Parse the user's answer against the AC IDs from the manifest. If the user names IDs not in the manifest, ignore them with a one-line note. If the user names none, treat the answer as "nothing to re-open" and continue to Step E.
+
+### Step D. Reverse selected ACs
+
+For each AC ID selected by the user:
+
+1. **Un-check the AC in `docs/prd.md`.** Locate the line matching the AC ID (format defined in `skills/sdd-guide/references/sprint-tags.md > PRD Acceptance Criteria IDs`) and flip its checkbox from `[x]` to `[ ]`.
+2. **Reverse the story split (if applicable).** If the manifest's `Story splits: ...` line maps this AC to a split-off story, restore the AC to its original story anchor. If the split-off story is left with no remaining ACs and `/sdd:refine` has not added any new ACs to it since close, delete the empty split-off story. ACs added by `/sdd:refine` to the split-off story since close are not touched — they stay.
+3. **Handle `/sdd:refine`-deleted ACs.** If the AC ID from the manifest no longer exists in `docs/prd.md` (deleted by `/sdd:refine` since close), emit a one-line informational warning naming the missing AC ID; skip un-check for that AC; do not block.
+
+### Step E. Append `[sprint-reopened]` marker
+
+Append a `[sprint-reopened]` marker entry to `process-notes-sprint-N.md` using the format defined in `skills/sdd-guide/references/sprint-tags.md > [sprint-reopened] process-notes marker`. The marker carries the current timestamp, the un-checked AC IDs, and the splits-undone mapping for the selected ACs. Do not re-derive the format here.
+
+### Step F. Proceed with iteration
+
+Continue with `## Behavior > Step 1: Read Open Concerns` and run the standard iteration flow to completion. (Satisfies `aaew`.)
+
+### What re-open does NOT reverse
+
+Per `docs/spec.md > Cross-Cutting Mechanisms > Close-Sprint Manifest > What re-open does NOT reverse`, the following are append-only history and/or manual-disposition records; re-litigation is the user's manual responsibility:
+
+- **Iteration-candidate dispositions** captured at the prior close.
+- **Tech-debt entries** written at the prior close.
+- **`docs/v2-verification.md` "Shipped" rows** written at the prior close.
+
+Do not touch any of these during re-open.
+
 ## State Updates (immediate)
 
 Before doing any other work:
 
 1. Set `lastCommand` to `"/sdd:polish"` in `docs/project-state.json`.
 2. Read and process `docs/open-concerns.md` per sdd-guide open concerns protocol.
+
+## Read `smallProject` (startup)
+
+After the `lastCommand` state update, read the top-level `smallProject` value from `docs/project-state.json`. If the key is absent or `null`, treat it as "no judgment yet" — standard cadence applies. See `skills/sdd-guide/references/right-sizing.md > ## The smallProject field` for what the value means and how it shapes downstream behavior.
+
+Per `skills/sdd-guide/references/right-sizing.md > ## The smallProject field > Authoring lifecycle`, `/sdd:polish` **may re-write `smallProject` if observed signals contradict the current value** — this is permissive, not mandated. The right-sizing reference's authoring lifecycle does not require `/sdd:polish` to re-evaluate; it only requires `/sdd:prd`, `/sdd:spec`, and `/sdd:plan` to do so. If during the iteration interview the items surfaced make the current judgment plainly wrong (e.g., a polish round introduces a new third-party integration on a `smallProject: true` project, or a `false` project's remaining work collapses to one focused beat), the agent may write the new value to `docs/project-state.json` and append a one-line entry to `process-notes-sprint-N.md` noting the flip direction and rationale. Confirm = no-op. Bias toward humility — when in doubt, leave the value alone and proceed with standard cadence.
 
 ## First-Run Explanation
 
@@ -198,7 +275,11 @@ Capture:
 - Any backlog items pulled in and the rationale.
 - Concerns raised or deferred.
 
-### Step 10: Wrap Up
+### Step 10: Delete docs/polish-resume.md
+
+After the iteration checklist has been appended to `docs/sprint-N.md` (per Step 7 above), delete `docs/polish-resume.md` if it exists. The single resume file applies to `/sdd:polish` regardless of which iteration number was just produced. A missing file is not an error — continue silently. Per `skills/sdd-guide/references/pause-resume.md > ## Cleanup`, the resumed command owns this deletion; `/sdd:pause` is the only writer.
+
+### Step 11: Wrap Up
 
 Tell the user:
 
@@ -211,7 +292,7 @@ If the user wants to add more iteration work after this, they can run `/sdd:poli
 
 ## End-of-Command Handoff
 
-Runs as the final step after Step 10 (the iteration checklist has been appended to the sprint file, open concerns have been updated, and process notes have been written).
+Runs as the final step after Step 11 (the iteration checklist has been appended to the sprint file, open concerns have been updated, process notes have been written, and the resume-file cleanup has fired).
 
 Emit the handoff per the canonical template in `skills/sdd-guide/SKILL.md > ## End-of-Command Handoff`. That template defines the two-line standard form, the first-handoff explanation paragraph (prepended exactly once per user), and the `handoffWarningShown` tracking convention in `~/.claude/sdd-user-profile.json`. Do not restate that mechanism here.
 
