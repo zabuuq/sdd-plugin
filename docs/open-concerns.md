@@ -12,10 +12,7 @@ Entry format:
 - **Concern:** [description of the concern, question, or issue]
 -->
 
-### Soft acceptance criteria for MIT distribution
-- **Source:** /sdd:retro — surfaced in requirements-thinking section.
-- **Target:** /sdd:refine (when items with judgment-based acceptance criteria are next refined)
-- **Concern:** Several PRD acceptance criteria rely on personal judgment (e.g., "enough context to pick this up cold months later" for backlog entries). Fine for self-use, weaker for outside contributors. When refining or adding similar criteria, anchor them with example entries or anti-examples.
+(none — all v2-cycle concerns are either Resolved below or carried to `docs/retro.md`)
 
 ## Resolved
 
@@ -28,6 +25,11 @@ Entry format:
 - **Resolved by:** /sdd:[command]
 - **Resolution:** [how it was resolved — include explanation for implicit resolutions]
 -->
+
+### Soft acceptance criteria for MIT distribution
+- **Source:** /sdd:retro — v1 cycle, friction-at-boundaries pattern.
+- **Carried to retro by:** /sdd:retro (v2 cycle close)
+- **Resolution:** Carried to `docs/retro.md > Open Concerns — Final Status > Carried to Retro (Unresolved)`. `/sdd:refine` never ran on this project (refinements were handled inline during sprint work), so the concern was not addressable through this cycle's commands. Revisit during v3 scope: if v3 introduces similar judgment-based ACs, anchor them with example entries or anti-examples; if v3 stays close to v2's testable-behavior bar, the concern can be marked dropped.
 
 ### One-time PRD AC ID backfill for this project
 - **Source:** /sdd:spec — Beat 2 (PRD-AC reference tag syntax).
