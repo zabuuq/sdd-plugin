@@ -3,7 +3,7 @@
   "currentSprint": 1,
   "buildMode": "autonomous",
   "smallProject": true,
-  "lastCommand": "build",
+  "lastCommand": "retro",
   "commandExplanationsShown": {
     "scope": true,
     "prd": true,

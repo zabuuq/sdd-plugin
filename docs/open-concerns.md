@@ -2,12 +2,14 @@
 
 ## Open
 
+_None. All concerns resolved or carried to `docs/retro.md` at project close (`/sdd:retro`, 2026-06-16)._
+
+## Resolved
+
 ### Plugin manifest version still reads 2.0.0 while v3 is the active cycle
 - **Source:** /sdd:build Sprint 1 Item 9 — zero-runtime check (incidental observation)
 - **Target:** project close / release step (not a Sprint 1 AC)
-- **Concern:** `plugins/sdd/.claude-plugin/plugin.json` is still `version: 2.0.0`; per CLAUDE.md the manifest and `marketplace.json` versions move together. No Sprint 1 AC covers a version bump, so it was deliberately not touched during build. Flag it as a release-time action before v3 ships so the published marketplace version reflects the cycle.
-
-## Resolved
+- **Resolution (/sdd:retro):** Carried to `docs/retro.md` (Open Concerns — Final Status) as a tracked **release-time action**, not a defect. `plugins/sdd/.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json` must move together to the v3 version at ship time. No behavioral effect before publish; the bump is the responsibility of the release step that ships v3.
 
 ### Can native-only technique-mining actually reach half the Caveman benchmark?
 - **Source:** /sdd:scope — Phase 1, Beat 4 (goals) — native-only target
