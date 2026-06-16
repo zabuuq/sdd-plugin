@@ -19,13 +19,12 @@ On startup, load the following in order:
 1. `skills/sdd-guide/SKILL.md` (shared behavior)
 2. `skills/sdd-guide/references/deepening-rounds.md`
 3. `skills/sdd-guide/references/context-management.md`
-4. `skills/sdd-guide/references/context-loading.md`
-5. `skills/sdd-guide/references/backlog.md` (defer-to-backlog write trigger and entry format)
-6. `docs/project-state.json` — read `currentSprint`, `commandExplanationsShown`, and `buildMode`
-7. Most recent `process-notes-sprint-N.md` in project root, if any — see `## Prior-Sprint Process Notes` below for selection rule and extraction.
-8. `docs/prd.md` — scan for incomplete and unvetted items only. Do not load completed stories.
-9. `docs/spec.md`
-10. `docs/open-concerns.md`
+4. `skills/sdd-guide/references/backlog.md` (defer-to-backlog write trigger and entry format)
+5. `docs/project-state.json` — read `currentSprint`, `commandExplanationsShown`, and `buildMode`
+6. Most recent `process-notes-sprint-N.md` in project root, if any — see `## Prior-Sprint Process Notes` below for selection rule and extraction.
+7. `docs/prd.md` — scan for incomplete and unvetted items only. Do not load completed stories.
+8. `docs/spec.md`
+9. `docs/open-concerns.md`
 
 ## Prerequisites
 
@@ -301,14 +300,7 @@ Update `docs/open-concerns.md` per sdd-guide protocol:
 
 ### Step 10: Process Notes
 
-Write sprint planning process notes to `process-notes-sprint-N.md` where N is the current sprint number.
-
-Capture:
-- Which items were proposed and why.
-- What the user changed in the proposal and their reasoning.
-- Build mode choice and rationale.
-- Number of deepening rounds and what they surfaced.
-- Any concerns raised or deferred.
+Write sprint planning process notes to `process-notes-sprint-N.md` where N is the current sprint number, per sdd-guide's `## Process Notes` (four categories, real-time, append-only). Capture plan specifics: which items were proposed and why; what the user changed and their reasoning; build mode choice and rationale; deepening rounds and what they surfaced; concerns raised or deferred.
 
 ### Step 11: Delete docs/plan-resume.md
 

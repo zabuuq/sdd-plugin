@@ -9,79 +9,77 @@
 ## Process Patterns Across Sprints
 
 ### What the Process Notes Revealed
-[Synthesis of patterns observed across all process-notes files. What themes repeated? What improved over time? What stayed problematic?]
+[Patterns across all process-notes files: what repeated, what improved, what stayed problematic.]
 
 ### Planning Phase Assessment
-[How well did scope, PRD, and spec phases set the project up? Was anything missing or over-specified?]
+[Did scope, PRD, and spec set the project up well? Anything missing or over-specified?]
 
 ### Sprint Cadence
-[Did the sprint rhythm work? Were sprints sized well? How did pacing change over the project?]
+[Did the sprint rhythm work? Were sprints sized well? How did pacing change?]
 
 ### Workflow Friction
-[Where did the SDD workflow create friction? What steps felt unnecessary or slow?]
+[Where did the SDD workflow create friction? What felt unnecessary or slow?]
 
 ### Communication Patterns
-[How well did the agent-user collaboration work? What would be changed?]
+[How well did agent-user collaboration work? What would change?]
 
 ## Product Assessment
 
 ### Outcome vs. Intent
-[Does the final product match what was originally envisioned? How did the vision evolve?]
+[Does the final product match the original vision? How did it evolve?]
 
 ### Scope Changes
-[What was added, cut, or changed during the project? Were those the right calls?]
+[What was added, cut, or changed? Were those the right calls?]
 
 ### Quality Assessment
-[Overall quality of what was built. Areas of strength and weakness.]
+[Overall quality; strengths and weaknesses.]
 
 ### Technical Debt
-[Significant technical debt accumulated. Is it acceptable given project goals?]
+[Significant debt accumulated. Acceptable given goals?]
 
 ## SDD Workflow Performance
 
 ### What Worked
-[Aspects of the SDD plugin-driven workflow that added clear value to this project.]
+[Workflow aspects that added clear value.]
 
 ### What Didn't Work
-[Aspects of the workflow that created friction, felt unnecessary, or need improvement.]
+[Workflow aspects that created friction or need improvement.]
 
 ### Workflow Recommendations
-[Specific recommendations for how the workflow should be adjusted for future projects.]
+[Specific adjustments for future projects.]
 
 ## Plugin Feedback Summary
 
-[If no plugin feedback was logged, write: "No plugin feedback was logged during this project."]
-
-[If feedback exists, summarize the themes and key entries from `docs/sdd-feedback.md`.]
+[If none logged: "No plugin feedback was logged during this project." Otherwise summarize themes and key entries from `docs/sdd-feedback.md`.]
 
 ### Feedback Themes
-- [Theme] — [summary of related feedback entries]
+- [Theme] — [summary of related entries]
 
 ### How to Act on Feedback
-[Instructions for taking feedback to the plugin repo — switch directories, use SDD process on the plugin itself.]
+[How to take feedback to the plugin repo: switch directories, run the SDD process on the plugin itself.]
 
 ## Open Concerns — Final Status
 
 ### Resolved During Retro
-- [Concern] — [How/why it is now resolved]
+- [Concern] — [How/why now resolved]
 
 ### Carried to Retro (Unresolved)
-- [Concern] — [Why it remains open, whether it matters going forward]
+- [Concern] — [Why it remains open; whether it matters going forward]
 
 ### Previously Resolved
-- [Concern] — [When/how it was resolved during the project]
+- [Concern] — [When/how resolved during the project]
 
 ## Key Takeaways
 
 ### Top Wins
 1. [Most important thing that went well]
-2. [Second most important]
-3. [Third most important]
+2. [Second]
+3. [Third]
 
 ### Top Lessons
 1. [Most important lesson learned]
-2. [Second most important]
-3. [Third most important]
+2. [Second]
+3. [Third]
 
 ### If Starting Over
 [What would be done differently knowing what is known now?]

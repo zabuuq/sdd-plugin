@@ -215,14 +215,7 @@ Update `docs/open-concerns.md` per sdd-guide protocol:
 
 ### Step 10: Process Notes
 
-Append refinement process notes to `process-notes-sprint-N.md` where N is the current sprint number from `docs/project-state.json`.
-
-Capture:
-- Which unvetted items were refined and the key decisions from each interview.
-- Spec impact assessment results — what changed or why nothing changed.
-- Document updates applied (PRD, spec, AGENTS.md, CLAUDE.md) and what was modified in each.
-- PRD health check results if any thresholds were triggered.
-- Concerns raised, resolved, or deferred.
+Append refinement process notes to `process-notes-sprint-N.md` where N is the current sprint number from `docs/project-state.json`, per sdd-guide's `## Process Notes` (four categories, real-time, append-only). Capture refine specifics: which unvetted items were refined and the key decisions from each; spec impact assessment results (what changed or why nothing did); document updates applied (PRD, spec, AGENTS.md, CLAUDE.md) and what changed in each; PRD health check results if any thresholds triggered; concerns raised, resolved, or deferred.
 
 ### Step 11: Delete docs/refine-resume.md
 

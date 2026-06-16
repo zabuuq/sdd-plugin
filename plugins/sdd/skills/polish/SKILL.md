@@ -267,13 +267,7 @@ Update `docs/open-concerns.md` per sdd-guide protocol:
 
 ### Step 9: Process Notes
 
-Append iteration process notes to `process-notes-sprint-N.md` where N is the current sprint number.
-
-Capture:
-- What the user wanted to work on and why.
-- How the iteration scope was narrowed or clarified during the interview.
-- Any backlog items pulled in and the rationale.
-- Concerns raised or deferred.
+Append iteration process notes to `process-notes-sprint-N.md` where N is the current sprint number, per sdd-guide's `## Process Notes` (four categories, real-time, append-only). Capture polish specifics: what the user wanted to work on and why; how the iteration scope was narrowed or clarified; any backlog items pulled in and the rationale; concerns raised or deferred.
 
 ### Step 10: Delete docs/polish-resume.md
 

@@ -142,16 +142,9 @@ Per sdd-guide's `## Process Notes` section, append to `process-notes-discovery.m
 
 - End of every Phase 1 mandatory beat (after the user's answer lands and any active-prompting close resolves).
 - End of every Phase 2 deepening round (after the round closes, alongside the structured end-of-round content recommendation).
-- Notable mid-interview moments: a decision being made, pushback from either side, a struggle the user surfaces, a pivot or shift in direction. Do not wait for a beat or round boundary if one of these lands mid-conversation.
+- Notable mid-interview moments — don't wait for a beat or round boundary if one lands mid-conversation.
 
-**What each entry captures** (per sdd-guide):
-
-- Decisions made and the rationale behind them.
-- Pushback from either side (user or agent) and how it was resolved.
-- Questions that came up and what made them difficult.
-- Struggles, pivots, and anything that shifted direction.
-
-**What entries do NOT contain:** verbatim conversation. The file is the human-side record — the decisions, friction, and direction shifts — not a transcript. Distill, do not transcribe.
+**What each entry captures:** the four categories from sdd-guide's `## Process Notes` (decisions, pushback, difficult questions, pivots). Distill, don't transcribe — no verbatim conversation.
 
 **Format:** append-only markdown. Each entry opens with a timestamp or beat marker (e.g., `### Beat 3 — The audience` or `### Phase 2, Round 1 close`) so the reader can locate the moment in the interview's shape.
 

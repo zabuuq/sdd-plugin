@@ -2,7 +2,7 @@
 
 **Used by:** all commands (critical for `/sdd:build`)
 
-This reference defines exactly what each command loads into context on startup. Following these rules keeps context usage efficient and prevents commands from loading irrelevant material.
+This reference defines exactly what each command loads into context on startup, keeping context usage efficient and preventing commands from loading irrelevant material.
 
 ## Per-Command Loading Rules
 
