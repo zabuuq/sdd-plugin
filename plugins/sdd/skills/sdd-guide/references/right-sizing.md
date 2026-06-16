@@ -2,9 +2,7 @@
 
 **Used by:** `/sdd:scope` (writes), `/sdd:prd`, `/sdd:spec`, `/sdd:plan` (re-evaluate)
 
-This reference is the canonical home for the v2 right-sizing heuristic. It defines what a "small project" means in the SDD workflow, which command owns the judgment, how subsequent commands revisit it, and how the judgment shortens interviews without sacrificing the document's usefulness.
-
-The goal is simple: when the project is genuinely small, the interview shouldn't feel like a TPS-report drill. When the project is larger or genuinely uncertain, the full interview cadence stays in force. Right-sizing is a quality-of-experience lever, not an excuse to skip rigor.
+This reference is the canonical home for the v2 right-sizing heuristic. It defines what a "small project" means in the SDD workflow, which command owns the judgment, how subsequent commands revisit it, and how the judgment shortens interviews without sacrificing the document's usefulness. Right-sizing is a quality-of-experience lever, not an excuse to skip rigor: when the project is genuinely small the interview shortens; when it is larger or uncertain the full cadence stays in force.
 
 ## The `smallProject` field
 

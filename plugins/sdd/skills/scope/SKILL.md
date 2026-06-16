@@ -255,12 +255,7 @@ After `docs/scope.md` has been written (per `## Document Generation` above), del
 
 ### Process notes
 
-Append to `process-notes-scope.md` in the project root. Capture:
-- Key decisions made during the interview and the rationale behind them.
-- Any pushback (from either side) and how it was resolved.
-- Questions that were difficult or revealing.
-- Number of deepening rounds and what they surfaced.
-- Whether the project was split and why.
+Append to `process-notes-scope.md` in the project root, per sdd-guide's `## Process Notes` (four categories, real-time, append-only). Also capture scope specifics: number of deepening rounds and what they surfaced; whether the project was split and why.
 
 If `process-notes-scope.md` does not yet exist at the project root, create it on the first append.
 

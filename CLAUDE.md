@@ -2,7 +2,7 @@
 
 This repository is the **SDD plugin source** — a spec-driven development workflow plugin for Claude Code. The plugin itself lives at `plugins/sdd/`. Planning artifacts for the current development cycle live in `docs/`.
 
-**Currently active cycle:** v2. See `docs/scope.md`, `docs/prd.md`, `docs/spec.md`.
+**Currently active cycle:** v3 — a token-efficiency pass that trims the plugin's input footprint and output verbosity without changing behavior. See `docs/scope.md`, `docs/prd.md`, `docs/spec.md`. v2 artifacts are archived at `docs/archive/v2/` and serve as the v3 dogfood comparison baseline.
 
 Read `AGENTS.md` for full project context, conventions, and the rationale behind key architectural decisions.
 
@@ -19,11 +19,14 @@ Read `AGENTS.md` for full project context, conventions, and the rationale behind
 - `plugins/sdd/skills/sdd-guide/templates/` — markdown templates the command skills emit (scope, prd, spec, sprint, retro, discovery).
 - `plugins/sdd/skills/<command>/SKILL.md` — one skill per command (`onboard`, `discovery`, `scope`, `prd`, `spec`, `plan`, `build`, `polish`, `refine`, `retro`, `pause`, `unpause`, `feedback`).
 - `plugins/sdd/CLAUDE.md` — plugin-level loader pointer (instructs Claude to load sdd-guide when an `/sdd:*` command runs).
-- `docs/archive/v1/` — v1 planning artifacts, kept untouched as historical record.
+- `docs/archive/v1/`, `docs/archive/v2/` — prior-cycle planning artifacts, kept untouched as historical record.
+- `docs/efficiency-techniques.md` — v3 technique inventory (compression/constraint techniques studied, with port-to-markdown verdicts). Credits its source toolkit in prose only; no source name in the filename or rule labels.
+- `docs/load-map.md` — v3 per-command load map: which references each `/sdd:*` command loads at startup, flagged load-justified or over-included. Also holds the rule-inventory audit trail that proves no behavioral rule was dropped by a trim.
+- `docs/dogfood-comparison.md` — v3 Sprint 1 verification record: the v3-vs-v2 input-footprint and output-verbosity comparison by inspection, with the ~23%/~32% guide-rail verdict and the native-only-benchmark conclusion.
 
-## v2 spec posture (read this before editing the spec)
+## Spec posture (read this before editing the spec)
 
-`docs/spec.md` is a **delta-and-resolution document**, not a comprehensive runtime description. It explains what v2 changes vs. v1 plus resolutions of every open concern, and points at `plugins/sdd/skills/sdd-guide/references/*.md` for the "how" — parser rules, schemas, loading orders, exact behavioral text. **Do not duplicate reference-file content into the spec.** Update the reference file; spec just names it.
+`docs/spec.md` is a **design doc**, not a comprehensive runtime description. The current (v3) spec is a **trim-plan design doc**: it names what changes, why, and where it lands, leaving line-edits to `/sdd:plan` and `/sdd:build`. It points at `plugins/sdd/skills/sdd-guide/references/*.md` for the "how" — parser rules, schemas, loading orders, exact behavioral text. **Do not duplicate reference-file content into the spec.** Update the reference file; spec just names it.
 
 ## Conventions
 

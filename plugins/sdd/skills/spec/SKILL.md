@@ -236,13 +236,7 @@ Present the generated spec to the user for review. Incorporate feedback before f
 
 ### Step 16: Append to Process Notes
 
-Append to `process-notes-spec.md` in the project root. Capture:
-
-- Key architectural decisions and the discussion that led to them.
-- Pushback from either side and how it was resolved.
-- Stack choices that were debated and why the final choice won.
-- Number of deepening rounds completed and what each surfaced.
-- Any concerns or doubts that arose during the spec process.
+Append to `process-notes-spec.md` in the project root, per sdd-guide's `## Process Notes` (four categories, real-time, append-only). Decisions here are the architectural ones and the discussion that led to them. Also capture spec specifics: stack choices debated and why the final choice won; number of deepening rounds and what each surfaced; concerns or doubts that arose.
 
 If `process-notes-spec.md` does not yet exist at the project root, create it on the first append.
 

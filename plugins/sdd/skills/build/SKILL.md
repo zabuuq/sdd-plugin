@@ -177,14 +177,7 @@ If no concerns changed, skip this step.
 
 #### Step 10: Process Notes
 
-Append build notes to `process-notes-sprint-N.md` where N is the current sprint number.
-
-Capture:
-- Which item was built and what was implemented.
-- Decisions made during the build and their rationale.
-- Any deviations from the spec or sprint plan and why.
-- Issues encountered and how they were resolved.
-- Test results summary.
+Append build notes to `process-notes-sprint-N.md` where N is the current sprint number, per sdd-guide's `## Process Notes` (four categories, real-time, append-only). Capture build specifics: which item was built and what was implemented; decisions made during the build and rationale; any deviations from the spec or sprint plan and why; issues encountered and how resolved; test results summary.
 
 #### Step 11: Prompt to Continue
 

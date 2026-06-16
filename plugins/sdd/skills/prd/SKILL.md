@@ -156,12 +156,7 @@ After `docs/prd.md` has been written (per `## Document Generation` above), delet
 
 ### Append to Process Notes
 
-Append to `process-notes-prd.md` in the project root. Capture:
-- Decisions made and rationale.
-- Pushback from either side and resolution.
-- Questions that were difficult and why.
-- Number of deepening rounds and what they surfaced.
-- Any phase-splitting discussion and outcome.
+Append to `process-notes-prd.md` in the project root, per sdd-guide's `## Process Notes` (four categories, real-time, append-only). Also capture PRD specifics: number of deepening rounds and what they surfaced; any phase-splitting discussion and outcome.
 
 If `process-notes-prd.md` does not yet exist at the project root, create it on the first append.
 

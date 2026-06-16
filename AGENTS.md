@@ -8,11 +8,19 @@ Project context, architecture decisions, and conventions for any AI agent or dev
 
 **Who it's for:**
 - The author (Jason), solo build.
-- A local tech group Jason actively hands the plugin to. They use v2 for both real projects and kick-the-tires evaluation, so v2 must clear a working-software bar AND its feedback loop must be real and easy to use.
+- A local tech group Jason actively hands the plugin to. They run SDD on their own projects. v3 introduces no audience shift.
 
 **What problem it solves:** ad-hoc prompting works for small tasks but breaks down on multi-week projects. SDD provides scaffolding — a known sequence, shared artifacts, and predictable interaction patterns — so multi-session, multi-sprint work stays coherent.
 
-## Current cycle (v2)
+## Current cycle (v3)
+
+v3 is a **token-efficiency pass**. Plugin behavior is unchanged; the goal is to make it cheaper to run — fewer input tokens spent on the plugin's own load stack, fewer output tokens spent on verbose responses. Techniques are mined from an external efficiency toolkit (credited in prose in `docs/efficiency-techniques.md`; never named in shipped artifacts) and reimplemented as native markdown. The plugin stays zero-runtime pure markdown — no hook, no scripts, no MCP middleware.
+
+The work is subtractive and held to a hard line: **no workflow step lost, no behavioral rule dropped, artifacts still complete, still passing `claude plugin validate .`.** Two persistent artifacts drive and audit it: `docs/efficiency-techniques.md` (technique inventory + port verdicts) and `docs/load-map.md` (per-command load map + over-inclusion flags + rule-inventory audit trail). Output terseness and anti-sycophancy become a named `## Output Constraints` section in sdd-guide that every command inherits.
+
+Success is judged by inspection against `docs/archive/v2/` (the v3 dogfood baseline), with rough ~23% input / ~32% output reductions as sanity-check guide-rails, not gates. See `docs/scope.md`, `docs/prd.md`, `docs/spec.md`.
+
+## Prior cycle (v2)
 
 v2 is a **streamlining pass** of v1, driven by real-use feedback from three projects (Event Planning App, fiver-gigs, sdd-plugin self-use). Not a feature expansion — refinement of what already works.
 
@@ -42,8 +50,11 @@ The reference implementation (`hackathon-in-a-plugin`) demonstrates that complex
 **Surgical context loading for `/sdd:build`.**
 Multi-sprint projects accumulate large specs and PRDs. `/sdd:build` loads only the spec subsection and PRD story for the current item, not full documents. CLAUDE.md serves as the architectural summary for re-entry after `/clear`. Trade-off: agent has narrower context per item; might miss cross-cutting concerns in other spec sections.
 
-**Lean spec posture (v2).**
-v1's `docs/spec.md` was 935 lines and partially duplicated runtime content from `references/*.md`. The duplication became a maintenance liability — the spec was both planning artifact AND runtime artifact, and updates had to happen twice. v2 spec is a delta-and-resolution document; the runtime files own "how." Trade-off: spec readers must follow cross-references for full detail.
+**Lean spec posture.**
+v1's `docs/spec.md` was 935 lines and partially duplicated runtime content from `references/*.md`. The duplication became a maintenance liability — the spec was both planning artifact AND runtime artifact, and updates had to happen twice. v2 made the spec a delta-and-resolution document; v3's spec is a trim-plan design doc in the same spirit. Either way the runtime files own "how"; the spec names what and why. Trade-off: spec readers must follow cross-references for full detail.
+
+**Shared output constraints (v3).**
+Terseness and anti-sycophancy live in one named `## Output Constraints` section in `sdd-guide/SKILL.md`, enumerated as concrete banned patterns rather than a vague "be terse" instruction. Every command inherits them by loading sdd-guide; no command overrides them. Trade-off: a single section governs all output voice — tuning it affects every command at once (which is the point).
 
 **ID-based PRD acceptance criteria references.**
 Sprint items carry `[PRD: a7kp]` tags pointing at AC IDs assigned by `/sdd:prd` at write time. IDs are stable across `/sdd:refine` reorders. Trade-off: sprint files unreadable without loading PRD context; mitigated by `/sdd:plan` and `/sdd:build` always loading relevant PRD sections.
@@ -116,11 +127,11 @@ claude --plugin-dir ./plugins/sdd
 ```
 Run after any change to manifest files, frontmatter, or directory structure.
 
-**Self-dogfooding for v2:**
-The plugin is used to plan and build v2 of itself. See `docs/project-state.json` for current cycle state and the planning artifacts in `docs/`.
+**Self-dogfooding:**
+The plugin is used to plan and build each cycle of itself. The v3 dogfood is this very planning chain, compared by inspection against `docs/archive/v2/`. See `docs/project-state.json` for current cycle state and the planning artifacts in `docs/`.
 
 **Verification:**
-`docs/v2-verification.md` (added in v2) tracks which in-scope feedback items have been implemented and end-to-end verified. Manual checkoff by the maintainer.
+v3 verification is structural and behavioral: `claude plugin validate .`, a rule-inventory check that proves no behavioral rule was dropped by a trim (recorded in `docs/load-map.md`), a workflow-step comparison against `docs/archive/v2/`, and the dogfood input/output comparison. See `docs/spec.md > Verification`.
 
 ## Don't
 
@@ -133,10 +144,13 @@ The plugin is used to plan and build v2 of itself. See `docs/project-state.json`
 
 ## Files to be aware of
 
-- `docs/scope.md`, `docs/prd.md`, `docs/spec.md` — v2 planning artifacts. Living through the v2 cycle.
+- `docs/scope.md`, `docs/prd.md`, `docs/spec.md` — v3 planning artifacts. Living through the v3 cycle.
+- `docs/efficiency-techniques.md` — v3 technique inventory + port-to-markdown verdicts.
+- `docs/load-map.md` — v3 per-command load map (load-justified / over-included flags) + rule-inventory audit trail.
+- `docs/dogfood-comparison.md` — v3 Sprint 1 dogfood record: v3-vs-v2 input/output reduction by inspection, guide-rail verdict.
 - `docs/open-concerns.md` — cross-phase concern tracking. Every command reads/updates.
 - `docs/project-state.json` — per-project state. `lastCommand`, `currentSprint`, `buildMode`, `commandExplanationsShown`, `smallProject`.
-- `docs/sdd-feedback.md` — v2-cycle feedback pile, kept active across the v2 build.
-- `docs/v2-verification.md` — audit trail for v2 release (will be created at /sdd:spec finalization for this cycle).
+- `docs/sdd-feedback.md` — feedback pile, carried across cycles.
+- `docs/archive/v2/` — archived v2 artifacts; v3 dogfood comparison baseline.
 - `~/.claude/sdd-user-profile.json` — user profile, cross-project (don't commit user-specific data; this lives outside the repo).
 - `~/.claude/sdd-cross-project-patterns.md` — v2 cross-project pattern capture from `/sdd:retro`, cross-project.

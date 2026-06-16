@@ -33,6 +33,6 @@
 
 ## Out of Scope
 
-<!-- Conditional pointer block. Emitted only when docs/backlog.md exists and contains at least one entry (per skills/sdd-guide/references/backlog.md > Parser note). When emitted, the section body is exactly the single line below, verbatim. When the backlog is absent or empty, omit the entire section heading and body — do not leave an empty section behind. Do not inline-list deferred items here; the backlog is the single source of truth. The sprint theme paragraph may still carry a brief "Out of scope:" narrative beat for sprint-specific framing, but enumeration of deferred items lives in docs/backlog.md. -->
+<!-- Conditional pointer block. Emit only when docs/backlog.md exists with ≥1 entry (see references/backlog.md > Parser note); body is exactly the line below, verbatim. Otherwise omit heading and body. The sprint theme paragraph may carry a brief "Out of scope:" narrative beat, but deferred-item enumeration lives in docs/backlog.md. -->
 
 Deferred items: see `docs/backlog.md`.

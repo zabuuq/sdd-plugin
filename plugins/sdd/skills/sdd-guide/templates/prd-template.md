@@ -24,15 +24,15 @@
 
 ## Unvetted
 
-<!-- Items added during sprints that have not yet been refined. /sdd:refine processes these before future sprints. Do not remove this section. -->
+<!-- Sprint-added items not yet refined. /sdd:refine processes these. Do not remove this section. -->
 
 ## What We're Building
 
-[Concise summary of the product. What it is, what it does, who it serves. Synthesized from the full PRD conversation.]
+[Concise summary: what it is, what it does, who it serves.]
 
 ## What We'd Add With More Time
 
-<!-- Conditional pointer block. Emitted only when docs/backlog.md exists and contains at least one entry (per skills/sdd-guide/references/backlog.md > Parser note). When emitted, the section body is exactly the single line below, verbatim. When the backlog is absent or empty, omit the entire section heading and body — do not leave an empty section behind. Do not inline-list deferred items here; the backlog is the single source of truth. -->
+<!-- Conditional pointer block. Emit only when docs/backlog.md exists with ≥1 entry (see references/backlog.md > Parser note); body is exactly the line below, verbatim. Otherwise omit heading and body. Don't inline-list deferred items. -->
 
 Deferred items: see `docs/backlog.md`.
 
