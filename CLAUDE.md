@@ -2,7 +2,7 @@
 
 This repository is the **SDD plugin source** — a spec-driven development workflow plugin for Claude Code. The plugin itself lives at `plugins/sdd/`. Planning artifacts for the current development cycle live in `docs/`.
 
-**Currently active cycle:** v3 — a token-efficiency pass that trims the plugin's input footprint and output verbosity without changing behavior. See `docs/scope.md`, `docs/prd.md`, `docs/spec.md`. v2 artifacts are archived at `docs/archive/v2/` and serve as the v3 dogfood comparison baseline.
+**Currently active cycle:** v4 — adds a new `/sdd:archive` command that cleanly closes out a finished project cycle: it sweeps the cycle's SDD-produced artifacts into a versioned `docs/archive/v{N}/`, writes an auto-generated `INDEX.md` and snapshots of the cross-cycle living docs, resets `project-state.json` for a fresh `/sdd:scope`, and (in a git repo) branches/commits/pushes/opens a PR. See `docs/scope.md`, `docs/prd.md`, `docs/spec.md`. Prior cycles are archived at `docs/archive/v1|v2|v3/`.
 
 Read `AGENTS.md` for full project context, conventions, and the rationale behind key architectural decisions.
 
@@ -17,16 +17,14 @@ Read `AGENTS.md` for full project context, conventions, and the rationale behind
 - `plugins/sdd/skills/sdd-guide/` — shared behavior loaded by every command. Tone, interaction rules, guard rails, command chain.
 - `plugins/sdd/skills/sdd-guide/references/` — focused reference files for cross-cutting mechanisms (right-sizing, pause-resume, sprint-tags, context-management, etc.). The v2 spec posture is to put "how" detail here, not in `docs/spec.md`.
 - `plugins/sdd/skills/sdd-guide/templates/` — markdown templates the command skills emit (scope, prd, spec, sprint, retro, discovery).
-- `plugins/sdd/skills/<command>/SKILL.md` — one skill per command (`onboard`, `discovery`, `scope`, `prd`, `spec`, `plan`, `build`, `polish`, `refine`, `retro`, `pause`, `unpause`, `feedback`).
+- `plugins/sdd/skills/<command>/SKILL.md` — one skill per command (`onboard`, `discovery`, `scope`, `prd`, `spec`, `plan`, `build`, `polish`, `refine`, `retro`, `pause`, `unpause`, `feedback`, `archive`). `archive` is the v4 addition — an anytime, no-precondition close-and-reset command (not in the linear chain).
 - `plugins/sdd/CLAUDE.md` — plugin-level loader pointer (instructs Claude to load sdd-guide when an `/sdd:*` command runs).
-- `docs/archive/v1/`, `docs/archive/v2/` — prior-cycle planning artifacts, kept untouched as historical record.
-- `docs/efficiency-techniques.md` — v3 technique inventory (compression/constraint techniques studied, with port-to-markdown verdicts). Credits its source toolkit in prose only; no source name in the filename or rule labels.
-- `docs/load-map.md` — v3 per-command load map: which references each `/sdd:*` command loads at startup, flagged load-justified or over-included. Also holds the rule-inventory audit trail that proves no behavioral rule was dropped by a trim.
-- `docs/dogfood-comparison.md` — v3 Sprint 1 verification record: the v3-vs-v2 input-footprint and output-verbosity comparison by inspection, with the ~23%/~32% guide-rail verdict and the native-only-benchmark conclusion.
+- `docs/archive/v1/`, `docs/archive/v2/`, `docs/archive/v3/` — prior-cycle planning, sprint, and process artifacts, each with an `INDEX.md` and a frozen `project-state.json`, kept untouched as historical record. v3's working docs (`efficiency-techniques.md`, `load-map.md`, `dogfood-comparison.md`) live in `docs/archive/v3/`. This archive convention is exactly what the v4 `/sdd:archive` command automates.
+- `docs/backlog.md`, `docs/sdd-feedback.md`, `docs/project-state.json` — the three cross-cycle living docs that carry forward across cycles (snapshotted, never swept, by `/sdd:archive`).
 
 ## Spec posture (read this before editing the spec)
 
-`docs/spec.md` is a **design doc**, not a comprehensive runtime description. The current (v3) spec is a **trim-plan design doc**: it names what changes, why, and where it lands, leaving line-edits to `/sdd:plan` and `/sdd:build`. It points at `plugins/sdd/skills/sdd-guide/references/*.md` for the "how" — parser rules, schemas, loading orders, exact behavioral text. **Do not duplicate reference-file content into the spec.** Update the reference file; spec just names it.
+`docs/spec.md` is a **design doc**, not a comprehensive runtime description. The current (v4) spec is a **new-command design doc**: it defines what `/sdd:archive` does, its behavioral contract, and where its files land, leaving the exact `SKILL.md` prose to `/sdd:plan` and `/sdd:build`. It points at `plugins/sdd/skills/sdd-guide/references/*.md` for the "how" — parser rules, schemas (the `project-state.json` `cycleNumber` field and reset map land in `references/living-documents.md`), loading orders, exact behavioral text. **Do not duplicate reference-file content into the spec.** Update the reference file; spec just names it.
 
 ## Conventions
 
