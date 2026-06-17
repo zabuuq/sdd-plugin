@@ -15,6 +15,54 @@ The following documents can be modified after initial creation:
 
 All other documents (scope, process notes, sprint files) are append-only or immutable once created.
 
+## project-state.json Schema and Reset
+
+`docs/project-state.json` carries cross-cycle state. This is its canonical field set:
+
+| Field | Type | Owner / notes |
+|---|---|---|
+| `version` | integer | Schema version (`1`). Not cycle state. |
+| `cycleNumber` | integer (top-level) | The current working cycle. **Sole owner: `/sdd:archive`.** `/sdd:scope` never reads or writes it. **Absent → assume `1`.** Single writer ⇒ no double-increment, no stale-number race. |
+| `currentSprint` | integer | Current sprint number. `/sdd:plan` computes the next sprint as `currentSprint + 1`. |
+| `buildMode` | string | Build pacing preference (mirrors profile `defaultSprintMode`). |
+| `smallProject` | boolean / null | Right-sizing judgment for the current cycle. |
+| `lastCommand` | string | Most recent command to run (see `## State Tracking` in `SKILL.md`). |
+| `commandExplanationsShown` | object | Per-command booleans gating the once-per-project explanation blurb (see `## Command Explanations` in `SKILL.md`). |
+| `notes` | string | Free-text seed line naming the cycle. |
+
+### cycleNumber resolution and bump
+
+`/sdd:archive` resolves the target archive directory from `cycleNumber`: read `cycleNumber` (absent → assume `1`); start at `docs/archive/v{cycleNumber}/`; if that directory already exists, advance to the next unused `v{N}`. The resolved `N` is authoritative for the directory name, the branch name, and the `cycleNumber` bump. After archiving into `v{N}/`, the reset sets live `cycleNumber = N + 1`.
+
+### Reset map
+
+`/sdd:archive` applies the following to the **live** `project-state.json` **after** the byte-identical snapshot is written into the archive directory:
+
+| Field | Reset behavior | Rationale |
+|---|---|---|
+| `version` | Carry (`1`) | Schema version, not cycle state. |
+| `cycleNumber` | Bump to `N+1` | Resolved N + 1; sole owner. |
+| `currentSprint` | Reset to `0` (or omit) | No carryover of prior sprint state. `/sdd:plan` computes the next sprint as `currentSprint + 1`, so `0` (or absent) makes the next cycle's first sprint `1`. |
+| `buildMode` | Carry | Stable user preference. |
+| `smallProject` | Reset to `null` | New cycle re-judges from scratch. |
+| `lastCommand` | Reset to `"archive"` | Truthful; `/sdd:scope` overwrites on next startup. |
+| `commandExplanationsShown` | Normalize + flip to `false` (except `archive`) | See normalization below. |
+| `notes` | Rewrite to a fresh seed line | Names the new cycle and where the prior cycle archived. |
+
+The reset must leave `project-state.json` a valid, parseable JSON file.
+
+### commandExplanationsShown normalization
+
+The reset normalizes the object to the current command set:
+
+- **Drop the stale legacy keys** `sprint`, `iterate`, `reflect`.
+- **Add an `archive` key.**
+- Flip every key to `false` **except `archive`**, whose value is preserved (the archive blurb is once-per-project, not once-per-cycle).
+
+### Snapshot-first / startup-overwrite exemption
+
+`/sdd:archive` is **exempt** from the `## State Tracking` rule that every command overwrites `lastCommand` on startup. It captures the existing `lastCommand` first (for the snapshot and `INDEX.md`), snapshots `project-state.json` untouched, and sets `lastCommand: "archive"` only later, in the reset. This preserves the cycle's true final command in the snapshot.
+
 ## Default Stance
 
 **Resist changes to scope, PRD, and spec.** These documents represent deliberate decisions made during planning. Changes should not happen casually.

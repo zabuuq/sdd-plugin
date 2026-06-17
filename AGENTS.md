@@ -8,17 +8,24 @@ Project context, architecture decisions, and conventions for any AI agent or dev
 
 **Who it's for:**
 - The author (Jason), solo build.
-- A local tech group Jason actively hands the plugin to. They run SDD on their own projects. v3 introduces no audience shift.
+- A local tech group Jason actively hands the plugin to. They run SDD on their own projects. v4 introduces no audience shift.
 
 **What problem it solves:** ad-hoc prompting works for small tasks but breaks down on multi-week projects. SDD provides scaffolding — a known sequence, shared artifacts, and predictable interaction patterns — so multi-session, multi-sprint work stays coherent.
 
-## Current cycle (v3)
+## Current cycle (v4)
 
-v3 is a **token-efficiency pass**. Plugin behavior is unchanged; the goal is to make it cheaper to run — fewer input tokens spent on the plugin's own load stack, fewer output tokens spent on verbose responses. Techniques are mined from an external efficiency toolkit (credited in prose in `docs/efficiency-techniques.md`; never named in shipped artifacts) and reimplemented as native markdown. The plugin stays zero-runtime pure markdown — no hook, no scripts, no MCP middleware.
+v4 adds one **new command, `/sdd:archive`** — a mechanical close-and-reset that automates the hand-cranked archive the maintainer otherwise does between cycles. It is separate from `/sdd:retro` (which stays reflection-only and terminal). In a single run, with one confirmation gate, it:
 
-The work is subtractive and held to a hard line: **no workflow step lost, no behavioral rule dropped, artifacts still complete, still passing `claude plugin validate .`.** Two persistent artifacts drive and audit it: `docs/efficiency-techniques.md` (technique inventory + port verdicts) and `docs/load-map.md` (per-command load map + over-inclusion flags + rule-inventory audit trail). Output terseness and anti-sycophancy become a named `## Output Constraints` section in sdd-guide that every command inherits.
+- Sweeps the cycle's **SDD-produced** artifacts (an explicit allow-list: `docs/{scope,prd,spec,discovery,retro,open-concerns}.md`, `docs/sprint-*.md`, `docs/*-resume.md`, root `process-notes-*.md`) into `docs/archive/v{N}/`. Foreign/hand-placed files in `docs/` are left in place and surfaced in the plan.
+- Writes an auto-generated `INDEX.md` and **byte-identical snapshots** of the three cross-cycle living docs (`backlog.md`, `sdd-feedback.md`, `project-state.json`), whose live copies stay in `docs/`.
+- Resets live `project-state.json` (bumps `cycleNumber`, resets `smallProject`/`currentSprint`/explanations, etc.) so a fresh `/sdd:scope` starts clean in place.
+- In a git repo, branches (`archive-v{N}`), commits with **tight staging**, pushes, and opens a PR via `gh`.
 
-Success is judged by inspection against `docs/archive/v2/` (the v3 dogfood baseline), with rough ~23% input / ~32% output reductions as sanity-check guide-rails, not gates. See `docs/scope.md`, `docs/prd.md`, `docs/spec.md`.
+The plugin stays zero-runtime pure markdown — `/sdd:archive` drives `git`/`gh` as external CLIs it does not bundle. The one cross-cutting change is the `project-state.json` schema: a new `cycleNumber` field (owned solely by `/sdd:archive`) and a normalized `commandExplanationsShown` object. See `docs/scope.md`, `docs/prd.md`, `docs/spec.md`.
+
+## Prior cycle (v3)
+
+v3 was a **token-efficiency pass** — subtractive, behavior-unchanged, trimming the plugin's input footprint and adding a named `## Output Constraints` section (terseness + anti-sycophancy) to sdd-guide that every command inherits. Its working artifacts (`efficiency-techniques.md`, `load-map.md`, `dogfood-comparison.md`) and planning docs are archived at `docs/archive/v3/`.
 
 ## Prior cycle (v2)
 
@@ -67,6 +74,15 @@ v1 had a single `process-notes.md`. v2 splits per-phase (`process-notes-discover
 
 **`docs/v2-verification.md` is sdd-plugin-specific.**
 Acceptable departure from the "plugin code works the same in every project" principle because the verification artifact lives in the project and the maintainer drives verification manually. Future plugin versions ship `<version>-verification.md` per the same pattern.
+
+**Allow-list sweep, not deny-list (v4 `/sdd:archive`).**
+The archive sweeps only artifacts SDD itself produces (an explicit allow-list), never "everything in `docs/` except the trio." This guarantees a foreign or hand-placed file is never archived by accident. The cost — ad-hoc cycle docs aren't auto-swept — is mitigated by the plan gate surfacing a *left-in-place* list before any move, so nothing is silently stranded.
+
+**`/sdd:archive` is the sole owner of `cycleNumber` (v4).**
+The archive target version comes from a new `cycleNumber` field in `project-state.json`. Only `/sdd:archive` reads/writes it: after archiving cycle N it sets `cycleNumber = N+1`. Single writer ⇒ no double-increment, no stale-number race; `/sdd:scope` stays unaware of versioning. An absent field defaults to `1` and rides the existing "advance past an existing `v{N}`" collision check as its bootstrap.
+
+**Snapshot-first; archive is exempt from the startup `lastCommand` overwrite (v4).**
+Every command normally overwrites `lastCommand` on startup. `/sdd:archive` must not — it snapshots `project-state.json` byte-identical *before* the reset so the frozen snapshot preserves the cycle's true final command (matching the v3 snapshot, which correctly reads `"retro"`). It sets `lastCommand: "archive"` only in the live reset, after the snapshot.
 
 ## Coding conventions
 
@@ -128,10 +144,10 @@ claude --plugin-dir ./plugins/sdd
 Run after any change to manifest files, frontmatter, or directory structure.
 
 **Self-dogfooding:**
-The plugin is used to plan and build each cycle of itself. The v3 dogfood is this very planning chain, compared by inspection against `docs/archive/v2/`. See `docs/project-state.json` for current cycle state and the planning artifacts in `docs/`.
+The plugin is used to plan and build each cycle of itself. The ultimate v4 dogfood is the real end-of-cycle run of `/sdd:archive` on this repo — archiving v4 into `docs/archive/v4/` and resetting for v5. See `docs/project-state.json` for current cycle state and the planning artifacts in `docs/`.
 
 **Verification:**
-v3 verification is structural and behavioral: `claude plugin validate .`, a rule-inventory check that proves no behavioral rule was dropped by a trim (recorded in `docs/load-map.md`), a workflow-step comparison against `docs/archive/v2/`, and the dogfood input/output comparison. See `docs/spec.md > Verification`.
+v4 verification is structural and behavioral: `claude plugin validate .` for the new skill, AC-by-AC manual checks (the destructive/git ACs exercised in a throwaway copy or disposable branch so moves/branch/PR can be driven then discarded), and the one-shot real dogfood archive run as the final proof — run only after the disposable-branch walkthrough passes. See `docs/spec.md > Testing Strategy`.
 
 ## Don't
 
@@ -144,13 +160,10 @@ v3 verification is structural and behavioral: `claude plugin validate .`, a rule
 
 ## Files to be aware of
 
-- `docs/scope.md`, `docs/prd.md`, `docs/spec.md` — v3 planning artifacts. Living through the v3 cycle.
-- `docs/efficiency-techniques.md` — v3 technique inventory + port-to-markdown verdicts.
-- `docs/load-map.md` — v3 per-command load map (load-justified / over-included flags) + rule-inventory audit trail.
-- `docs/dogfood-comparison.md` — v3 Sprint 1 dogfood record: v3-vs-v2 input/output reduction by inspection, guide-rail verdict.
+- `docs/scope.md`, `docs/prd.md`, `docs/spec.md` — v4 planning artifacts. Living through the v4 cycle.
 - `docs/open-concerns.md` — cross-phase concern tracking. Every command reads/updates.
-- `docs/project-state.json` — per-project state. `lastCommand`, `currentSprint`, `buildMode`, `commandExplanationsShown`, `smallProject`.
-- `docs/sdd-feedback.md` — feedback pile, carried across cycles.
-- `docs/archive/v2/` — archived v2 artifacts; v3 dogfood comparison baseline.
+- `docs/project-state.json` — per-project state. `lastCommand`, `currentSprint`, `buildMode`, `commandExplanationsShown`, `smallProject`, and (v4) `cycleNumber`. Cross-cycle living doc — carried forward, snapshotted by `/sdd:archive`.
+- `docs/backlog.md`, `docs/sdd-feedback.md` — cross-cycle living docs (deferral log, feedback pile), carried across cycles, snapshotted by `/sdd:archive`.
+- `docs/archive/v1|v2|v3/` — archived prior-cycle artifacts, each with an `INDEX.md` and frozen `project-state.json`. The structure `/sdd:archive` reproduces.
 - `~/.claude/sdd-user-profile.json` — user profile, cross-project (don't commit user-specific data; this lives outside the repo).
 - `~/.claude/sdd-cross-project-patterns.md` — v2 cross-project pattern capture from `/sdd:retro`, cross-project.

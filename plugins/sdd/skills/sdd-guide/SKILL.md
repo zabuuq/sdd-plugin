@@ -182,3 +182,4 @@ Tracked via `handoffWarningShown` in `~/.claude/sdd-user-profile.json`. Seeded `
 - `/sdd:pause` — emits the PRD-required line `Paused. Run /sdd:unpause to resume.` Overrides the normal handoff template.
 - `/sdd:unpause` — emits no separate handoff. The resumed command emits its normal handoff at its own completion.
 - `/sdd:feedback` — emits no handoff (instant-return per PRD).
+- `/sdd:archive` — not an interview command; not bound by the interview-handoff template or `handoffWarningShown`. Closes and resets a finished cycle. Emits a one-line outcome (`Cycle v{N} archived to docs/archive/v{N}/.`) plus a two-line handoff to `/sdd:scope` (`Run /clear, then /sdd:scope to start the next cycle.`). A PR line (`PR opened: <url>.`) is conditional — present only when git opened a PR, omitted/replaced for a no-repo or failure. Next step is always `/sdd:scope`.
