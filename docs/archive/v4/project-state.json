@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "currentSprint": 1,
+  "buildMode": "autonomous",
+  "smallProject": true,
+  "lastCommand": "/sdd:build",
+  "commandExplanationsShown": {
+    "scope": true,
+    "prd": true,
+    "spec": true,
+    "sprint": true,
+    "plan": true,
+    "build": true,
+    "iterate": true,
+    "polish": false,
+    "reflect": true,
+    "refine": false,
+    "retro": true,
+    "feedback": true
+  },
+  "notes": "v4 cycle. Started 2026-06-16. v3 artifacts archived to docs/archive/v3/. Cross-cycle living docs (docs/backlog.md, docs/sdd-feedback.md) carried forward. lastCommand=scope; smallProject=true (judged at end of /sdd:scope Phase 1 — single new command /sdd:archive, solo self-improvement cycle). Cycle goal: add /sdd:archive (close-and-archive a project, reset dir for a new /sdd:scope run)."
+}
