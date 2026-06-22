@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "cycleNumber": 5,
+  "currentSprint": 1,
+  "buildMode": "autonomous",
+  "smallProject": true,
+  "lastCommand": "/sdd:retro",
+  "commandExplanationsShown": {
+    "scope": true,
+    "prd": true,
+    "spec": true,
+    "plan": true,
+    "build": true,
+    "polish": false,
+    "refine": false,
+    "retro": true,
+    "feedback": false,
+    "archive": true
+  },
+  "notes": "v5 cycle. Prior cycle (v4) archived to docs/archive/v4/ on 2026-06-17. Cross-cycle living docs (docs/backlog.md, docs/sdd-feedback.md) carried forward. Run /sdd:scope to begin."
+}
