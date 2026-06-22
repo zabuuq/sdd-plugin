@@ -8,20 +8,31 @@ Project context, architecture decisions, and conventions for any AI agent or dev
 
 **Who it's for:**
 - The author (Jason), solo build.
-- A local tech group Jason actively hands the plugin to. They run SDD on their own projects. v4 introduces no audience shift.
+- A local tech group Jason actively hands the plugin to. They run SDD on their own projects. Neither v4 nor v5 introduces an audience shift.
 
 **What problem it solves:** ad-hoc prompting works for small tasks but breaks down on multi-week projects. SDD provides scaffolding — a known sequence, shared artifacts, and predictable interaction patterns — so multi-session, multi-sprint work stays coherent.
 
-## Current cycle (v4)
+## Current cycle (v5)
 
-v4 adds one **new command, `/sdd:archive`** — a mechanical close-and-reset that automates the hand-cranked archive the maintainer otherwise does between cycles. It is separate from `/sdd:retro` (which stays reflection-only and terminal). In a single run, with one confirmation gate, it:
+v5 **extends `/sdd:archive`** to handle the `docs/refs/` reference directory, which the command currently ignores entirely — `docs/refs/` is neither on the sweep allow-list nor part of the carry-forward trio, so it silently falls into "left in place" and is never read or moved. When a **real** archive run (non-empty sweep set) finds files under `docs/refs/`, the command:
+
+- **Enumerates** them in a flattened, recursive **numbered list** — relative paths shown (so same-named files in different subdirs stay distinct), dotfiles/hidden excluded, symlinks counted — and asks the maintainer which to archive.
+- **Parses** a numeric/keyword reply (`1,3` / `2-4` / `all` / `none` / empty; invalid tokens ignored-and-proceed) as a plan-*building* step inside a **two-step plan gate** that still takes exactly one final confirmation.
+- **Moves** (not copies) the selected refs into `docs/archive/v{N}/refs/<relpath>`, preserving relative paths; leaves unselected refs live and untouched (no flag, copy, delete, rename, or report).
+- **Enumerates** the swept refs per-file in the generated `INDEX.md` and **counts** them in the "Artifacts archived" total.
+
+Strictly additive: when `docs/refs/` is empty/absent, or the sweep set is empty (the nothing-to-archive exit wins even if refs exist), every other archive surface is byte-for-byte unchanged. No `project-state.json` schema change and no new reference file — the feature is self-contained in `plugins/sdd/skills/archive/SKILL.md`. See `docs/scope.md`, `docs/prd.md`, `docs/spec.md`.
+
+## Prior cycle (v4)
+
+v4 added one **new command, `/sdd:archive`** — a mechanical close-and-reset that automates the hand-cranked archive the maintainer otherwise does between cycles. It is separate from `/sdd:retro` (which stays reflection-only and terminal). In a single run, with one confirmation gate, it:
 
 - Sweeps the cycle's **SDD-produced** artifacts (an explicit allow-list: `docs/{scope,prd,spec,discovery,retro,open-concerns}.md`, `docs/sprint-*.md`, `docs/*-resume.md`, root `process-notes-*.md`) into `docs/archive/v{N}/`. Foreign/hand-placed files in `docs/` are left in place and surfaced in the plan.
 - Writes an auto-generated `INDEX.md` and **byte-identical snapshots** of the three cross-cycle living docs (`backlog.md`, `sdd-feedback.md`, `project-state.json`), whose live copies stay in `docs/`.
 - Resets live `project-state.json` (bumps `cycleNumber`, resets `smallProject`/`currentSprint`/explanations, etc.) so a fresh `/sdd:scope` starts clean in place.
 - In a git repo, branches (`archive-v{N}`), commits with **tight staging**, pushes, and opens a PR via `gh`.
 
-The plugin stays zero-runtime pure markdown — `/sdd:archive` drives `git`/`gh` as external CLIs it does not bundle. The one cross-cutting change is the `project-state.json` schema: a new `cycleNumber` field (owned solely by `/sdd:archive`) and a normalized `commandExplanationsShown` object. See `docs/scope.md`, `docs/prd.md`, `docs/spec.md`.
+The plugin stays zero-runtime pure markdown — `/sdd:archive` drives `git`/`gh` as external CLIs it does not bundle. The one cross-cutting change is the `project-state.json` schema: a new `cycleNumber` field (owned solely by `/sdd:archive`) and a normalized `commandExplanationsShown` object. See `docs/archive/v4/{scope,prd,spec}.md`.
 
 ## Prior cycle (v3)
 
@@ -84,6 +95,9 @@ The archive target version comes from a new `cycleNumber` field in `project-stat
 **Snapshot-first; archive is exempt from the startup `lastCommand` overwrite (v4).**
 Every command normally overwrites `lastCommand` on startup. `/sdd:archive` must not — it snapshots `project-state.json` byte-identical *before* the reset so the frozen snapshot preserves the cycle's true final command (matching the v3 snapshot, which correctly reads `"retro"`). It sets `lastCommand: "archive"` only in the live reset, after the snapshot.
 
+**Two-step plan gate preserves the single-confirmation contract (v5).**
+The refs-selection feature needs an interactive per-file choice, but `/sdd:archive`'s contract is "one confirmation covers the whole run." Resolution: the refs list + selection is a plan-*building* sub-step (Step A) that runs **before** the plan is displayed; the resolved selection folds into the plan as a "Will archive (refs)" group, and the existing single confirmation (Step B) approves the complete plan. The selection reply is input, not a go/no-go — the contract holds literally. Detection runs in pre-flight (read-only, all mutation stays behind the one confirmation); the nothing-to-archive exit short-circuits before Step A; and `docs/refs/` is excluded from the plan's "Left in place" set in all cases so refs are never double-surfaced. Execute ordering is load-bearing: selected refs move *before* `INDEX.md` generation so the index can enumerate and count them.
+
 ## Coding conventions
 
 **SKILL.md frontmatter:**
@@ -144,10 +158,10 @@ claude --plugin-dir ./plugins/sdd
 Run after any change to manifest files, frontmatter, or directory structure.
 
 **Self-dogfooding:**
-The plugin is used to plan and build each cycle of itself. The ultimate v4 dogfood is the real end-of-cycle run of `/sdd:archive` on this repo — archiving v4 into `docs/archive/v4/` and resetting for v5. See `docs/project-state.json` for current cycle state and the planning artifacts in `docs/`.
+The plugin is used to plan and build each cycle of itself. The ultimate v5 dogfood is the real end-of-cycle run of `/sdd:archive` on this repo with a populated `docs/refs/` — archiving v5 into `docs/archive/v5/` (including the selected refs) and resetting for v6. See `docs/project-state.json` for current cycle state and the planning artifacts in `docs/`.
 
 **Verification:**
-v4 verification is structural and behavioral: `claude plugin validate .` for the new skill, AC-by-AC manual checks (the destructive/git ACs exercised in a throwaway copy or disposable branch so moves/branch/PR can be driven then discarded), and the one-shot real dogfood archive run as the final proof — run only after the disposable-branch walkthrough passes. See `docs/spec.md > Testing Strategy`.
+v5 verification is structural and behavioral: `claude plugin validate .` for the edited skill, AC-by-AC manual checks against a populated `docs/refs/` fixture (nested subdirs, a same-named file in two subdirs, a `.gitkeep`, a symlink) with the destructive/git ACs exercised in a throwaway copy or disposable branch, the inert-path cases (absent / empty / dotfile-only refs, and empty-sweep-set), and the one-shot real dogfood archive run as the final proof — run only after the disposable-branch walkthrough passes. See `docs/spec.md > Testing Strategy`.
 
 ## Don't
 
@@ -160,10 +174,11 @@ v4 verification is structural and behavioral: `claude plugin validate .` for the
 
 ## Files to be aware of
 
-- `docs/scope.md`, `docs/prd.md`, `docs/spec.md` — v4 planning artifacts. Living through the v4 cycle.
+- `docs/scope.md`, `docs/prd.md`, `docs/spec.md` — v5 planning artifacts. Living through the v5 cycle.
+- `docs/refs/` — the reference directory the v5 `/sdd:archive` extension handles. May or may not exist at runtime; when populated during a real archive run, the maintainer selects per file what gets swept into `docs/archive/v{N}/refs/`.
 - `docs/open-concerns.md` — cross-phase concern tracking. Every command reads/updates.
 - `docs/project-state.json` — per-project state. `lastCommand`, `currentSprint`, `buildMode`, `commandExplanationsShown`, `smallProject`, and (v4) `cycleNumber`. Cross-cycle living doc — carried forward, snapshotted by `/sdd:archive`.
 - `docs/backlog.md`, `docs/sdd-feedback.md` — cross-cycle living docs (deferral log, feedback pile), carried across cycles, snapshotted by `/sdd:archive`.
-- `docs/archive/v1|v2|v3/` — archived prior-cycle artifacts, each with an `INDEX.md` and frozen `project-state.json`. The structure `/sdd:archive` reproduces.
+- `docs/archive/v1|v2|v3|v4/` — archived prior-cycle artifacts, each with an `INDEX.md` and frozen `project-state.json`. The structure `/sdd:archive` reproduces.
 - `~/.claude/sdd-user-profile.json` — user profile, cross-project (don't commit user-specific data; this lives outside the repo).
 - `~/.claude/sdd-cross-project-patterns.md` — v2 cross-project pattern capture from `/sdd:retro`, cross-project.

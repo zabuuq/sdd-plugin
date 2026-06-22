@@ -101,9 +101,65 @@ Anything else in `docs/` that is neither on the allow-list nor part of the trio 
 
 If the computed sweep set is empty, report that there is nothing to archive and make **zero** changes — do not create a `v{N}/` directory, do not branch, do not commit, do not push, do not open a PR, and do not modify `docs/project-state.json`. Stop cleanly.
 
+**This exit short-circuits BEFORE the plan gate's Step A** (`bprd`, `bpre`). When the sweep set is empty the command exits here with zero changes and never reaches the refs list — **even if `docs/refs/` is populated**. A populated `docs/refs/` alone never triggers a numbered list, a selection prompt, or a ref move; refs handling is reachable only on a real archive run.
+
+### Enumerate refs candidates
+
+Compute the flattened candidate list of references under `docs/refs/`. This is a **read-only** computation — like every other pre-flight step it reads and computes only; it **moves nothing**. The list is merely *built* here; it is *displayed* and the user's selection *collected* later, at the plan gate (Step A), so that all mutation stays behind the single confirmation.
+
+Walk `docs/refs/` and produce a flat list of candidate entries:
+
+- **Recurse to any depth.** Flatten every file found anywhere under `docs/refs/` — including in nested subdirectories — into one single list.
+- **One entry per file**, displayed as the file's path **relative to `docs/refs/`**. So `docs/refs/foo.md` lists as `foo.md`, and `docs/refs/sub/bar.md` lists as `sub/bar.md`. Two same-named files in different subdirectories (e.g. `sub/notes.md` and `archive-notes/notes.md`) are **distinct entries**.
+- **Exclude hidden/dotfiles.** Skip any entry whose filename begins with `.` (e.g. `.gitkeep`, `.DS_Store`) — it is not counted, not listed, and not a candidate. A `docs/refs/` that holds **only** dotfiles (such as a lone `.gitkeep`) therefore yields an **empty** candidate list and counts as empty.
+- **Symlinks count as ordinary files** — list them like any other entry.
+- **Empty subdirectories contribute nothing** — only files produce entries; bare directories do not.
+
+If `docs/refs/` is absent or yields no candidates after the exclusions above, the candidate list is empty. An empty candidate list means Step A at the plan gate is skipped entirely (see below); refs handling stays dormant.
+
+Computing this list here is harmless even on a nothing-to-archive run: the nothing-to-archive exit above short-circuits before the plan gate, so an empty sweep set never reaches Step A regardless of what `docs/refs/` holds.
+
 ## Plan Gate & Confirmation
 
 Pre-flight has now computed the sweep set, the target version `N`, and the left-in-place set, and has written and moved nothing. Before moving any file, writing any snapshot, resetting `project-state.json`, or running any git operation, display **one** plan and wait for **one** explicit user confirmation. This single gate covers the entire run — there is **no separate confirmation** later for opening the PR or for any other step.
+
+The plan gate has two parts: **Step A** (refs selection — a plan-*building* input collected before the plan is shown) and **Step B** (the plan display below plus the single confirmation). Step A gathers input only; it is **not** a confirmation. The single explicit confirmation remains the one in **Wait for confirmation** below.
+
+### Step A — refs selection (plan-building input)
+
+Run this step **only when both** of the following hold:
+
+- the **sweep set is non-empty** (a real archive is happening — the nothing-to-archive exit did not fire), **and**
+- the **refs candidate list** computed in pre-flight (`### Enumerate refs candidates`) is **non-empty**.
+
+If either is empty, **skip Step A entirely** — do not display the list, do not prompt, and proceed straight to **Display the plan**. Refs handling stays dormant when there is nothing to sweep or no live references.
+
+When Step A runs, display the candidates as a simple numbered list — one line per candidate, showing its path relative to `docs/refs/` — then **wait for the user's reply**. This step **moves no file** under `docs/refs/`; it only displays and collects a selection. Use this format (the exact wording is a build-time authoring choice; keep it to a numbered list plus a numeric/keyword reply, with no elaborate UI):
+
+```
+docs/refs/ has references. Select which to archive:
+  1. foo.md
+  2. sub/bar.md
+  3. notes/2026-design.md
+Reply with numbers to archive (e.g. 1,3 or 2-3 or all / none).
+```
+
+**Parse the reply** into a **selected refs** set (a subset of the candidate list). Accepted reply forms:
+
+- **Comma-separated numbers** — `1,3,5` selects candidates 1, 3, and 5.
+- **Inclusive ranges** — `2-4` selects candidates 2, 3, and 4.
+- **Keywords** — `all` selects every candidate; `none` selects nothing.
+- **Combinations** — `1,3-5,8` mixes numbers and ranges.
+
+Keyword and empty semantics:
+
+- **`all`** selects every candidate. If `all` appears anywhere in the reply, any other tokens in the same reply are **ignored** — the result is the full candidate list.
+- **`none`** selects nothing — every reference is left live for the next cycle.
+- An **empty reply** is treated the same as `none` — nothing selected.
+
+Forgiveness (no re-prompt): silently **drop** any invalid or out-of-range token (a non-numeric token that is not a keyword, a number larger than the candidate count, a malformed range), and **honor the valid selections** from the same reply. Do **not** re-prompt. This is safe because the resolved selected-refs set is surfaced back to the user in the plan and still passes the single final confirmation below — a fat-fingered number cannot silently archive the wrong file.
+
+The resolved **selected refs** set is the output of Step A. It is held and **fed into the plan gate**: a later build item folds it into the plan display (a "Will archive (refs)" group) and the move execution. Step A itself resolves the set and performs **no move** — collecting input only, it leaves the single confirmation below fully intact.
 
 ### Display the plan
 
@@ -111,7 +167,11 @@ Present the plan as plain text, in this order. Keep it scannable — group and c
 
 1. **Will archive** — the sweep set, **grouped with counts**, not an exhaustive per-filename list. Group by kind, for example: "the planning trio (scope, prd, spec)", "discovery / retro / open-concerns (whichever are present)", "N sprint files", "N resume files", "N root process-notes files". Show only the groups that actually have members. A one-line total file count is fine; a full filename roster is not.
 
+   **`Will archive (refs):` group** — *only when Step A ran and resolved a non-empty selected-refs set.* List the resolved selected refs by their **flattened relative path** under `docs/refs/` (e.g. `foo.md`, `sub/bar.md`) — one per line. This folds the Step A selection into the plan so the user sees exactly which references the single confirmation below will sweep. **Omit this group entirely** when Step A was skipped or resolved to an empty selection (no refs to archive) — keeping the plan inert for the no-refs case.
+
 2. **Left in place** — the left-in-place set computed in pre-flight: everything in `docs/` that is neither on the allow-list, nor part of the carry-forward trio, nor under `docs/archive/`. List these by name (this set is normally small, and the point is to let the user see exactly what stays behind). If it is empty, say so. Make clear that these files will **not** be moved — so the user can abort here, relocate any straggler manually, and re-run.
+
+   **`docs/refs/` is NEVER shown here.** Exclude `docs/refs/` (and everything under it) from this "Left in place" set **outright, in all cases** — engaged, empty/absent, or partial selection. Refs are owned wholly by the refs path: selected refs surface in the `Will archive (refs):` group above; unselected refs simply stay live and are not re-surfaced here. This holds even when Step A was skipped (empty candidate list or no sweep) — `docs/refs/` still does not appear under "Left in place." Pre-feature, `docs/refs/` would have fallen into this set; it is now removed from the computation entirely, so it is never double-surfaced.
 
 3. **Target** — `docs/archive/v{N}/`, using the authoritative `N` resolved in pre-flight. If `N` was advanced past one or more existing `v{N}` directories (because the starting `cycleNumber` slot was already taken), say so explicitly, e.g. "v3 already exists, so this cycle will be archived as v4."
 
@@ -131,6 +191,7 @@ If the user declines (or gives anything other than an explicit confirmation), ma
 
 - **No file changes** — no files moved into the archive, no `v{N}/` directory created, no snapshots written, no `INDEX.md` generated, and no edit to `docs/project-state.json` (it is not reset).
 - **No git changes** — no branch created, no commit, no push, and no PR opened.
+- **The refs selection is discarded** — the selected-refs set resolved in Step A is dropped; no reference under `docs/refs/` is moved, and nothing is retained from the selection.
 
 The repository and `docs/` are left exactly as pre-flight found them. Report that the archive was cancelled and that nothing was changed.
 
@@ -143,7 +204,7 @@ Two later steps are **out of scope here and must not be performed in this sectio
 - **The live `docs/project-state.json` reset** is a later section. Do **not** reset, re-key, or otherwise edit the live `docs/project-state.json` here.
 - **The git steps** (branch, commit, push, PR) are a later section. Do **not** run any git operation here.
 
-Run the steps below in **exactly this order**. The order matters: the trio snapshot (step 2) **must be taken before** the later reset section touches the live `docs/project-state.json`, so the snapshot captures the cycle's true pre-reset state — including the real final `lastCommand`. Do not reorder to snapshot after the reset.
+Run the steps below in **exactly this order**: create `v{N}/` → snapshot trio → move sweep set → move selected refs → generate INDEX. The order matters: the trio snapshot (step 2) **must be taken before** the later reset section touches the live `docs/project-state.json`, so the snapshot captures the cycle's true pre-reset state — including the real final `lastCommand`. Do not reorder to snapshot after the reset. The refs move (step 4) **must run after** the allow-list sweep (step 3) and **before** `INDEX.md` generation (step 5), so the swept-refs set is settled before the INDEX enumerates it.
 
 ### 1. Create the archive directory
 
@@ -169,11 +230,23 @@ These are **copied, not moved** — the live trio stays in `docs/`.
 - `docs/` globs: `sprint-*.md`, `*-resume.md`.
 - Root-level glob: `process-notes-*.md`.
 
-Move only the files actually present in the pre-flight sweep set — do not invent or assume artifacts the cycle did not produce. After this step, the **only** files left in `docs/` outside `docs/archive/` are the live carry-forward trio (`backlog.md`, `sdd-feedback.md`, `project-state.json`).
+Move only the files actually present in the pre-flight sweep set — do not invent or assume artifacts the cycle did not produce. After this step (and the refs move in step 4), the **only** files left in `docs/` outside `docs/archive/` are the live carry-forward trio (`backlog.md`, `sdd-feedback.md`, `project-state.json`) and any **unselected** references still live under `docs/refs/`.
 
-### 4. Generate `docs/archive/v{N}/INDEX.md`
+### 4. Move the selected references
 
-Auto-generate the `INDEX.md` from the files **actually swept** plus the snapshotted trio. This is fully automatic — **do not prompt the user** for a hand-authored description or summary. Mirror the established skeleton used by prior cycles (`docs/archive/v1|v2|v3/INDEX.md`).
+Move the **selected refs** set resolved at the Plan Gate (Step A) out of `docs/refs/` and into the archive. Run this step **after** the allow-list sweep (step 3) and **before** INDEX generation (step 5).
+
+- **Engage only when the selected-refs set is non-empty.** If Step A was skipped (no sweep, or empty candidate list) or resolved to an empty selection, this step does **nothing at all** — it moves, creates, and reports nothing. Refs handling stays inert.
+- **Move, not copy.** For each selected ref at `docs/refs/<relpath>`, **MOVE** it to `docs/archive/v{N}/refs/<relpath>`, preserving its relative subdirectory path under `refs/`. So `docs/refs/foo.md` → `docs/archive/v{N}/refs/foo.md`, and `docs/refs/sub/bar.md` → `docs/archive/v{N}/refs/sub/bar.md`. **Create intermediate subdirectories** under `docs/archive/v{N}/refs/` as needed.
+- **After the move, the selected file no longer exists** at its original `docs/refs/` location — it is moved, not copied.
+- **Unselected refs are left untouched.** Every reference the user did not select remains at its original path under `docs/refs/`. Do **not** copy, delete, rename, or otherwise act on an unselected ref — it is simply absent from the swept set.
+- **Leftover empty `docs/refs/`.** If every candidate was selected, `docs/refs/` may be left empty after the moves. **Leave the empty directory in place** — this command does not remove the `docs/refs/` directory itself.
+
+Record the set of refs **actually swept** (by flattened relative path under `refs/`) — step 5 enumerates it in `INDEX.md` and counts it toward the archived-artifacts total.
+
+### 5. Generate `docs/archive/v{N}/INDEX.md`
+
+Auto-generate the `INDEX.md` from the files **actually swept** (allow-list sweep in step 3 plus any references swept in step 4) plus the snapshotted trio. This is fully automatic — **do not prompt the user** for a hand-authored description or summary. Mirror the established skeleton used by prior cycles (`docs/archive/v1|v2|v3/INDEX.md`).
 
 Write the file using this template, substituting the runtime values:
 
@@ -187,6 +260,7 @@ and are not modified by later cycles.
 ## Contents
 
 - <auto-enumerated swept files, grouped: planning artifacts / sprint files / process notes>
+- reference files: <flattened relative paths of swept refs — e.g. refs/foo.md, refs/sub/bar.md> (only when >=1 ref swept)
 - `project-state.json` — snapshot of final v{N} state (lastCommand `<value>`).
 - `backlog.md`, `sdd-feedback.md` — snapshots of the cross-cycle living docs as they stood at v{N} close; live copies remain in `docs/`.
 
@@ -202,15 +276,16 @@ and are not modified by later cycles.
 Fill the template as follows:
 
 - **`{N}`** — the resolved target version.
-- **Contents list** — derived from the files *actually swept* (step 3), grouped so the list stays accurate regardless of which artifacts the cycle produced:
+- **Contents list** — derived from the files *actually swept* (step 3 allow-list sweep and step 4 refs move), grouped so the list stays accurate regardless of which artifacts the cycle produced:
   - **planning artifacts** — the swept exact-name docs (`scope.md`, `prd.md`, `spec.md`, `discovery.md`, `retro.md`, `open-concerns.md`) that are present;
   - **sprint files** — swept `sprint-*.md` (and any `*-resume.md`);
-  - **process notes** — swept `process-notes-*.md`.
-  List only groups that have members. After the swept-file groups, include the fixed `project-state.json` and `backlog.md`/`sdd-feedback.md` snapshot bullets shown in the template.
+  - **process notes** — swept `process-notes-*.md`;
+  - **reference files** — the refs **actually swept** in step 4, listed one per bullet line as `reference files:` followed by their **flattened relative paths under `refs/`** (e.g. `reference files: refs/foo.md, refs/sub/bar.md`). Emit this group with **flattened per-file granularity**, not a single `refs/` summary line. **Emit it ONLY when at least one ref was swept**; omit it entirely when no ref was swept.
+  List only groups that have members. Place the `reference files` group **after** the swept-file groups (planning / sprint / process notes) and **before** the fixed `project-state.json` snapshot bullet. After all swept-file groups (including reference files), include the fixed `project-state.json` and `backlog.md`/`sdd-feedback.md` snapshot bullets shown in the template.
 - **`lastCommand`** — the value captured in pre-flight (pre-reset). It appears in **both** the `project-state.json` Contents bullet and the `Last command at archive:` summary bullet.
 - **`Archived:`** — the current date as supplied by the running agent at runtime.
 - **`Sprints:`** — the captured `currentSprint`.
-- **`Artifacts archived:`** — the count of files actually swept in step 3 (the trio snapshots are not counted as swept artifacts).
+- **`Artifacts archived:`** — the count of **all files actually swept**: the allow-list sweep set (step 3) **plus** every reference swept in step 4. Refs count toward this single total (all-files-archived semantics) — they are **not** tallied separately. The trio snapshots are not counted as swept artifacts.
 
 `## Cycle summary` is **factual metadata bullets only** — no narrative prose. Do not write a paragraph summarizing the cycle; emit only the bulleted metadata above.
 
@@ -237,7 +312,7 @@ Rewrite the live `docs/project-state.json` field-by-field, using the authoritati
 
 ### `lastCommand` — the deferred write
 
-Setting `lastCommand: "archive"` **here** is the deferred write promised in `## State Updates (startup exemption)` at the top of this file. Startup deliberately did **not** write `lastCommand`; it captured the existing value and held it so the snapshot (Execute step 2) and `INDEX.md` (Execute step 4) could record the cycle's true final command. Now that those have been written, the live `lastCommand` is finally set to `"archive"`. This is the **only** place `/sdd:archive` writes `lastCommand`.
+Setting `lastCommand: "archive"` **here** is the deferred write promised in `## State Updates (startup exemption)` at the top of this file. Startup deliberately did **not** write `lastCommand`; it captured the existing value and held it so the snapshot (Execute step 2) and `INDEX.md` (Execute step 5) could record the cycle's true final command. Now that those have been written, the live `lastCommand` is finally set to `"archive"`. This is the **only** place `/sdd:archive` writes `lastCommand`.
 
 ### `commandExplanationsShown` normalization
 
@@ -273,11 +348,12 @@ If pre-flight determined this **is** a git repo, run these four steps in order: 
    - **Branch collision:** if `archive-v{N}` already exists, **auto-suffix** to the first free name (`archive-v{N}-2`, then `archive-v{N}-3`, …) — the same advance-past-existing logic the archive directory uses — **and notify the user** that the base branch `archive-v{N}` already existed and which suffixed branch was used instead.
 
 2. **Commit (tight staging).** Stage **only the archive's own changes**, never the whole tree:
-   - the new `docs/archive/v{N}/` tree (the created directory, the snapshotted trio, the swept files, and the generated `INDEX.md`);
+   - the new `docs/archive/v{N}/` tree (the created directory, the snapshotted trio, the swept files, the generated `INDEX.md`, **and the new `docs/archive/v{N}/refs/...` files moved in from `docs/refs/`** — these additions are already covered by staging the `docs/archive/v{N}/` tree);
    - the moved-file **deletions** from their old paths (the swept files removed from `docs/` and from the repo root);
+   - **the `docs/refs/...` deletions of the selected (moved) references** — these old paths are **outside** the `docs/archive/v{N}/` tree, so they are **not** covered by staging the archive tree and **must be staged EXPLICITLY BY PATH**. Stage only the moved (selected) refs' old paths; **unselected references are untouched working-tree files and are NEVER staged**;
    - the reset `docs/project-state.json`.
 
-   **NEVER run `git add -A`** (or `git add .`). Stage the specific archive paths explicitly so any unrelated uncommitted work in the tree stays **out** of the archive commit. Then commit with a clear message naming the archived cycle (e.g. `Archive v{N} cycle artifacts to docs/archive/v{N}/`).
+   **NEVER run `git add -A`** (or `git add .`). Stage the specific archive paths explicitly so any unrelated uncommitted work in the tree — including any unselected references still live under `docs/refs/` — stays **out** of the archive commit. Then commit with a clear message naming the archived cycle (e.g. `Archive v{N} cycle artifacts to docs/archive/v{N}/`).
 
 3. **Push.** Push the branch to the remote (setting upstream as needed).
 
@@ -288,6 +364,19 @@ If pre-flight determined this **is** a git repo, run these four steps in order: 
 If the file archive completed but a git step fails — for example `gh` is missing or unauthenticated, no remote is configured, the push is rejected, or the branch step fails — **do not roll back.** The completed file archive (the swept `docs/archive/v{N}/`, the snapshots, the `INDEX.md`, and the reset `project-state.json`) and any git work that already succeeded (e.g. a local commit that was made before the push failed) are **left in place.**
 
 Report the **specific failing step** and the **resulting state** — say plainly what succeeded (file archive done; branch/commit made if they were) and what failed and why — then **prompt the user how to proceed** (e.g. authenticate `gh` and re-run the PR step manually, add a remote and push, or open the PR by hand). Do not silently abandon the run and do not undo any completed work.
+
+## Behavior Preservation & Inert Path
+
+Refs handling is **completely inert** unless it actually engages. It engages **only** when the sweep set is non-empty **and** at least one countable (non-hidden) ref exists in the pre-flight candidate list. In **every** other case the run produces **none** of the refs surfaces: no numbered list, no selection prompt, no refs-related process note, no `reference files:` group in `INDEX.md`, and no refs counted in the archived-artifacts total. The local notes that enforce this — the Step A skip conditions (`### Step A — refs selection`), the move-step engage-gate (`### 4. Move the selected references`), and the INDEX omit (`### 5. Generate ... INDEX.md`) — are the per-site enforcement of the consolidated guarantee below.
+
+The inert cases, mapped to their acceptance criteria:
+
+- **`docs/refs/` absent (`bpra`).** The candidate list is empty, Step A is skipped, and the command produces no numbered list, no selection prompt, and no refs-related output or record.
+- **`docs/refs/` present but zero countable files (`bprb`).** Empty, only empty subdirectories, or only hidden/dotfiles (such as a lone `.gitkeep`) all yield an empty candidate list — the exclusions in `### Enumerate refs candidates` make these count as empty. Same inertness as absent: no list, no prompt, no refs-related output or record.
+- **Both inert cases preserve every non-refs surface byte-for-byte (`bprc`).** In either inert case the sweep allow-list, the living-doc trio snapshot, `INDEX.md` generation, the `project-state.json` reset, and the git steps each produce **exactly** the result they produced before this feature: no `reference files:` group in `INDEX.md`, no refs in the archived-artifacts count, and `docs/refs/` simply **absent from every surface** (it appears neither under "Will archive (refs)", nor under "Left in place", nor in the commit's staged paths). The refs feature adds nothing to a run on which it does not engage.
+- **Empty sweep set (`bprd`, `bpre`).** The existing nothing-to-archive exit (`## Pre-flight > ### Nothing-to-archive exit`) **wins and short-circuits BEFORE Step A** — **even if `docs/refs/` is populated**. No numbered list is shown and no file under `docs/refs/` is moved; the command exits with zero changes.
+
+**Refs-related output is confined to the engaged path.** A refs-related note or record (the candidate list display, the `Will archive (refs):` plan group, the `reference files:` INDEX group, the refs contribution to the count) is emitted **only when the feature actually engages** — refs listed at Step A **and** a selection resolved into the swept set. On every inert path the command emits and records **nothing** refs-related. (`/sdd:archive` is a mechanical command, exempt from the interview-style open-concerns and process-notes protocols per `## Loading > Protocol exemptions` — so this guarantee is simply the **absence** of any refs-specific output or record on an inert run. Do **not** introduce a new process-notes mechanism for this command.)
 
 ## Handoff
 

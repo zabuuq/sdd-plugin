@@ -125,3 +125,9 @@
 - **After command:** /sdd:spec
 - **Project:** sdd-plugin
 - **Note:** Add an optional /sdd:viability command that can be run anytime. Stress-tests the idea — solves a real problem, audience is real, approach is sound. Distinct from /sdd:discovery (descriptive/exploratory) so the tone problem of mixing supportive exploration with evaluative critique stays separated.
+
+### 2026-06-22T00:00:00Z
+- **Sprint:** 1
+- **After command:** /sdd:retro
+- **Project:** sdd-plugin
+- **Note:** /sdd:build should auto-defer to project conventions. In the v5 cycle, the autonomous-build SKILL.md instructs subagents to commit when done, but this repo's AGENTS.md forbids auto-commit during /sdd:build ("Clean state = last user commit"). The conflict was resolved correctly (subagents did not commit) only because the maintainer knew AGENTS.md overrides the built-in behavior. The plugin should detect and defer to project-convention files (e.g. AGENTS.md commit discipline) automatically, rather than relying on maintainer knowledge of the override. Caused no friction this cycle but is latent risk for any future autonomous build in a repo with its own commit/convention rules. Surfaced during /sdd:retro for v5.
