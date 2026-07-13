@@ -50,6 +50,20 @@ Read `settings.prototypeFidelity` from `docs/project-state.json`.
 
 ## Step 3: Loop, Review, and Issue Map
 
+### Loop behavior
+
+Build the pages with the vendored loop skeleton from `references/build-loop.md`, using its **prototype (disposable) specialization** — plan → make → separate checker → bounded retry (≤2) → compound — **without the git machinery**: no worktrees, no branches, no PRs. Pages build in place under `prototype/`. The checker verifies each page against the plan section and navigation-path step it implements.
+
+**On a twice-failed page:** write a `[GAP: …]` marker into `docs/plan.md` per `references/markers.md`, placed in the section the page implements and naming what couldn't be built and why — then **continue building the remaining pages**. The prototype loop never halts on a failed page; a too-complex page is information about the plan, and the gap resurfaces in the review below and in the next `/sdd:refine` scan. (A `[GAP]` write pre-validate bumps the plan's minor version, e.g. `1.0 → 1.1`.)
+
+### Prototype review
+
+When the loop finishes, walk **each page along the navigation paths** from `prototype/navigation-paths.md` and check it against `docs/plan.md`: does the page do what the plan says at that step? Report per-path results to the maintainer — what matches, what diverges, and where `[GAP]` markers were written. The review is the command's deliverable as much as the pages are.
+
+### Optional: page→issue map
+
+On request (offer it once at review end, don't push), produce a **page→issue mapping** that seeds the real build: one row per page or flow — page, the `plan.md` requirement(s) it exercises (by AC ID), and the issue title that work would become. `/sdd:build` can use this as its starting queue. Write it to `prototype/issue-map.md` if the maintainer says yes.
+
 ## Process Notes
 
 Per sdd-guide's `## Process Notes` section, append to `process-notes-prototype.md` at the project root throughout the run — decisions, pushback, difficult questions, pivots, and each page's loop outcome. Create the file on first append.
