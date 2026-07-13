@@ -15,9 +15,23 @@ Read `skills/sdd-guide/SKILL.md` for shared behavior before executing this comma
 
 ## Prerequisites
 
-None. This is the first command in the SDD workflow.
+None beyond the GitHub gate below. This is the first command in the SDD workflow.
 
 ## Behavior
+
+### Step 0: GitHub Gate (hard block)
+
+GitHub is a hard dependency of the SDD workflow — `/sdd:build` creates issues, branches, and PRs, and `/sdd:resolve-pr` manages them. Verify both of the following before anything else:
+
+1. **A Git repository exists.** Run `git rev-parse --is-inside-work-tree` in the project directory.
+2. **`gh` is authenticated.** Run `gh auth status`.
+
+**If either check fails, hard-block.** This is a block, not a warning: do not continue onboarding, and tell the user that no SDD command — starting with `/sdd:discovery` — can proceed until the gate passes. Emit a clear remediation message naming exactly what failed:
+
+- No repository: "No Git repository found. Run `git init` (and connect a GitHub remote) first, then re-run `/sdd:onboard`."
+- `gh` unauthenticated or missing: "GitHub CLI is not authenticated. Run `gh auth login` first, then re-run `/sdd:onboard`."
+
+Only when both checks pass, continue to Step 1.
 
 ### Step 1: Check for Existing Profile
 
@@ -53,24 +67,21 @@ Output the following as plain text. This is NOT a question — do not wait for a
 
 SDD (Spec-Driven Development) is a structured, interview-driven process for planning and building software. Here's how it works:
 
-**Planning Phase:**
-- `/sdd:discovery` — Open exploration before structural decisions. Reads files placed in `docs/refs/` and runs an interview to capture "what is this?"
-- `/sdd:scope` — Defines the project boundary — what's in, what's out. We'll interview you, push back on vague thinking, and distill it into a clear project definition.
-- `/sdd:prd` — Translates your scope into precise, testable product requirements organized as user stories with acceptance criteria.
-- `/sdd:spec` — Designs the technical architecture: stack, file structure, data flow, testing strategy. Produces CLAUDE.md and AGENTS.md for AI agents to build from.
+**Planning:**
+- `/sdd:discovery` — The brainstorm-first entry point. Ingests whatever you have (text, images, audio in `docs/refs/` or pasted), interviews you from that material, and auto-drafts `docs/plan.md` — one document carrying intent, requirements, and architecture, with the AI's assumptions, gaps, and concerns tagged inline as markers.
+- `/sdd:refine` — Walks the markers in `plan.md` one at a time, resolves them with you in place, and finalizes the document (version `0.x` → `1.0`).
+- `/sdd:validate` (optional) — Offers an adversarial self-critique and reconciles external validation files dropped into `docs/validation/`, one difference at a time.
 
-**Sprint Loop:**
-- `/sdd:plan` — Pulls a logical batch of work from the PRD into a buildable sprint checklist with spec references and verification steps.
-- `/sdd:build` — Executes the sprint checklist. Supports step-by-step (one item per session) or autonomous (works through multiple items with checkpoints) modes. Closes the sprint in its wrap-up phase (PRD checkoff, story splitting, "anything notable?" beat).
-- `/sdd:polish` — Optional post-sprint cleanup. Bugs, features, UX improvements — scoped and appended to the sprint.
-- `/sdd:refine` — Runs unvetted PRD items through a compressed planning interview before the next sprint.
-
-Then loop back to `/sdd:plan` for the next cycle.
+**Build:**
+- `/sdd:prototype` — Builds a disposable HTML/CSS/JS prototype at `prototype/` with AI-authored navigation paths, so you can walk the product before the real build.
+- `/sdd:build` — Turns refined work into GitHub issues and runs the autonomous build-loop: one issue → one branch → one PR, each checked by a separate agent. Your PR review is the only gate — nothing auto-merges.
 
 **Project Close:**
-- `/sdd:retro` — Project-level retrospective across all sprints. Synthesizes what worked, what didn't, and how to improve. Captures cross-project patterns to your user profile.
+- `/sdd:retro` — Lists the lessons captured during the project for promotion, and reports timing and issue-queue status.
 
 **Anytime:**
+- `/sdd:checkpoint` — Prints a tailored `/compact` instruction string when context is getting long.
+- `/sdd:resolve-pr` — Works review feedback on build-loop PRs and cleans up branches of merged ones.
 - `/sdd:pause` and `/sdd:unpause` — Suspend and resume the current command across sessions.
 - `/sdd:feedback` — Quickly flag something the plugin could do better. Captures your note with context and returns immediately.
 
