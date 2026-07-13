@@ -1,8 +1,8 @@
 # Deepening Rounds
 
-**Used by:** `/sdd:discovery`, `/sdd:scope`, `/sdd:prd`, `/sdd:spec`, `/sdd:plan`, `/sdd:refine`
+**Used by:** `/sdd:discovery` (pre-draft interview), `/sdd:refine`, `/sdd:validate`
 
-This reference defines the two-phase interview pattern used by planning and sprint-planning commands.
+This reference defines the two-phase interview pattern used by the interview commands.
 
 ## Phase 1 — Mandatory Questions
 
