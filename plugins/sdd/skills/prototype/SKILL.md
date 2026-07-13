@@ -36,6 +36,18 @@ Read `settings.prototypeFidelity` from `docs/project-state.json`.
 
 ## Step 2: Build & Navigation
 
+### Output: plain web, walled off
+
+- The prototype is **plain HTML/CSS/JS** — no frameworks, no build step, no package manager. Files open directly in a browser.
+- Output goes to **`prototype/` at the repo root** (outside `docs/`). It is disposable by design and **walled off from any real build**: nothing in the code, comments, README, or plan marks it as a foundation, a starting point, or a scaffold for the final product. The real build starts fresh; the prototype's value is what it teaches, not its code. (`prototype/` sits outside `docs/`, so `/sdd:archive` never touches it — it stays live as the durable north-star reference.)
+
+### Navigation paths
+
+- Author the navigation path(s) — the ordered walk-throughs a reviewer follows to experience the product — **from `docs/plan.md` and nothing else**. Not from the prototype code as built, not from generic UX patterns: the paths express what the plan says the product does, so walking them tests the plan.
+- Produce one or more paths as the plan warrants (e.g. a core flow plus secondary flows).
+- Write the paths to a **companion file `prototype/navigation-paths.md`** — never into `plan.md`. Each path lists its steps: start page, action, expected next page/state.
+- **Surface the paths to the maintainer** when the build completes: name the companion file and give the one-line gist of each path so the review can start immediately.
+
 ## Step 3: Loop, Review, and Issue Map
 
 ## Process Notes
