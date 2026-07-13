@@ -66,7 +66,32 @@ If `docs/refs/` is missing or empty **and** nothing was pasted, there is nothing
 
 ## Step 2: Data-First Pre-Draft Interview
 
-With sources ingested (or the brainstorm path chosen), run the pre-draft interview, then auto-draft the plan (Step 3).
+The interview fills what the material doesn't already cover. Its register is "what is this and what should it be?" — intent, audience, requirements-shaping, and architecture-shaping input all belong here, because the auto-draft (Step 3) produces the whole plan.
+
+### Data-first rule
+
+For **every** interview question, **search the provided material for an answer before asking**:
+
+- **When the material answers it:** still ask the question, but state what was found and where — "The voice memo says this is for your local tech group — confirm, or is the audience broader?" Accept a **confirm / decline / add** response: confirm locks the finding in, decline replaces it with the user's answer, add layers detail on top.
+- **When the material doesn't answer it:** ask fresh, with no invented attribution.
+
+Never silently adopt a finding without surfacing it — the confirm step is what turns ingested material into settled interview ground. On the brainstorm path (nothing ingested) every question is asked fresh; the data-first rule simply has nothing to search.
+
+### Question coverage
+
+Compose questions to give the auto-draft what the template needs: the idea in plain language, the why, the audience, what "done" looks like, prior art, constraints and non-negotiables, and any architecture-shaping facts already fixed (stack, platform, deployment). Skip anything the material plus confirmations already settled — the point of data-first is spending questions only on what's still unknown.
+
+### Interview mechanics
+
+Standard mechanics per sdd-guide and `references/deepening-rounds.md`:
+
+- One question at a time, free-form, never multiple-choice.
+- **~5 questions by default, hard cap of 10.** Past 10, stop and get explicit permission with a stated reason before continuing.
+- After the core questions, emit the structured **deepening-round recommendation** per `references/deepening-rounds.md` — a definite continue-with-topic-preview or close-with-reasoning position, never a bare "want another round?". Deepening rounds run per that reference until the user accepts a close.
+
+### smallProject judgment
+
+At the end of the core interview (before any deepening rounds), write the authoritative initial `smallProject` value to `docs/project-state.json`, per `skills/sdd-guide/references/right-sizing.md` — discovery owns this judgment in v6. Apply the reference's signals holistically; when in doubt, write `false`. If `smallProject: true`, the shortened-round defaults from the reference apply to any deepening rounds that follow.
 
 ## Step 3: Auto-Draft
 
