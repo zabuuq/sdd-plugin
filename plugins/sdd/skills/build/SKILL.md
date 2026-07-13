@@ -55,6 +55,40 @@ Before creating issues, show the user the proposed issue list (titles + AC IDs) 
 
 ## Step 2: Build-Loop
 
+Run the vendored loop skeleton from `references/build-loop.md` with its **build (durable) specialization** — full git machinery. Work issues in issue-number order unless the user reorders.
+
+### One issue → one branch → one PR
+
+Each issue maps to exactly one branch and one pull request. No batching several issues into a branch, no splitting one issue across PRs. The PR closes the loop for its issue (`Closes #N` in the body).
+
+### Stamping convention
+
+Stamp everything the loop creates so `/sdd:resolve-pr` can recognize its own:
+
+- **Branch:** prefix `sdd/<issue>-<slug>` (e.g. `sdd/14-login-form`).
+- **PR:** the `sdd` label.
+
+### Worktrees and fan-out
+
+Each issue builds in **its own git worktree** (`git worktree add`), keeping items isolated from each other and from the user's working tree. Multiple agents **fan out across issues in parallel** — dispatch one agent per issue (via the Agent tool), each in its own worktree, each running the loop stages for its issue. Scale the fan-out to what the machine and the issue dependencies allow; dependent issues run in dependency order, independent ones in parallel. Remove each worktree after its PR opens.
+
+### Loop stages per issue
+
+Per `references/build-loop.md`: **plan → make → separate checker → bounded retry (≤2) → compound.**
+
+- **Plan/make:** the agent reads the issue (ACs, plan link), plans, builds, and commits on the stamped branch.
+- **Separate checker:** a distinct agent — never the maker — verifies the result against the issue's ACs before the PR reaches the maintainer. The checker's findings go back to the maker for the bounded retry.
+- **Twice-failed:** stop that issue and **surface it** — report what failed and why, leave the branch as-is for inspection, and continue or halt per the failure's blast radius (an isolated failure doesn't stop other issues; a shared-contract failure does). Never guess past a failure.
+- **Compound:** lesson-worthy findings go to `docs/learnings/`.
+
+### Never auto-merge
+
+The loop opens PRs and stops there. **No PR is ever merged by the loop or any agent** — not on green checks, not on checker approval, not on user inactivity. Human PR review is the only gate. Merged/closed PR cleanup belongs to `/sdd:resolve-pr`.
+
+### No decisions mid-build
+
+Required decisions are expected to already live in `plan.md` and the issue. When an agent hits an under-specified issue — a missing decision, an ambiguous AC, a contradiction with the plan — it **surfaces the question and stops that issue**; it never guesses, never picks "the reasonable default," never resolves ambiguity by fiat. The surfaced question goes to the user; the answer belongs in `plan.md` (via `/sdd:refine`) or the issue before that issue re-enters the queue.
+
 ## Process Notes
 
 Per sdd-guide's `## Process Notes` section, append to `process-notes-build.md` at the project root — issue-queue decisions, loop outcomes per issue, surfaced under-specifications, and anything lesson-worthy (which also goes to `docs/learnings/` per sdd-guide's Lesson Capture).
