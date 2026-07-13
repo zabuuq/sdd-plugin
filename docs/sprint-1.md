@@ -111,80 +111,80 @@ Out of scope: the deferred automated third-party AI validation, GitHub-native PR
 ---
 
 ### Item 10 — Discovery: ingest & inventory
-- [ ] Rewrite the ingest half of `skills/discovery/SKILL.md`: accept text/images/audio, transcribe audio in-flow, emit a source inventory and block for user response before drafting, and run a full brainstorm when there's nothing to ingest [PRD: ingm, ausd, invl, ingw, noin]
+- [x] Rewrite the ingest half of `skills/discovery/SKILL.md`: accept text/images/audio, transcribe audio in-flow, emit a source inventory and block for user response before drafting, and run a full brainstorm when there's nothing to ingest [PRD: ingm, ausd, invl, ingw, noin]
 - **PRD ref:** `prd.md > Discovery`
 - **Spec ref:** `spec.md > Discovery > Ingest & inventory`
 - **What to build:** In `skills/discovery/SKILL.md`, build the ingest step: accept text, images, and audio (`ingm`); transcribe audio in-flow via the `transcribe` skill / faster-whisper and use the transcript as interview context (`ausd`); before drafting, emit an inventory listing every source found — files under `docs/refs/`, pasted material, in-flow transcriptions (`invl`) — then block and wait for an explicit user response (`ingw`). When there is nothing to ingest (empty/absent `docs/refs/` and no pasted material), skip the inventory and enter a full brainstorm interview as a first-class path, not an error (`noin`).
 - **Acceptance criteria:** (from `prd.md > Discovery`)
-  - [ ] `ingm` — `/sdd:discovery` accepts text, images, and audio as ingest input.
-  - [ ] `ausd` — Audio sources are transcribed in-flow (via the `transcribe` skill / faster-whisper) rather than rejected; the transcript is used as interview context.
-  - [ ] `invl` — Before drafting, the command emits an inventory listing every source it found.
-  - [ ] `ingw` — The command blocks after presenting the inventory and waits for an explicit user response before it begins drafting.
-  - [ ] `noin` — With nothing to ingest, the command skips the inventory and enters a full brainstorm interview as a first-class path, not an error state.
+  - [x] `ingm` — `/sdd:discovery` accepts text, images, and audio as ingest input.
+  - [x] `ausd` — Audio sources are transcribed in-flow (via the `transcribe` skill / faster-whisper) rather than rejected; the transcript is used as interview context.
+  - [x] `invl` — Before drafting, the command emits an inventory listing every source it found.
+  - [x] `ingw` — The command blocks after presenting the inventory and waits for an explicit user response before it begins drafting.
+  - [x] `noin` — With nothing to ingest, the command skips the inventory and enters a full brainstorm interview as a first-class path, not an error state.
 - **Verification:** `claude plugin validate .` passes. Behavior matches spec `Ingest & inventory`: drive a mixed-source run (confirm inventory lists refs + pasted + transcription, then waits); drive an empty run (no `docs/refs/`, no paste) and confirm it enters the brainstorm path with no inventory and no error.
 
 ---
 
 ### Item 11 — Discovery: data-first pre-draft interview
-- [ ] Build the data-first interview in `skills/discovery/SKILL.md`: search the provided material before each question, state what was found and accept confirm/decline/add, using standard interview mechanics [PRD: dfsc, dfst, dfrq]
+- [x] Build the data-first interview in `skills/discovery/SKILL.md`: search the provided material before each question, state what was found and accept confirm/decline/add, using standard interview mechanics [PRD: dfsc, dfst, dfrq]
 - **PRD ref:** `prd.md > Discovery`
 - **Spec ref:** `spec.md > Discovery > Data-first pre-draft interview`, `references/deepening-rounds.md`
 - **What to build:** For each interview question, first search the provided material for an answer (`dfsc`). When the material answers it, ask the question *and* state what was found, accepting a confirm / decline / add response; when it doesn't, ask fresh (`dfst`). Use standard interview mechanics — one question at a time, a default of ~5 questions with a hard cap of 10, then the deepening-round recommendation (`dfrq`) — reusing `references/deepening-rounds.md`.
 - **Acceptance criteria:** (from `prd.md > Discovery`)
-  - [ ] `dfsc` — For each interview question, the command first searches the provided material for an answer before asking.
-  - [ ] `dfst` — When the material answers a question, the command asks it *and* states what it found, accepting confirm / decline / add; when it doesn't, the command asks fresh.
-  - [ ] `dfrq` — The pre-draft interview uses standard interview mechanics: one at a time, ~5 default / 10 hard cap, followed by the deepening-round recommendation.
+  - [x] `dfsc` — For each interview question, the command first searches the provided material for an answer before asking.
+  - [x] `dfst` — When the material answers a question, the command asks it *and* states what it found, accepting confirm / decline / add; when it doesn't, the command asks fresh.
+  - [x] `dfrq` — The pre-draft interview uses standard interview mechanics: one at a time, ~5 default / 10 hard cap, followed by the deepening-round recommendation.
 - **Verification:** `claude plugin validate .` passes. Behavior matches spec `Data-first pre-draft interview` and the `deepening-rounds.md` contract (one-at-a-time, cap, recommendation); a question the material answers is asked-with-finding, one it doesn't is asked fresh.
 
 ---
 
 ### Item 12 — Discovery: auto-draft plan.md
-- [ ] Build the auto-draft step: produce `docs/plan.md` at `Version: 0.1` from `plan-template.md`, tagging every assumption, gap, and feasibility concern inline as markers [PRD: draf, dnam, dasm, dgap]
+- [x] Build the auto-draft step: produce `docs/plan.md` at `Version: 0.1` from `plan-template.md`, tagging every assumption, gap, and feasibility concern inline as markers [PRD: draf, dnam, dasm, dgap]
 - **PRD ref:** `prd.md > Discovery`
 - **Spec ref:** `spec.md > Discovery > Auto-draft`, `spec.md > Document Model — plan.md`, `spec.md > Markers`
 - **What to build:** From the interview, produce `docs/plan.md` written to disk at `Version: 0.1` using `plan-template.md` (`draf`). The file carries its final name from creation (never "draft"); draft status is the version major digit `0` (`dnam`). Tag every AI assumption inline as `[ASSUMPTION a#: …]` (`dasm`), every identified gap as `[GAP g#: …]` (`dgap`), and any feasibility concern as `[CONCERN c#: …]`, all per `references/markers.md`.
 - **Acceptance criteria:** (from `prd.md > Discovery`)
-  - [ ] `draf` — The command produces one planning document capturing intent, requirements, and architecture, written to disk.
-  - [ ] `dnam` — The document file carries its final name from creation; draft-vs-final status is the version major digit inside the file (major `0` = draft), written as a draft (`0.1`) at this stage.
-  - [ ] `dasm` — Every assumption the AI makes is tagged inline with a machine-findable marker carrying a short ID (`[ASSUMPTION a3: …]`).
-  - [ ] `dgap` — Every gap the AI identifies is tagged inline with a machine-findable marker carrying a short ID (`[GAP g2: …]`).
+  - [x] `draf` — The command produces one planning document capturing intent, requirements, and architecture, written to disk.
+  - [x] `dnam` — The document file carries its final name from creation; draft-vs-final status is the version major digit inside the file (major `0` = draft), written as a draft (`0.1`) at this stage.
+  - [x] `dasm` — Every assumption the AI makes is tagged inline with a machine-findable marker carrying a short ID (`[ASSUMPTION a3: …]`).
+  - [x] `dgap` — Every gap the AI identifies is tagged inline with a machine-findable marker carrying a short ID (`[GAP g2: …]`).
 - **Verification:** `claude plugin validate .` passes. A discovery run writes `docs/plan.md` at `Version: 0.1`, section order matching `plan-template.md`, with inline `[ASSUMPTION …]`/`[GAP …]`/`[CONCERN …]` markers whose syntax matches `markers.md`.
 
 ---
 
 ### Item 13 — Refine: marker walk
-- [ ] Rewrite the walk in `skills/refine/SKILL.md`: scan `plan.md` for markers, present one at a time in document order, resolve in place and strip, re-scan until none remain resolvable, and never remove a marker autonomously [PRD: rwlk, rres, rlop, rnau]
+- [x] Rewrite the walk in `skills/refine/SKILL.md`: scan `plan.md` for markers, present one at a time in document order, resolve in place and strip, re-scan until none remain resolvable, and never remove a marker autonomously [PRD: rwlk, rres, rlop, rnau]
 - **PRD ref:** `prd.md > Refine`
 - **Spec ref:** `spec.md > Refine > Marker walk (step 4)`, `spec.md > Markers > Resolve-loop rules`
 - **What to build:** Rewrite `skills/refine/SKILL.md` (clean break; no old mid-chain refine behavior carries over). Scan `plan.md` for markers and present them one at a time in document order (`rwlk`). Resolving replaces the marked text in place and strips the marker with no breadcrumb (`rres`). Re-scan and repeat until none remain resolvable; a marker added mid-loop (including a prototype `[GAP]`) is caught on a later re-scan (`rlop`). Never remove a marker on the AI's own initiative — only explicit user resolution removes one (`rnau`).
 - **Acceptance criteria:** (from `prd.md > Refine`)
-  - [ ] `rwlk` — `/sdd:refine` scans the document for markers and presents them one at a time in document order.
-  - [ ] `rres` — Resolving a marker replaces the marked text in place with settled content and strips the marker, leaving no breadcrumb.
-  - [ ] `rlop` — After each resolution the command re-scans and repeats until no markers remain except those explicitly left tagged; a marker added mid-loop is picked up on a later re-scan.
-  - [ ] `rnau` — The command never removes a marker on its own; a marker is removed only through explicit user resolution.
+  - [x] `rwlk` — `/sdd:refine` scans the document for markers and presents them one at a time in document order.
+  - [x] `rres` — Resolving a marker replaces the marked text in place with settled content and strips the marker, leaving no breadcrumb.
+  - [x] `rlop` — After each resolution the command re-scans and repeats until no markers remain except those explicitly left tagged; a marker added mid-loop is picked up on a later re-scan.
+  - [x] `rnau` — The command never removes a marker on its own; a marker is removed only through explicit user resolution.
 - **Verification:** `claude plugin validate .` passes. Behavior matches `markers.md` resolve-loop rules: drive a walk that resolves some markers (confirm in-place replacement, marker stripped, no breadcrumb), leaves some, and picks up one added mid-loop on re-scan; confirm no marker is removed without explicit resolution.
 
 ---
 
 ### Item 14 — Refine: carry-forward + proposed solutions
-- [ ] Build carry-forward: an unresolvable marker stays tagged and carries to `prototype`; the AI may append a `PROPOSED` solution but must keep the marker [PRD: rcnt, rpsl]
+- [x] Build carry-forward: an unresolvable marker stays tagged and carries to `prototype`; the AI may append a `PROPOSED` solution but must keep the marker [PRD: rcnt, rpsl]
 - **PRD ref:** `prd.md > Refine`
 - **Spec ref:** `spec.md > Refine > Marker walk (step 4)`, `spec.md > Markers > Resolve-loop rules`
 - **What to build:** In `skills/refine/SKILL.md`, when a marker can't be resolved during refine, leave it tagged in the document so it carries forward to `prototype` (`rcnt`). The AI may append a proposed solution next to the unresolved marker (the `PROPOSED` form) but only if it also keeps the marker in place (`rpsl`). Nothing is force-decided.
 - **Acceptance criteria:** (from `prd.md > Refine`)
-  - [ ] `rcnt` — When a marker can't be resolved during refine, it stays tagged in the document and carries forward to `prototype`.
-  - [ ] `rpsl` — The AI may append a proposed solution next to an unresolved marker, but only if it also keeps the marker in place.
+  - [x] `rcnt` — When a marker can't be resolved during refine, it stays tagged in the document and carries forward to `prototype`.
+  - [x] `rpsl` — The AI may append a proposed solution next to an unresolved marker, but only if it also keeps the marker in place.
 - **Verification:** `claude plugin validate .` passes. An unresolvable marker survives the refine pass still tagged; when a `PROPOSED` note is appended, the marker remains (matches `markers.md`).
 
 ---
 
 ### Item 15 — Refine: finalize
-- [ ] Build finalize: drop draft status by bumping the version major `0.x → 1.0` in place, with no separate final file [PRD: rfin]
+- [x] Build finalize: drop draft status by bumping the version major `0.x → 1.0` in place, with no separate final file [PRD: rfin]
 - **PRD ref:** `prd.md > Refine`
 - **Spec ref:** `spec.md > Refine > Finalize (step 5)`, `spec.md > Document Model — plan.md > Versioning`
 - **What to build:** In `skills/refine/SKILL.md`, the finalize step drops draft status by bumping the version major from `0.x` to `1.0` and updating the same file in place — no separate "final" file is created. The version number is the single source of truth for maturity.
 - **Acceptance criteria:** (from `prd.md > Refine`)
-  - [ ] `rfin` — At the end of the review pass the command finalizes by bumping the version major (`0.x → 1.0`, draft → final) and updates the same file in place — no separate "final" file is created.
+  - [x] `rfin` — At the end of the review pass the command finalizes by bumping the version major (`0.x → 1.0`, draft → final) and updates the same file in place — no separate "final" file is created.
 - **Verification:** `claude plugin validate .` passes. Finalize bumps `plan.md` to `1.0` in place; no sibling final file appears; the version walk matches spec Versioning.
 
 ---
