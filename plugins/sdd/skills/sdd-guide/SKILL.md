@@ -58,6 +58,22 @@ From `/sdd:discovery` onward, any command may raise feasibility or viability pus
 - Pushback that needs to persist beyond the current conversation is written into `docs/plan.md` as a `[CONCERN c#: …]` marker per `references/markers.md`, so it survives a clear/compact and resurfaces in the next marker walk.
 - Pushback is advice, not a veto. The user decides; an overridden concern is either dropped or, if it still needs visibility, kept as its marker.
 
+## Lesson Capture
+
+During doc creation (`/sdd:discovery`, `/sdd:refine`) and item build (`/sdd:prototype`, `/sdd:build`), the AI detects lesson-worthy events and writes them to `docs/learnings/` **without prompting** — capture is automatic, not offered.
+
+**Lesson-worthy events:**
+- Lost-context or redundant-question moments — the AI asked something already answered, or lost state a file should have carried.
+- Repeated roadblocks — the same failure or friction appearing twice.
+- Course corrections — the user redirecting an approach in a way that generalizes.
+- Reusable designs, practices, or preferences — anything worth applying to future work.
+
+**Capture format:** one terse lesson per file in `docs/learnings/` (short kebab-case filename, a few lines: what happened, the lesson, when it applies). Distill, don't transcribe.
+
+`docs/learnings/` is a **permanent carry-forward store** — never swept by `/sdd:archive`. Captured lessons surface at `/sdd:retro` for promotion (plugin-level → `/sdd:feedback`, global → `~/.claude`).
+
+The maintainer's ad-hoc "record this globally right now" move stays a **manual action** — the plugin does not implement or watch for it. Automatic capture writes only to `docs/learnings/`.
+
 ## Guard Rails
 
 Every command checks its prerequisites before doing any real work. If prerequisites are not met, name the command the user should run instead and stop. Do not attempt to recover, improvise, or partially execute.
