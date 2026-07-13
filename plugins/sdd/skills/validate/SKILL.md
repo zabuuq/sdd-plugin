@@ -39,7 +39,43 @@ Per `skills/sdd-guide/references/right-sizing.md`, re-evaluate `smallProject` on
 
 ## Behavior
 
-Validate runs three beats in order (defined below).
+Validate runs three beats in order.
+
+### Beat 1: Offer Self-Critique (ask-first)
+
+Offer to run Claude's own adversarial self-critique of `plan.md` — **ask first, never auto-run**. The maintainer may already have enough external sources and not want another Claude pass, but still needs this command to pull them in.
+
+- **On yes:** run the critique — read `plan.md` adversarially (feasibility, internal contradictions, unstated assumptions, missing requirements, architecture risks) — and write the findings as a **validation file into `docs/validation/`** (e.g. `docs/validation/self-critique.md`), uniform with external sources. It gets no special treatment in Beat 3; it is just another file in the folder.
+- **On no:** skip straight to Beat 2. No critique runs, nothing is written.
+
+The self-critique does **not** write markers into `plan.md` — its output is the validation file only. Markers enter `plan.md` solely as Beat 3 carry-forwards.
+
+### Beat 2: Gather Validation Files
+
+Scan `docs/validation/`. **Any file present is a validation file** — no naming convention, no manifest, no required format. The folder is a source-agnostic drop-zone: a Claude self-critique, another AI's review, or a person's notes are all treated identically.
+
+Handle both shapes:
+
+- **A full modified copy of the document** — the producer edited a copy of `plan.md`. Extract the proposed changes by diffing it against the live `docs/plan.md`; each difference becomes a reconciliation item.
+- **A suggestion list** — free-form findings or recommendations. Each distinct suggestion becomes a reconciliation item.
+
+If `docs/validation/` is missing or empty and the self-critique was declined, there is nothing to reconcile: say so and exit without touching `plan.md` (no version bump, no handoff-worthy change — emit a one-line "nothing to validate against" close instead of the standard handoff).
+
+### Beat 3: Reconciliation Walk
+
+Present the differences between the validations and `plan.md` **one at a time**, in a stable order (by source file, then document order). For each difference:
+
+1. State what the validation says, what `plan.md` says, and where they diverge.
+2. Accept a **keep / remove / change** decision: **keep** the plan as-is (reject the suggestion), **remove** what the suggestion says to drop, or **change** the plan per the suggestion (or the user's own variant).
+3. Apply the decision to `docs/plan.md` **in place** before moving to the next difference.
+
+One difference per message; interview rules apply (free-form, clarifying questions don't advance the walk).
+
+**Carried-over markers** still live in `plan.md` are walked in this same pass, as reconciliation items in document order, under the resolve rules of `references/markers.md`.
+
+**Nothing is force-decided.** A difference the user can't settle becomes a carry-forward marker in `plan.md` (`[GAP]` or `[ASSUMPTION]` per `markers.md`) rather than a silent drop or a forced ruling.
+
+**Version bump.** After the walk, bump `plan.md` to major `2`: `1.x → 2.0` in place; if already at major `2` (a re-run), bump the minor (`2.0 → 2.1`). Confirm the bump and any carry-forward markers to the user in one line, then proceed to the handoff.
 
 ## Process Notes
 
