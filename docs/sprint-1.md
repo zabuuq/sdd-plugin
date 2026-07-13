@@ -10,46 +10,46 @@ Out of scope: the deferred automated third-party AI validation, GitHub-native PR
 ## Checklist
 
 ### Item 1 — project-state.json schema v2 + explanation-key rekey
-- [ ] Migrate `docs/project-state.json` to schema v2: bump `version` to 2, add a `settings` object (`prototypeFidelity: null`), drop `currentSprint` and `buildMode`, keep `smallProject` top-level, and rekey `commandExplanationsShown` to the full v6 command set [PRD: fsch, fcek]
+- [x] Migrate `docs/project-state.json` to schema v2: bump `version` to 2, add a `settings` object (`prototypeFidelity: null`), drop `currentSprint` and `buildMode`, keep `smallProject` top-level, and rekey `commandExplanationsShown` to the full v6 command set [PRD: fsch, fcek]
 - **PRD ref:** `prd.md > Foundations & Migration`
 - **Spec ref:** `spec.md > Foundations & Migration > project-state.json schema (v2)`
 - **What to build:** Change the on-disk `docs/project-state.json` to the v6 shape per the spec's schema block: `version: 2`; add `settings` (persisted user choices, seeded `{ "prototypeFidelity": null }`); remove the now-vestigial `currentSprint` and `buildMode`; keep `smallProject` at top level (machine-owned, AI-derived); rekey `commandExplanationsShown` to `discovery, refine, validate, prototype, build, retro, checkpoint, resolve-pr, onboard, pause, unpause, feedback, archive`, each `false`. Do not duplicate `plan.md`'s version into state — maturity lives only in the document.
 - **Acceptance criteria:** (from `prd.md > Foundations & Migration`)
-  - [ ] `fsch` — `docs/project-state.json` gains persisted settings (prototype fidelity at minimum).
-  - [ ] `fcek` — The `commandExplanationsShown` key set is rekeyed to the full v6 command set — the six chain commands plus the anytime commands (`checkpoint`, `resolve-pr`, `pause`, `unpause`, `feedback`, `archive`, `onboard`).
+  - [x] `fsch` — `docs/project-state.json` gains persisted settings (prototype fidelity at minimum).
+  - [x] `fcek` — The `commandExplanationsShown` key set is rekeyed to the full v6 command set — the six chain commands plus the anytime commands (`checkpoint`, `resolve-pr`, `pause`, `unpause`, `feedback`, `archive`, `onboard`).
 - **Verification:** `claude plugin validate .` passes. The written state file parses as valid JSON and matches the spec's schema-v2 block field-for-field: `settings.prototypeFidelity` present, `currentSprint`/`buildMode` absent, `smallProject` top-level, and `commandExplanationsShown` keys equal to the v6 set.
 
 ---
 
 ### Item 2 — sdd-guide command chain + remove between-rounds section
-- [ ] Update `skills/sdd-guide/SKILL.md`: command chain → `discovery → refine → validate → prototype → build → retro` (validate optional); update the interview-command set and end-of-command handoff next-command map; remove the "Between-Rounds Context Recommendation" section entirely [PRD: fchn]
+- [x] Update `skills/sdd-guide/SKILL.md`: command chain → `discovery → refine → validate → prototype → build → retro` (validate optional); update the interview-command set and end-of-command handoff next-command map; remove the "Between-Rounds Context Recommendation" section entirely [PRD: fchn]
 - **PRD ref:** `prd.md > Foundations & Migration`
 - **Spec ref:** `spec.md > Foundations & Migration > Shared-behavior cascade`
 - **What to build:** In `skills/sdd-guide/SKILL.md`, replace the six-plus-command v5 chain with the v6 chain `discovery → refine → validate → prototype → build → retro`, marking `validate` optional. Update the interview-command list and the End-of-Command Handoff next-command map to the v6 commands. Delete the entire "Between-Rounds Context Recommendation" section — v6 drops between-rounds auto-suggest; context is user-driven via `/sdd:checkpoint`.
 - **Acceptance criteria:** (from `prd.md > Foundations & Migration`)
-  - [ ] `fchn` — `sdd-guide`'s command chain is updated to `discovery → refine → validate → prototype → build → retro`, with `validate` marked optional.
+  - [x] `fchn` — `sdd-guide`'s command chain is updated to `discovery → refine → validate → prototype → build → retro`, with `validate` marked optional.
 - **Verification:** `claude plugin validate .` passes. The chain string and handoff next-command map in `sdd-guide/SKILL.md` match the spec; a grep confirms the Between-Rounds Context Recommendation section is gone with no dangling references to it.
 
 ---
 
 ### Item 3 — delete context-management.md + retire sprint-tags.md
-- [ ] Delete `references/context-management.md` and `references/sprint-tags.md`; remove or repoint any loader references so nothing loads the deleted files [PRD: fcas]
+- [x] Delete `references/context-management.md` and `references/sprint-tags.md`; remove or repoint any loader references so nothing loads the deleted files [PRD: fcas]
 - **PRD ref:** `prd.md > Foundations & Migration`
 - **Spec ref:** `spec.md > Foundations & Migration > Shared-behavior cascade`, `spec.md > File Structure`
 - **What to build:** Delete `plugins/sdd/skills/sdd-guide/references/context-management.md` (the whole between-rounds three-tier auto-suggest model v6 removes) and `references/sprint-tags.md` (obsolete; `markers.md` replaces it — created in Item 4). Sweep the command SKILLs and `sdd-guide` for any "load `context-management.md`" / "load `sprint-tags.md`" instructions and remove them. The surviving one-liner ("context is user-driven; use `/sdd:checkpoint`") lives in checkpoint's SKILL.md (Item 22), not here.
 - **Acceptance criteria:** (from `prd.md > Foundations & Migration`, `fcas`)
-  - [ ] `fcas` (part) — `context-management.md` is deleted outright and `sprint-tags.md` is retired.
+  - [x] `fcas` (part) — `context-management.md` is deleted outright and `sprint-tags.md` is retired.
 - **Verification:** `claude plugin validate .` passes. Both files are gone; a repo-wide grep finds no surviving loader references to either.
 
 ---
 
 ### Item 4 — add markers.md + build-loop.md reference contracts
-- [ ] Create `references/markers.md` (the inline-marker parser contract) and `references/build-loop.md` (the vendored loop skeleton), each per its full spec design section [PRD: fcas]
+- [x] Create `references/markers.md` (the inline-marker parser contract) and `references/build-loop.md` (the vendored loop skeleton), each per its full spec design section [PRD: fcas]
 - **PRD ref:** `prd.md > Foundations & Migration`
 - **Spec ref:** `spec.md > Markers`, `spec.md > Build-Loop Skeleton`
 - **What to build:** Create `references/markers.md` as the single parser contract for inline markers per spec `## Markers`: the three types (`[ASSUMPTION a#]`, `[GAP g#]`, `[CONCERN c#]`), the optional `PROPOSED` form, the stateless round-local ID rules, the scan regex `\[(ASSUMPTION|GAP|CONCERN) ([agc]\d+):`, the resolve-loop rules (resolve→replace→strip→re-scan; never auto-strip), and the writers/resolvers table. Create `references/build-loop.md` as the vendored loop skeleton per spec `## Build-Loop Skeleton`: `plan → make → separate checker → bounded retry (≤2) → compound`, with the build (durable, git worktree, stop-on-twice-failed) vs prototype (disposable, no git, `[GAP]`-and-continue) specialization table including the PR/branch stamping row.
 - **Acceptance criteria:** (from `prd.md > Foundations & Migration`, `fcas`)
-  - [ ] `fcas` (part) — `markers.md` and `build-loop.md` are added as new reference files.
+  - [x] `fcas` (part) — `markers.md` and `build-loop.md` are added as new reference files.
 - **Verification:** `claude plugin validate .` passes. `markers.md`'s syntax, ID rules, and scan regex match spec `## Markers`; `build-loop.md`'s skeleton and specialization table match spec `## Build-Loop Skeleton`.
 
 ---
