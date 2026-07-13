@@ -18,8 +18,6 @@ Read `skills/sdd-guide/SKILL.md` and follow all rules defined there (tone, inter
 
 Read `skills/sdd-guide/references/living-documents.md`. This defines the protocol for updating living documents during iteration. Follow its default stance: resist changes to scope, PRD, and spec. New ideas surface through the backlog or unvetted section, not through direct edits.
 
-Read `skills/sdd-guide/references/context-management.md`. Polish does not run formal deepening rounds, but the iteration interview (Step 5) and the end-of-iteration wrap (Step 11) are natural transition points. At those points, the agent may emit the three-tier between-rounds context recommendation (continue / `/compact` / `/clear`) when warranted — this is discretionary for polish, not round-by-round mandatory. Use the reference's triggers and signals to judge whether a recommendation is appropriate at a given transition.
-
 ### 3. Read user profile
 
 Read `~/.claude/sdd-user-profile.json`.
@@ -62,7 +60,7 @@ If the file does not exist, skip this step without error.
 
 ### 7. Detect closed-sprint state (re-open escape hatch)
 
-Scan `process-notes-sprint-N.md` for `[close-sprint-manifest] ... [/close-sprint-manifest]` blocks using the parser documented in `skills/sdd-guide/references/sprint-tags.md > [close-sprint-manifest] / [/close-sprint-manifest] block`. The sprint is "closed" iff at least one such block exists.
+Scan `process-notes-sprint-N.md` for `[close-sprint-manifest] ... [/close-sprint-manifest]` blocks (an opening `[close-sprint-manifest] timestamp: ...` line through a closing `[/close-sprint-manifest]` line). The sprint is "closed" iff at least one such block exists.
 
 **Branch:**
 
@@ -107,7 +105,7 @@ Do not run the iteration interview. Do not modify any files. Exit `/sdd:polish`.
 
 ### Step C. On confirmation — surface the manifest's checked ACs
 
-Parse the most recent `[close-sprint-manifest]` block (per `skills/sdd-guide/references/sprint-tags.md > [close-sprint-manifest]`). Read its `PRD ACs checked: ...` line and surface that list to the user verbatim.
+Parse the most recent `[close-sprint-manifest]` block (the block bounded by `[close-sprint-manifest] timestamp: ...` and `[/close-sprint-manifest]`). Read its `PRD ACs checked: ...` line and surface that list to the user verbatim.
 
 Then ask a single open-ended question:
 
@@ -119,13 +117,13 @@ Free-form response. Parse the user's answer against the AC IDs from the manifest
 
 For each AC ID selected by the user:
 
-1. **Un-check the AC in `docs/prd.md`.** Locate the line matching the AC ID (format defined in `skills/sdd-guide/references/sprint-tags.md > PRD Acceptance Criteria IDs`) and flip its checkbox from `[x]` to `[ ]`.
+1. **Un-check the AC in `docs/prd.md`.** Locate the AC line (format: `- [x] ` followed by the 4-char lowercase alphabetic ID in inline backticks, then the AC text) and flip its checkbox from `[x]` to `[ ]`.
 2. **Reverse the story split (if applicable).** If the manifest's `Story splits: ...` line maps this AC to a split-off story, restore the AC to its original story anchor. If the split-off story is left with no remaining ACs and `/sdd:refine` has not added any new ACs to it since close, delete the empty split-off story. ACs added by `/sdd:refine` to the split-off story since close are not touched — they stay.
 3. **Handle `/sdd:refine`-deleted ACs.** If the AC ID from the manifest no longer exists in `docs/prd.md` (deleted by `/sdd:refine` since close), emit a one-line informational warning naming the missing AC ID; skip un-check for that AC; do not block.
 
 ### Step E. Append `[sprint-reopened]` marker
 
-Append a `[sprint-reopened]` marker entry to `process-notes-sprint-N.md` using the format defined in `skills/sdd-guide/references/sprint-tags.md > [sprint-reopened] process-notes marker`. The marker carries the current timestamp, the un-checked AC IDs, and the splits-undone mapping for the selected ACs. Do not re-derive the format here.
+Append a `[sprint-reopened]` marker entry to `process-notes-sprint-N.md` — a single `[sprint-reopened] timestamp: <ISO-8601>` line followed by indented detail lines. The marker carries the current timestamp, the un-checked AC IDs, and the splits-undone mapping for the selected ACs. Do not re-derive the format here.
 
 ### Step F. Proceed with iteration
 

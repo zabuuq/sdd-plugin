@@ -18,8 +18,6 @@ Read `skills/sdd-guide/SKILL.md` and follow all rules defined there (tone, inter
 
 Read `skills/sdd-guide/references/deepening-rounds.md`. This defines the two-phase interview pattern used later in this command.
 
-Read `skills/sdd-guide/references/context-management.md`. This defines the three-tier between-rounds context recommendation (continue / `/compact` / `/clear`) emitted alongside the end-of-round content recommendation.
-
 Read `skills/sdd-guide/references/backlog.md`. This defines the defer-to-backlog vs drop confirmation prompt, the 6-field entry schema, and the bootstrap rule for `docs/backlog.md`.
 
 ### 3. Read user profile
@@ -203,8 +201,6 @@ Signs a project is too large:
 ## Interview — Phase 2: Deepening Rounds
 
 Follow the deepening rounds protocol defined in `skills/sdd-guide/references/deepening-rounds.md` — including the Phase 1 → Phase 2 transition, the per-round question count (5 default, up to 10 with explicit reason+permission past the cap), and the structured end-of-round content recommendation (continue-with-topic-preview or close-with-reasoning). Do not emit a bare transition prompt; the reference defines the recommendation wording.
-
-After the end-of-round content recommendation fires, emit the three-tier between-rounds context recommendation per `skills/sdd-guide/references/context-management.md`. Order is fixed: content recommendation first, then context recommendation, in the same end-of-round message group. The two are separate and independent.
 
 Deepening questions for scope should target edge cases, ambiguities, thin areas, hidden assumptions, and unexplored angles. Ask them one at a time per the reference.
 

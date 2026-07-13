@@ -4,7 +4,9 @@
 
 ## Open
 
-_(none)_
+### context-loading.md has no v6 disposition
+- **Raised by:** /sdd:build — v6 sprint 1, item 3/7 (foundations group).
+- **Concern:** `references/context-loading.md` is absent from the spec's v6 file-structure listing, but no sprint item deletes or rewrites it. Its content is heavily v5 (per-command load table naming `scope`/`prd`/`plan`/`polish`, sprint-file re-entry order). Left untouched during the foundations group. Needs a decision at item 28's reference sweep: delete it, or rewrite its load table for the v6 command set.
 
 ## Resolved
 

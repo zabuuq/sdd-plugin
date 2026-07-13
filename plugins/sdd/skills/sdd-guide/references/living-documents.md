@@ -21,14 +21,15 @@ All other documents (scope, process notes, sprint files) are append-only or immu
 
 | Field | Type | Owner / notes |
 |---|---|---|
-| `version` | integer | Schema version (`1`). Not cycle state. |
-| `cycleNumber` | integer (top-level) | The current working cycle. **Sole owner: `/sdd:archive`.** `/sdd:scope` never reads or writes it. **Absent → assume `1`.** Single writer ⇒ no double-increment, no stale-number race. |
-| `currentSprint` | integer | Current sprint number. `/sdd:plan` computes the next sprint as `currentSprint + 1`. |
-| `buildMode` | string | Build pacing preference (mirrors profile `defaultSprintMode`). |
-| `smallProject` | boolean / null | Right-sizing judgment for the current cycle. |
+| `version` | integer | Schema version (`2`). Not cycle state. |
+| `cycleNumber` | integer (top-level) | The current working cycle. **Sole owner: `/sdd:archive`.** No other command reads or writes it. **Absent → assume `1`.** Single writer ⇒ no double-increment, no stale-number race. |
+| `smallProject` | boolean / null | Right-sizing judgment for the current cycle. Stays top-level: machine-owned, AI-derived — not a user setting. |
 | `lastCommand` | string | Most recent command to run (see `## State Tracking` in `SKILL.md`). |
-| `commandExplanationsShown` | object | Per-command booleans gating the once-per-project explanation blurb (see `## Command Explanations` in `SKILL.md`). |
+| `settings` | object | **Persisted user choices.** Seeded `{ "prototypeFidelity": null }`; `prototypeFidelity` is `"hifi"`, `"lofi"`, or `null` (not yet asked). Written by the command that asks the choice; carried across cycles. |
+| `commandExplanationsShown` | object | Per-command booleans gating the once-per-project explanation blurb (see `## Command Explanations` in `SKILL.md`). Keys are the v6 command set: `discovery`, `refine`, `validate`, `prototype`, `build`, `retro`, `checkpoint`, `resolve-pr`, `onboard`, `pause`, `unpause`, `feedback`, `archive`. |
 | `notes` | string | Free-text seed line naming the cycle. |
+
+Schema v2 (v6) **dropped** the v1 fields `currentSprint` and `buildMode` — both were sprint-machinery state; v6 has no sprint documents and build is always autonomous. Maturity of `docs/plan.md` lives only in that document's in-file version line, never duplicated into state.
 
 ### cycleNumber resolution and bump
 
@@ -40,24 +41,32 @@ All other documents (scope, process notes, sprint files) are append-only or immu
 
 | Field | Reset behavior | Rationale |
 |---|---|---|
-| `version` | Carry (`1`) | Schema version, not cycle state. |
+| `version` | Carry (`2`) | Schema version, not cycle state. |
 | `cycleNumber` | Bump to `N+1` | Resolved N + 1; sole owner. |
-| `currentSprint` | Reset to `0` (or omit) | No carryover of prior sprint state. `/sdd:plan` computes the next sprint as `currentSprint + 1`, so `0` (or absent) makes the next cycle's first sprint `1`. |
-| `buildMode` | Carry | Stable user preference. |
 | `smallProject` | Reset to `null` | New cycle re-judges from scratch. |
-| `lastCommand` | Reset to `"archive"` | Truthful; `/sdd:scope` overwrites on next startup. |
-| `commandExplanationsShown` | Normalize + flip to `false` (except `archive`) | See normalization below. |
+| `lastCommand` | Reset to `"archive"` | Truthful; the next cycle's first command overwrites on startup. |
+| `settings` | **Carry** | Sticky user choices (e.g. `prototypeFidelity`) survive cycles. |
+| `commandExplanationsShown` | Rekey to the v6 set + flip to `false` (except `archive`) | See normalization below. |
 | `notes` | Rewrite to a fresh seed line | Names the new cycle and where the prior cycle archived. |
 
-The reset must leave `project-state.json` a valid, parseable JSON file.
+The reset must leave `project-state.json` a valid, parseable JSON file. The dropped v1 fields (`currentSprint`, `buildMode`) are removed outright if a pre-v2 file still carries them.
 
 ### commandExplanationsShown normalization
 
 The reset normalizes the object to the current command set:
 
-- **Drop the stale legacy keys** `sprint`, `iterate`, `reflect`.
-- **Add an `archive` key.**
+- **Drop stale legacy keys** (any key not in the v6 command set — e.g. `scope`, `prd`, `spec`, `plan`, `polish`, `sprint`, `iterate`, `reflect`).
+- **Ensure every v6 key exists:** `discovery`, `refine`, `validate`, `prototype`, `build`, `retro`, `checkpoint`, `resolve-pr`, `onboard`, `pause`, `unpause`, `feedback`, `archive`.
 - Flip every key to `false` **except `archive`**, whose value is preserved (the archive blurb is once-per-project, not once-per-cycle).
+
+### Never-swept carry-forward set
+
+The following are permanent cross-cycle stores. `/sdd:archive` snapshots the three files but never moves or empties any of these; `docs/learnings/` is never even snapshotted — it simply persists:
+
+- `docs/backlog.md`
+- `docs/sdd-feedback.md`
+- `docs/project-state.json`
+- `docs/learnings/`
 
 ### Snapshot-first / startup-overwrite exemption
 
@@ -79,10 +88,10 @@ When `/sdd:refine` processes changes, update documents in this order. **Each ste
 1. **`docs/prd.md`** — Update stories, move items from unvetted to approved, or modify existing acceptance criteria. AC editing semantics:
    - **Pure reword (same intent):** the AC's checked/unchecked state survives; confirm with the user that the intent did not shift.
    - **Semantic change:** un-check the AC. Surface any work already shipped against the old wording as an iteration candidate — log it to the current open sprint's process notes if one exists, otherwise flag it to the user.
-   - **Split or merge:** new ACs get fresh 4-char IDs and start unchecked; old IDs are removed (not recycled). See `references/sprint-tags.md` for AC ID rules.
+   - **Split or merge:** new ACs get fresh 4-char IDs and start unchecked; old IDs are removed (not recycled).
    Show the user exactly what changed and get confirmation before proceeding.
 2. **`docs/spec.md`** — Update technical specifications to match the PRD changes. Show the user the changes and get confirmation.
-3. **Open sprint files (if affected)** — when the PRD edit touched an AC referenced in a `[PRD: ...]` tag inside an **open** sprint file, offer to update those refs in lockstep. An open sprint file is one without a `[close-sprint-manifest]` block (see `references/sprint-tags.md` for the parser). **Closed sprint files are never touched.** Show and confirm.
+3. **Open sprint files (if affected)** — when the PRD edit touched an AC referenced in a `[PRD: ...]` tag inside an **open** sprint file, offer to update those refs in lockstep. An open sprint file is one without a `[close-sprint-manifest]` block. **Closed sprint files are never touched.** Show and confirm.
 4. **`AGENTS.md`** — Update agent instructions if the changes affect how work is structured or delegated. Show and confirm.
 5. **`CLAUDE.md`** — Update project conventions if the changes affect coding standards, patterns, or project-wide rules. Show and confirm.
 

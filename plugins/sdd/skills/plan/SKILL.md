@@ -10,16 +10,13 @@ Read `skills/sdd-guide/SKILL.md` for shared behavior before executing this comma
 
 Read `skills/sdd-guide/references/deepening-rounds.md` for the interview pattern used in this command.
 
-Read `skills/sdd-guide/references/context-management.md` for the three-tier between-rounds context recommendation (continue / `/compact` / `/clear`) emitted alongside the end-of-round content recommendation.
-
 ## Loading
 
 On startup, load the following in order:
 
 1. `skills/sdd-guide/SKILL.md` (shared behavior)
 2. `skills/sdd-guide/references/deepening-rounds.md`
-3. `skills/sdd-guide/references/context-management.md`
-4. `skills/sdd-guide/references/backlog.md` (defer-to-backlog write trigger and entry format)
+3. `skills/sdd-guide/references/backlog.md` (defer-to-backlog write trigger and entry format)
 5. `docs/project-state.json` — read `currentSprint`, `commandExplanationsShown`, and `buildMode`
 6. Most recent `process-notes-sprint-N.md` in project root, if any — see `## Prior-Sprint Process Notes` below for selection rule and extraction.
 7. `docs/prd.md` — scan for incomplete and unvetted items only. Do not load completed stories.
@@ -150,7 +147,7 @@ Every checkbox bullet in the proposed sprint contents must carry either a `[PRD:
 
 ### Parser
 
-Parse every checkbox bullet line in the proposed sprint contents. See `references/sprint-tags.md > Validation summary` for parser regex and matching rules. Do not re-implement the patterns here.
+Parse every checkbox bullet line in the proposed sprint contents: single-line checkbox items whose inline tag is `[PRD: id1, id2, ...]` (4-char lowercase alphabetic AC IDs), `[FB: FB-NNN]`, or `[unmapped]`. Every item must carry exactly one of these tag forms.
 
 ### Failure handling
 
@@ -248,8 +245,6 @@ Build mode was already resolved upstream in `## Sprint-Mode Resolution`. Confirm
 ### Step 6: Deepening Rounds (Optional)
 
 After the sprint contents and build mode are confirmed, follow the deepening rounds protocol defined in `skills/sdd-guide/references/deepening-rounds.md` — including the Phase 1 → Phase 2 transition, the per-round question count (5 default, up to 10 with explicit reason+permission past the cap), and the structured end-of-round content recommendation (continue-with-topic-preview or close-with-reasoning). Do not emit a bare transition prompt; the reference defines the recommendation wording.
-
-After the end-of-round content recommendation fires, emit the three-tier between-rounds context recommendation per `skills/sdd-guide/references/context-management.md`. Order is fixed: content recommendation first, then context recommendation, in the same end-of-round message group. The two are separate and independent.
 
 The deepening target here is the sprint plan itself — not the PRD or spec. Deepening questions should probe:
 

@@ -10,102 +10,102 @@ Out of scope: the deferred automated third-party AI validation, GitHub-native PR
 ## Checklist
 
 ### Item 1 — project-state.json schema v2 + explanation-key rekey
-- [ ] Migrate `docs/project-state.json` to schema v2: bump `version` to 2, add a `settings` object (`prototypeFidelity: null`), drop `currentSprint` and `buildMode`, keep `smallProject` top-level, and rekey `commandExplanationsShown` to the full v6 command set [PRD: fsch, fcek]
+- [x] Migrate `docs/project-state.json` to schema v2: bump `version` to 2, add a `settings` object (`prototypeFidelity: null`), drop `currentSprint` and `buildMode`, keep `smallProject` top-level, and rekey `commandExplanationsShown` to the full v6 command set [PRD: fsch, fcek]
 - **PRD ref:** `prd.md > Foundations & Migration`
 - **Spec ref:** `spec.md > Foundations & Migration > project-state.json schema (v2)`
 - **What to build:** Change the on-disk `docs/project-state.json` to the v6 shape per the spec's schema block: `version: 2`; add `settings` (persisted user choices, seeded `{ "prototypeFidelity": null }`); remove the now-vestigial `currentSprint` and `buildMode`; keep `smallProject` at top level (machine-owned, AI-derived); rekey `commandExplanationsShown` to `discovery, refine, validate, prototype, build, retro, checkpoint, resolve-pr, onboard, pause, unpause, feedback, archive`, each `false`. Do not duplicate `plan.md`'s version into state — maturity lives only in the document.
 - **Acceptance criteria:** (from `prd.md > Foundations & Migration`)
-  - [ ] `fsch` — `docs/project-state.json` gains persisted settings (prototype fidelity at minimum).
-  - [ ] `fcek` — The `commandExplanationsShown` key set is rekeyed to the full v6 command set — the six chain commands plus the anytime commands (`checkpoint`, `resolve-pr`, `pause`, `unpause`, `feedback`, `archive`, `onboard`).
+  - [x] `fsch` — `docs/project-state.json` gains persisted settings (prototype fidelity at minimum).
+  - [x] `fcek` — The `commandExplanationsShown` key set is rekeyed to the full v6 command set — the six chain commands plus the anytime commands (`checkpoint`, `resolve-pr`, `pause`, `unpause`, `feedback`, `archive`, `onboard`).
 - **Verification:** `claude plugin validate .` passes. The written state file parses as valid JSON and matches the spec's schema-v2 block field-for-field: `settings.prototypeFidelity` present, `currentSprint`/`buildMode` absent, `smallProject` top-level, and `commandExplanationsShown` keys equal to the v6 set.
 
 ---
 
 ### Item 2 — sdd-guide command chain + remove between-rounds section
-- [ ] Update `skills/sdd-guide/SKILL.md`: command chain → `discovery → refine → validate → prototype → build → retro` (validate optional); update the interview-command set and end-of-command handoff next-command map; remove the "Between-Rounds Context Recommendation" section entirely [PRD: fchn]
+- [x] Update `skills/sdd-guide/SKILL.md`: command chain → `discovery → refine → validate → prototype → build → retro` (validate optional); update the interview-command set and end-of-command handoff next-command map; remove the "Between-Rounds Context Recommendation" section entirely [PRD: fchn]
 - **PRD ref:** `prd.md > Foundations & Migration`
 - **Spec ref:** `spec.md > Foundations & Migration > Shared-behavior cascade`
 - **What to build:** In `skills/sdd-guide/SKILL.md`, replace the six-plus-command v5 chain with the v6 chain `discovery → refine → validate → prototype → build → retro`, marking `validate` optional. Update the interview-command list and the End-of-Command Handoff next-command map to the v6 commands. Delete the entire "Between-Rounds Context Recommendation" section — v6 drops between-rounds auto-suggest; context is user-driven via `/sdd:checkpoint`.
 - **Acceptance criteria:** (from `prd.md > Foundations & Migration`)
-  - [ ] `fchn` — `sdd-guide`'s command chain is updated to `discovery → refine → validate → prototype → build → retro`, with `validate` marked optional.
+  - [x] `fchn` — `sdd-guide`'s command chain is updated to `discovery → refine → validate → prototype → build → retro`, with `validate` marked optional.
 - **Verification:** `claude plugin validate .` passes. The chain string and handoff next-command map in `sdd-guide/SKILL.md` match the spec; a grep confirms the Between-Rounds Context Recommendation section is gone with no dangling references to it.
 
 ---
 
 ### Item 3 — delete context-management.md + retire sprint-tags.md
-- [ ] Delete `references/context-management.md` and `references/sprint-tags.md`; remove or repoint any loader references so nothing loads the deleted files [PRD: fcas]
+- [x] Delete `references/context-management.md` and `references/sprint-tags.md`; remove or repoint any loader references so nothing loads the deleted files [PRD: fcas]
 - **PRD ref:** `prd.md > Foundations & Migration`
 - **Spec ref:** `spec.md > Foundations & Migration > Shared-behavior cascade`, `spec.md > File Structure`
 - **What to build:** Delete `plugins/sdd/skills/sdd-guide/references/context-management.md` (the whole between-rounds three-tier auto-suggest model v6 removes) and `references/sprint-tags.md` (obsolete; `markers.md` replaces it — created in Item 4). Sweep the command SKILLs and `sdd-guide` for any "load `context-management.md`" / "load `sprint-tags.md`" instructions and remove them. The surviving one-liner ("context is user-driven; use `/sdd:checkpoint`") lives in checkpoint's SKILL.md (Item 22), not here.
 - **Acceptance criteria:** (from `prd.md > Foundations & Migration`, `fcas`)
-  - [ ] `fcas` (part) — `context-management.md` is deleted outright and `sprint-tags.md` is retired.
+  - [x] `fcas` (part) — `context-management.md` is deleted outright and `sprint-tags.md` is retired.
 - **Verification:** `claude plugin validate .` passes. Both files are gone; a repo-wide grep finds no surviving loader references to either.
 
 ---
 
 ### Item 4 — add markers.md + build-loop.md reference contracts
-- [ ] Create `references/markers.md` (the inline-marker parser contract) and `references/build-loop.md` (the vendored loop skeleton), each per its full spec design section [PRD: fcas]
+- [x] Create `references/markers.md` (the inline-marker parser contract) and `references/build-loop.md` (the vendored loop skeleton), each per its full spec design section [PRD: fcas]
 - **PRD ref:** `prd.md > Foundations & Migration`
 - **Spec ref:** `spec.md > Markers`, `spec.md > Build-Loop Skeleton`
 - **What to build:** Create `references/markers.md` as the single parser contract for inline markers per spec `## Markers`: the three types (`[ASSUMPTION a#]`, `[GAP g#]`, `[CONCERN c#]`), the optional `PROPOSED` form, the stateless round-local ID rules, the scan regex `\[(ASSUMPTION|GAP|CONCERN) ([agc]\d+):`, the resolve-loop rules (resolve→replace→strip→re-scan; never auto-strip), and the writers/resolvers table. Create `references/build-loop.md` as the vendored loop skeleton per spec `## Build-Loop Skeleton`: `plan → make → separate checker → bounded retry (≤2) → compound`, with the build (durable, git worktree, stop-on-twice-failed) vs prototype (disposable, no git, `[GAP]`-and-continue) specialization table including the PR/branch stamping row.
 - **Acceptance criteria:** (from `prd.md > Foundations & Migration`, `fcas`)
-  - [ ] `fcas` (part) — `markers.md` and `build-loop.md` are added as new reference files.
+  - [x] `fcas` (part) — `markers.md` and `build-loop.md` are added as new reference files.
 - **Verification:** `claude plugin validate .` passes. `markers.md`'s syntax, ID rules, and scan regex match spec `## Markers`; `build-loop.md`'s skeleton and specialization table match spec `## Build-Loop Skeleton`.
 
 ---
 
 ### Item 5 — living-documents.md schema-v2 + archive reset map
-- [ ] Update `references/living-documents.md` with the schema-v2 shape and the updated archive reset map (drop `currentSprint`/`buildMode`; carry `settings`; reset `smallProject` to null; `docs/learnings/` never swept) [PRD: fcas]
+- [x] Update `references/living-documents.md` with the schema-v2 shape and the updated archive reset map (drop `currentSprint`/`buildMode`; carry `settings`; reset `smallProject` to null; `docs/learnings/` never swept) [PRD: fcas]
 - **PRD ref:** `prd.md > Foundations & Migration`
 - **Spec ref:** `spec.md > Foundations & Migration > project-state.json schema (v2)`, `spec.md > Foundations & Migration > Shared-behavior cascade`
 - **What to build:** In `references/living-documents.md`, document the v2 `project-state.json` shape (the same block Item 1 writes to disk) and update the archive reset map: drop `currentSprint`/`buildMode`, carry `settings` forward, reset `smallProject` to null, rekey `commandExplanationsShown`, and add `docs/learnings/` to the never-swept carry-forward set alongside `backlog.md`, `sdd-feedback.md`, and `project-state.json`.
 - **Acceptance criteria:** (from `prd.md > Foundations & Migration`, `fcas`)
-  - [ ] `fcas` (part) — `living-documents.md` is updated for the schema change.
+  - [x] `fcas` (part) — `living-documents.md` is updated for the schema change.
 - **Verification:** `claude plugin validate .` passes. The schema block and reset map in `living-documents.md` match the spec; `docs/learnings/` is listed as never-swept carry-forward.
 
 ---
 
 ### Item 6 — deepening-rounds.md trim + right-sizing.md remap
-- [ ] Trim `references/deepening-rounds.md` of its context-recommendation coupling; remap `references/right-sizing.md` (scope→discovery as `smallProject` writer; re-evaluators → refine/validate; skippable-beat lists → v6 commands) [PRD: fcas]
+- [x] Trim `references/deepening-rounds.md` of its context-recommendation coupling; remap `references/right-sizing.md` (scope→discovery as `smallProject` writer; re-evaluators → refine/validate; skippable-beat lists → v6 commands) [PRD: fcas]
 - **PRD ref:** `prd.md > Foundations & Migration`
 - **Spec ref:** `spec.md > Foundations & Migration > Shared-behavior cascade`
 - **What to build:** In `references/deepening-rounds.md`, remove the coupling to the deleted between-rounds context recommendation (the "emit the three-tier context recommendation after the content recommendation" wiring), keeping the deepening mechanics themselves. In `references/right-sizing.md`, mechanically remap the v5 command roles to v6: `discovery` inherits scope's role as the `smallProject` writer; the re-evaluator set becomes the surviving v6 interview commands (`refine`, `validate`); the skippable Phase-1-beat lists remap from the old commands to the v6 commands.
 - **Acceptance criteria:** (from `prd.md > Foundations & Migration`, `fcas`)
-  - [ ] `fcas` (part) — `deepening-rounds.md` is trimmed of its context-recommendation coupling and `right-sizing.md` is remapped (scope→discovery as the `smallProject` writer).
+  - [x] `fcas` (part) — `deepening-rounds.md` is trimmed of its context-recommendation coupling and `right-sizing.md` is remapped (scope→discovery as the `smallProject` writer).
 - **Verification:** `claude plugin validate .` passes. `deepening-rounds.md` no longer references the deleted context tiers; `right-sizing.md`'s writer, re-evaluator, and skippable-beat lists name only v6 commands.
 
 ---
 
 ### Item 7 — templates: drop old, add plan-template.md, keep/update retro-template
-- [ ] Delete the scope/prd/spec/sprint/discovery templates; create `templates/plan-template.md` (single planning document per the spec's section order); keep and streamline `templates/retro-template.md` [PRD: ftpl]
+- [x] Delete the scope/prd/spec/sprint/discovery templates; create `templates/plan-template.md` (single planning document per the spec's section order); keep and streamline `templates/retro-template.md` [PRD: ftpl]
 - **PRD ref:** `prd.md > Foundations & Migration`
 - **Spec ref:** `spec.md > Document Model — plan.md > Template`, `spec.md > File Structure`
 - **What to build:** Delete `templates/` entries for scope, prd, spec, sprint, and discovery. Create `templates/plan-template.md` with the spec's section order: a top `**Version:** 0.1` line, then `# [Project] — Plan`, `## Overview`, `## Goals & Success`, `## Requirements` (epic → story → acceptance criteria with stable 4-char AC IDs), `## Architecture` (stack table with doc URLs, file structure, data flow, component sections), `## Key Decisions` (decision | rationale | tradeoff), `## Non-Goals` (+ conditional `docs/backlog.md` pointer); markers live inline, no roll-up section. Keep `templates/retro-template.md`, streamlined to the three-part v6 retro (drop the long-form structured-retro prose).
 - **Acceptance criteria:** (from `prd.md > Foundations & Migration`)
-  - [ ] `ftpl` — The templates drop scope/prd/spec/sprint/discovery, add the single planning-document template (`plan-template.md`), and keep/update the retro template.
+  - [x] `ftpl` — The templates drop scope/prd/spec/sprint/discovery, add the single planning-document template (`plan-template.md`), and keep/update the retro template.
 - **Verification:** `claude plugin validate .` passes. The old five templates are gone; `plan-template.md`'s section order matches spec `## Document Model — plan.md > Template`; `retro-template.md` is streamlined and carries no long-form structured-retro prose.
 
 ---
 
 ### Item 8 — onboard GitHub hard gate
-- [ ] Update `skills/onboard/SKILL.md` to verify `gh` is authenticated and a repository exists, and hard-block v6 (not warn) when either check fails [PRD: fgit, fgbl]
+- [x] Update `skills/onboard/SKILL.md` to verify `gh` is authenticated and a repository exists, and hard-block v6 (not warn) when either check fails [PRD: fgit, fgbl]
 - **PRD ref:** `prd.md > Foundations & Migration`
 - **Spec ref:** `spec.md > Foundations & Migration > GitHub gate (onboard)`
 - **What to build:** In `skills/onboard/SKILL.md`, add a startup verification that `gh` is authenticated and a Git repository exists. On either failure, hard-block: v6 does not start and `/sdd:discovery` cannot proceed — a block with a clear remediation message, not a warning that lets the flow continue.
 - **Acceptance criteria:** (from `prd.md > Foundations & Migration`)
-  - [ ] `fgit` — `/sdd:onboard` verifies that `gh` is authenticated and a repository exists.
-  - [ ] `fgbl` — When either check fails, `/sdd:onboard` hard-blocks: v6 does not start and `/sdd:discovery` cannot proceed. It is a block, not a warning.
+  - [x] `fgit` — `/sdd:onboard` verifies that `gh` is authenticated and a repository exists.
+  - [x] `fgbl` — When either check fails, `/sdd:onboard` hard-blocks: v6 does not start and `/sdd:discovery` cannot proceed. It is a block, not a warning.
 - **Verification:** `claude plugin validate .` passes. Behavior matches the spec: with `gh` unauthenticated or no repo, onboard blocks and discovery is refused; with both satisfied, onboard proceeds.
 
 ---
 
 ### Item 9 — feasibility/viability pushback (CONCERN behavior)
-- [ ] Add cross-cutting feasibility/viability pushback to `sdd-guide`: any command from `discovery` onward can raise it, written into `plan.md` as `[CONCERN c#: …]` markers so it survives clear/compact [PRD: ffea]
+- [x] Add cross-cutting feasibility/viability pushback to `sdd-guide`: any command from `discovery` onward can raise it, written into `plan.md` as `[CONCERN c#: …]` markers so it survives clear/compact [PRD: ffea]
 - **PRD ref:** `prd.md > Foundations & Migration`
 - **Spec ref:** `spec.md > Foundations & Migration > Feasibility/viability pushback`, `spec.md > Markers`
 - **What to build:** Add to `skills/sdd-guide/SKILL.md` a cross-cutting behavior: from `discovery` onward, the AI may raise feasibility/viability pushback ("the market may not justify this"; "this is high-effort — a lighter version?") at any time, not gated to a single step. Pushback that needs to persist is written into `plan.md` as a `[CONCERN c#: …]` marker per `references/markers.md`, so it survives a clear/compact. Because it lives in `sdd-guide`, every command inherits it — no per-command wiring.
 - **Acceptance criteria:** (from `prd.md > Foundations & Migration`)
-  - [ ] `ffea` — Feasibility/viability pushback is available as cross-cutting behavior any command from `discovery` onward can raise when warranted; it is not gated to a single step.
+  - [x] `ffea` — Feasibility/viability pushback is available as cross-cutting behavior any command from `discovery` onward can raise when warranted; it is not gated to a single step.
 - **Verification:** `claude plugin validate .` passes. `sdd-guide` documents the CONCERN-raising behavior and references `markers.md` for the marker form; the behavior is defined once in `sdd-guide` (inherited), not duplicated per command.
 
 ---

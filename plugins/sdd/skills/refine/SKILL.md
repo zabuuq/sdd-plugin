@@ -18,8 +18,6 @@ Read `skills/sdd-guide/SKILL.md` and follow all rules defined there (tone, inter
 
 Read `skills/sdd-guide/references/living-documents.md`. This defines the protocol for updating living documents during refinement, including the update ordering that this command must follow. The `/sdd:refine` command is the primary mechanism for making deliberate changes to project documents — unlike other commands, it does not default to resisting changes. It is the gatekeeper that makes changes legitimate.
 
-Read `skills/sdd-guide/references/context-management.md`. Refine does not run formal deepening rounds, but it works through unvetted items one-at-a-time with natural transition points between items (and between document updates inside Step 6). At those transitions, the agent may emit the three-tier between-rounds context recommendation (continue / `/compact` / `/clear`) when warranted — this is discretionary for refine, not round-by-round mandatory. Use the reference's triggers and signals to judge whether a recommendation is appropriate at a given transition.
-
 ### 3. Read user profile
 
 Read `~/.claude/sdd-user-profile.json`.

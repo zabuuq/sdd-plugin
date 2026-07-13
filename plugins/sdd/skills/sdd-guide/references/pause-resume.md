@@ -1,6 +1,6 @@
 # Pause / Resume
 
-**Used by:** `/sdd:pause` (writes), `/sdd:unpause` (reads and deletes), and the `/clear` branch of the three-tier between-rounds context-management model (writes — see `references/context-management.md`).
+**Used by:** `/sdd:pause` (writes), `/sdd:unpause` (reads and deletes).
 
 This reference defines the resume-file location, schema, per-section quality bar, and the distillation discipline that makes resumption reliable. The goal: a fresh, zero-context model reading the resume file alone must arrive at the same decision state the paused conversation was in, with no replay needed.
 
@@ -74,8 +74,4 @@ The resumed command is responsible for deleting its own resume file. The delete 
 - `/sdd:unpause` does NOT delete on entry. It reads, resumes, then the resumed command deletes on completion.
 - If the resume file is missing when cleanup runs, that is not an error. Cleanup is a best-effort `delete-if-exists`. A missing file means either the user already cleared it manually or the consolidation path never wrote one — both are valid states.
 
-## Three-tier `/clear` consolidation
 
-The three-tier between-rounds context-management model (see `references/context-management.md`) may recommend `/clear` after a deepening round when context pressure is high. Before instructing the user to `/clear`, the agent writes a resume file using this exact schema and location convention. After `/clear`, the user runs `/sdd:unpause`, which reads that file and resumes.
-
-This is the same file format, same quality bar, and same cleanup rule as a manual `/sdd:pause`. The only difference is the trigger. There is no separate "round-summary schema" — the schema in this reference is canonical for both paths.
