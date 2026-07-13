@@ -95,7 +95,29 @@ At the end of the core interview (before any deepening rounds), write the author
 
 ## Step 3: Auto-Draft
 
-Produce `docs/plan.md` from the interview and ingested material.
+Once the user accepts the close-recommendation at the end of the interview, produce `docs/plan.md` — the single planning document capturing intent, requirements, and architecture — and write it to disk.
+
+### File and version
+
+- Use `skills/sdd-guide/templates/plan-template.md` as the schema; keep its section order (`Overview`, `Goals & Success`, `Requirements`, `Architecture`, `Key Decisions`, `Non-Goals`).
+- The file is `docs/plan.md` **from creation** — never `plan-draft.md`, never a versioned sibling. Draft status lives only in the version line: write `**Version:** 0.1` at the top. The major digit `0` *is* the draft marker; a re-draft in the same maturity bumps the minor (`0.2`).
+- Requirements are epic-grouped stories with acceptance criteria carrying stable 4-char lowercase alphabetic IDs in inline backticks, assigned at write time. `/sdd:build` later lifts issues from these ACs by ID — the document owns them.
+
+### Inline markers
+
+Tag the draft per `skills/sdd-guide/references/markers.md` as you write it:
+
+- Every **assumption** the AI makes — a choice the interview didn't settle — is tagged inline where it lives: `[ASSUMPTION a1: …]`.
+- Every **gap** the AI identifies — something it couldn't resolve and needs input on — is tagged: `[GAP g1: …]`.
+- Any **feasibility/viability concern** worth persisting is tagged: `[CONCERN c1: …]`.
+
+Markers live inline in the content they annotate. Do **not** add a roll-up "open markers" section — enumeration is always by scan. ID assignment and the optional `PROPOSED` form follow `markers.md`; do not restate the rules here.
+
+The honest draft is the useful draft: tag liberally. An untagged guess is invisible to `/sdd:refine`; a tagged one gets resolved.
+
+### After the write
+
+Surface the draft to the user: name the file, its version (`0.1`), and the marker counts by type (e.g. "7 assumptions, 3 gaps, 1 concern — `/sdd:refine` walks these"). Then proceed to the handoff.
 
 ## Deferrals
 
