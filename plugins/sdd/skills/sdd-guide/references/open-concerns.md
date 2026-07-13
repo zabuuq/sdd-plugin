@@ -19,8 +19,8 @@ Each concern is recorded as a structured entry:
 ```markdown
 ### [Short descriptive title]
 
-- **Source:** [Command that raised this concern, e.g., `/sdd:scope`]
-- **Target:** [Command expected to resolve this, if known, e.g., `/sdd:spec`. Use "Unknown" if unclear.]
+- **Source:** [Command that raised this concern, e.g., `/sdd:discovery`]
+- **Target:** [Command expected to resolve this, if known, e.g., `/sdd:refine`. Use "Unknown" if unclear.]
 - **Status:** [open | resolved | deferred]
 - **Concern:** [The actual question, issue, or unresolved item. Be specific.]
 - **Resolution:** [How this was resolved, including indirect resolution explanations. Empty if open.]
@@ -46,7 +46,7 @@ Every command follows this protocol on startup, after updating `lastCommand` in 
 
 ## File Lifecycle
 
-- Created during `/sdd:scope` (or whichever command first encounters an unresolved concern).
+- Created during `/sdd:discovery` (or whichever command first encounters an unresolved concern).
 - Updated by every subsequent command.
 - Reviewed comprehensively during `/sdd:retro`.
 - Any concerns still open at `/sdd:retro` are flagged as unresolved project debt.

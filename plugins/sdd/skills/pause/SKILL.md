@@ -32,21 +32,21 @@ Read `lastCommand` from `docs/project-state.json`. Branch on its value before do
 **Pauseable commands** — `/sdd:pause` proceeds when `lastCommand` is one of:
 
 - `/sdd:discovery`
-- `/sdd:scope`
-- `/sdd:prd`
-- `/sdd:spec`
-- `/sdd:plan`
 - `/sdd:refine`
-- `/sdd:polish`
+- `/sdd:validate`
 
-If `lastCommand` matches one of the seven values above, fall through to the `## Behavior` section below — the resume-file write logic runs there.
+If `lastCommand` matches one of the three values above, fall through to the `## Behavior` section below — the resume-file write logic runs there.
 
 **Non-pauseable commands** — when `lastCommand` is one of:
 
 - `/sdd:onboard`
+- `/sdd:prototype`
 - `/sdd:build`
 - `/sdd:retro`
+- `/sdd:checkpoint`
+- `/sdd:resolve-pr`
 - `/sdd:feedback`
+- `/sdd:archive`
 
 …or when `lastCommand` is unset (the field is missing, `docs/project-state.json` does not exist, or the value is null/empty), `/sdd:pause` has nothing to snapshot. Emit a single line stating that there is nothing in-flight to pause, for example:
 
@@ -56,17 +56,17 @@ Then exit cleanly. Write NO resume file. Write NO other `docs/` outputs. Do not 
 
 ## Behavior
 
-When the startup gate above passes — i.e., `lastCommand` is one of the seven pauseable commands — run the steps below in order.
+When the startup gate above passes — i.e., `lastCommand` is one of the pauseable commands — run the steps below in order.
 
 ### Derive the resume-file path
 
 The resume file lives at `docs/<command>-resume.md`, where `<command>` is the value of `lastCommand` with the `/sdd:` prefix stripped. Concrete examples:
 
-- `lastCommand = "/sdd:scope"` → `docs/scope-resume.md`
-- `lastCommand = "/sdd:plan"` → `docs/plan-resume.md`
 - `lastCommand = "/sdd:discovery"` → `docs/discovery-resume.md`
+- `lastCommand = "/sdd:refine"` → `docs/refine-resume.md`
+- `lastCommand = "/sdd:validate"` → `docs/validate-resume.md`
 
-This naming convention is canonical for both `/sdd:pause` and the three-tier `/clear` consolidation path — see `references/pause-resume.md > ## Location convention`.
+This naming convention is canonical — see `references/pause-resume.md > ## Location convention`.
 
 ### Write the resume file
 
