@@ -30,7 +30,7 @@ Update `lastCommand` in `docs/project-state.json` to `"/sdd:refine"` before any 
 
 ## smallProject Re-Evaluation (startup)
 
-Per `skills/sdd-guide/references/right-sizing.md`, re-evaluate `smallProject` on startup: read the current value, apply the reference's signals against `plan.md`'s content, and flip it only on contradictory or first-surfacing evidence. A confirming re-evaluation is a no-op; a flip is written to `docs/project-state.json` and logged in this command's process notes (see `## Process Notes`).
+Per `skills/sdd-guide/references/right-sizing.md`, re-evaluate `smallProject` on startup: read the current value, apply the reference's signals against `plan.md`'s content, and flip it only on contradictory or first-surfacing evidence. A confirming re-evaluation is a no-op; a flip is written to `docs/project-state.json` and logged in this command's process notes file.
 
 ## Step 1: Marker Walk
 
@@ -48,11 +48,23 @@ For each marker:
 
 ## Step 2: Carry-Forward
 
+Not every marker resolves during refine. When one can't be settled — the user doesn't know yet, the decision depends on something downstream, the discussion stalls without a ruling — **leave it tagged in the document**. It carries forward to `/sdd:prototype` (and beyond) as-is; unresolved markers are a normal end state, not a failure. Nothing is force-decided.
+
+The AI may append a **proposed solution** to an unresolved marker using the `PROPOSED` form from `references/markers.md`:
+
+```
+[GAP g2: the plan doesn't say how sessions expire — PROPOSED: default to a 30-day idle window]
+```
+
+The proposal rides inside the marker; the marker stays in place. Appending a proposal is never resolution — only the user's explicit decision resolves and strips. When the user later accepts a proposal, that acceptance is the explicit resolution: apply it in place and strip per Step 1's rules.
+
+Before finalizing, tell the user which markers remain tagged so carrying them forward is a choice, not an accident.
+
 ## Step 3: Finalize
 
 ## Process Notes
 
-Per sdd-guide's `## Process Notes` section, append to `process-notes-refine.md` at the project root throughout the walk — real-time entries capturing decisions (each marker's resolution and rationale), pushback, difficult questions, and pivots. Create the file on first append.
+Per sdd-guide's `## Process Notes` section, append to `process-notes-refine.md` at the project root throughout the walk — real-time entries capturing decisions (each marker's resolution and rationale), pushback, difficult questions, and pivots. Create the file on first append. A `smallProject` flip from the startup re-evaluation is logged here.
 
 ## End-of-Command Handoff
 
