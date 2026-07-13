@@ -62,6 +62,13 @@ Before finalizing, tell the user which markers remain tagged so carrying them fo
 
 ## Step 3: Finalize
 
+When the walk ends (no markers remain, or the remaining ones are deliberate carry-forwards), finalize the plan:
+
+- Bump the version major: **`0.x → 1.0`**, edited in the same `**Version:**` line of the same file. If the document is already at major `1` (a re-run), bump the minor instead (`1.0 → 1.1`).
+- **No separate "final" file is created** — no `plan-final.md`, no copy, no rename. `docs/plan.md` updated in place is the finalized plan; the version number is the single source of truth for maturity.
+
+Confirm the bump to the user in one line (e.g. "Finalized: `docs/plan.md` is now `1.0`; 2 markers carry forward"), then proceed to the handoff.
+
 ## Process Notes
 
 Per sdd-guide's `## Process Notes` section, append to `process-notes-refine.md` at the project root throughout the walk — real-time entries capturing decisions (each marker's resolution and rationale), pushback, difficult questions, and pivots. Create the file on first append. A `smallProject` flip from the startup re-evaluation is logged here.
