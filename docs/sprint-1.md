@@ -286,69 +286,69 @@ Out of scope: the deferred automated third-party AI validation, GitHub-native PR
 ---
 
 ### Item 23 — Build: issues from refined work
-- [ ] Rewrite `skills/build/SKILL.md` issue-creation: keep `docs/backlog.md` as the local, unrefined holding area (never acted on), and turn a refined item into a GitHub issue with title, description, ACs lifted from `plan.md`, a link back, and labels [PRD: bgat, biss]
+- [x] Rewrite `skills/build/SKILL.md` issue-creation: keep `docs/backlog.md` as the local, unrefined holding area (never acted on), and turn a refined item into a GitHub issue with title, description, ACs lifted from `plan.md`, a link back, and labels [PRD: bgat, biss]
 - **PRD ref:** `prd.md > Build`
 - **Spec ref:** `spec.md > Build > Issues from refined work`
 - **What to build:** In `skills/build/SKILL.md`, keep `docs/backlog.md` as the local, unrefined holding area that build agents never act on directly (`bgat`). Turn a refined item into a GitHub issue carrying a title, a description, acceptance criteria lifted (not authored) from `plan.md` by AC ID, a link back to `plan.md`, and labels (`biss`).
 - **Acceptance criteria:** (from `prd.md > Build`)
-  - [ ] `bgat` — `docs/backlog.md` remains the local, unrefined holding area and is never itself acted on by build agents.
-  - [ ] `biss` — A refined item becomes a GitHub issue carrying a title, a description, acceptance criteria, a link back to the document, and labels.
+  - [x] `bgat` — `docs/backlog.md` remains the local, unrefined holding area and is never itself acted on by build agents.
+  - [x] `biss` — A refined item becomes a GitHub issue carrying a title, a description, acceptance criteria, a link back to the document, and labels.
 - **Verification:** `claude plugin validate .` passes. Backlog items are never turned into issues by build; a refined item yields an issue with all five parts, ACs lifted from `plan.md` by ID with a link back.
 
 ---
 
 ### Item 24 — Build: build-loop
-- [ ] Build the loop with git: one issue → one branch → one PR in its own worktree with agents fanning out; a separate checker per PR; never auto-merge; no decisions mid-build [PRD: blop, bchk, bmrg, bnod, bfan]
+- [x] Build the loop with git: one issue → one branch → one PR in its own worktree with agents fanning out; a separate checker per PR; never auto-merge; no decisions mid-build [PRD: blop, bchk, bmrg, bnod, bfan]
 - **PRD ref:** `prd.md > Build`
 - **Spec ref:** `spec.md > Build > Build-loop`, `spec.md > Build-Loop Skeleton`
 - **What to build:** In `skills/build/SKILL.md`, run the vendored loop skeleton (`references/build-loop.md`) with git machinery: one issue → one branch → one PR (`blop`), each item in its own git worktree with multiple agents fanning out across issues in parallel (`bfan`). Each PR is checked by a separate agent before it reaches the maintainer (`bchk`). Never auto-merge; wait on the maintainer's review (`bmrg`). Make no decisions mid-build — an under-specified issue is surfaced, not guessed; required decisions are expected to already live in `plan.md` and the issue (`bnod`). Apply the PR/branch stamping convention from `build-loop.md` (the `sdd` label + `sdd/<issue>-<slug>` prefix); the stamping AC (`rpst`) is tracked in Item 25.
 - **Acceptance criteria:** (from `prd.md > Build`)
-  - [ ] `blop` — `/sdd:build` runs the build-loop such that one issue maps to one branch and one pull request.
-  - [ ] `bchk` — Each PR is checked by a separate agent before it reaches the maintainer.
-  - [ ] `bmrg` — The build-loop never auto-merges a PR; it waits on the maintainer's review.
-  - [ ] `bnod` — The build-loop makes no decisions mid-build; an under-specified issue is surfaced, not guessed.
-  - [ ] `bfan` — Multiple agents can work different issues in parallel, each in its own worktree.
+  - [x] `blop` — `/sdd:build` runs the build-loop such that one issue maps to one branch and one pull request.
+  - [x] `bchk` — Each PR is checked by a separate agent before it reaches the maintainer.
+  - [x] `bmrg` — The build-loop never auto-merges a PR; it waits on the maintainer's review.
+  - [x] `bnod` — The build-loop makes no decisions mid-build; an under-specified issue is surfaced, not guessed.
+  - [x] `bfan` — Multiple agents can work different issues in parallel, each in its own worktree.
 - **Verification:** `claude plugin validate .` passes. Behavior matches `build-loop.md` build specialization: one issue → one branch → one PR in its own worktree; a separate checker runs before maintainer review; PRs are never auto-merged; an under-specified issue is surfaced rather than guessed.
 
 ---
 
 ### Item 25 — Resolve-PR command
-- [ ] Create `skills/resolve-pr/SKILL.md`: a vendored anytime command that recognizes its own PRs via the stamp, deletes branches of closed/merged PRs, and works open-PR review threads in bounded rounds [PRD: rpvc, rpbh, brpf, rpst]
+- [x] Create `skills/resolve-pr/SKILL.md`: a vendored anytime command that recognizes its own PRs via the stamp, deletes branches of closed/merged PRs, and works open-PR review threads in bounded rounds [PRD: rpvc, rpbh, brpf, rpst]
 - **PRD ref:** `prd.md > Resolve-PR`
 - **Spec ref:** `spec.md > Resolve-PR`, `spec.md > Build > Build-loop` (stamping), `spec.md > Build-Loop Skeleton`
 - **What to build:** Create `skills/resolve-pr/SKILL.md` as a vendored anytime SDD command — distinct from the personal `resolve-pr-feedback` skill, whose thread-resolution logic it reuses — runnable independent of chain position (`rpvc`). Branch hygiene: find PRs it created (recognized via the `sdd` label + `sdd/<issue>-<slug>` prefix) that are now closed or merged, and delete their local and remote branches (`rpbh`). Feedback resolution: find its still-open PRs carrying review comments and work each thread (fix → reply → resolve → push) in bounded rounds (`brpf`). The stamping convention (`rpst`) is applied by the build-loop (Item 24) and consumed here for recognition.
 - **Acceptance criteria:** (from `prd.md > Resolve-PR`)
-  - [ ] `rpvc` — `/sdd:resolve-pr` is a vendored anytime SDD command — distinct from the personal `resolve-pr-feedback` skill, whose logic it reuses — runnable independent of chain position.
-  - [ ] `rpbh` — Branch hygiene: the command finds PRs it created that are now closed or merged and deletes their local and remote branches.
-  - [ ] `brpf` — Feedback resolution: after the maintainer leaves review comments, `/sdd:resolve-pr` works each open-PR review thread (fix → reply → resolve → push) in bounded rounds.
-  - [ ] `rpst` — The build-loop stamps its PRs and branches (an `sdd` label plus an `sdd/<issue>-<slug>` prefix) so `/sdd:resolve-pr` can recognize its own.
+  - [x] `rpvc` — `/sdd:resolve-pr` is a vendored anytime SDD command — distinct from the personal `resolve-pr-feedback` skill, whose logic it reuses — runnable independent of chain position.
+  - [x] `rpbh` — Branch hygiene: the command finds PRs it created that are now closed or merged and deletes their local and remote branches.
+  - [x] `brpf` — Feedback resolution: after the maintainer leaves review comments, `/sdd:resolve-pr` works each open-PR review thread (fix → reply → resolve → push) in bounded rounds.
+  - [x] `rpst` — The build-loop stamps its PRs and branches (an `sdd` label plus an `sdd/<issue>-<slug>` prefix) so `/sdd:resolve-pr` can recognize its own.
 - **Verification:** `claude plugin validate .` passes. The command recognizes its own PRs via the stamp; on a closed/merged stamped PR it deletes the local + remote branches; on an open stamped PR with review comments it works each thread in bounded rounds; unstamped PRs are ignored.
 
 ---
 
 ### Item 26 — Retro
-- [ ] Rewrite `skills/retro/SKILL.md`, streamlined to three parts: list `docs/learnings/` lessons and promote per-lesson with routing, report dump-to-prototype session count and issue-queue status, and drop the long-form structured-retro prose [PRD: rtls, rtpr, rtre, rttm, rtiq, rtdr]
+- [x] Rewrite `skills/retro/SKILL.md`, streamlined to three parts: list `docs/learnings/` lessons and promote per-lesson with routing, report dump-to-prototype session count and issue-queue status, and drop the long-form structured-retro prose [PRD: rtls, rtpr, rtre, rttm, rtiq, rtdr]
 - **PRD ref:** `prd.md > Retro`
 - **Spec ref:** `spec.md > Retro`
 - **What to build:** Rewrite `skills/retro/SKILL.md`, streamlined to three parts and dropping the long-form structured-retro prose (`rtdr`). List the lessons captured to `docs/learnings/` during the project (`rtls`). Per lesson, prompt to promote it and suggest routing — plugin-level lessons to `/sdd:feedback`, global lessons to `~/.claude` (`rtpr`) — and actively recommend against re-promoting a lesson already present in global config (`rtre`). Report a rough dump-to-prototype timing as a session count, not a stopwatch (`rttm`), and the current issue-queue status (`rtiq`).
 - **Acceptance criteria:** (from `prd.md > Retro`)
-  - [ ] `rtls` — `/sdd:retro` lists the lessons captured to `docs/learnings/` during the project.
-  - [ ] `rtpr` — For each lesson, the command prompts to promote it and suggests routing (plugin-level → `/sdd:feedback`, global → `~/.claude`).
-  - [ ] `rtre` — The command actively recommends against re-promoting a lesson already present in global config.
-  - [ ] `rttm` — The command reports a rough dump-to-prototype timing as a session count, not a stopwatch time.
-  - [ ] `rtiq` — The command reports the current issue-queue status.
-  - [ ] `rtdr` — The retro omits the old long-form structured-retro prose.
+  - [x] `rtls` — `/sdd:retro` lists the lessons captured to `docs/learnings/` during the project.
+  - [x] `rtpr` — For each lesson, the command prompts to promote it and suggests routing (plugin-level → `/sdd:feedback`, global → `~/.claude`).
+  - [x] `rtre` — The command actively recommends against re-promoting a lesson already present in global config.
+  - [x] `rttm` — The command reports a rough dump-to-prototype timing as a session count, not a stopwatch time.
+  - [x] `rtiq` — The command reports the current issue-queue status.
+  - [x] `rtdr` — The retro omits the old long-form structured-retro prose.
 - **Verification:** `claude plugin validate .` passes. Retro lists `docs/learnings/` lessons, prompts per-lesson promotion with routing, guards against re-promoting an already-global lesson, reports a session-count timing and issue-queue status, and carries no long-form structured-retro prose.
 
 ---
 
 ### Item 27 — Archive adaptation
-- [ ] Update `skills/archive/SKILL.md` for the v6 structure: sweep `plan.md` and `docs/validation/`, drop the `sprint-*.md` and `discovery.md` sweeps, grow the never-swept set with `docs/learnings/`, leave `prototype/` untouched, and repoint the handoff to `/sdd:discovery` [PRD: farc]
+- [x] Update `skills/archive/SKILL.md` for the v6 structure: sweep `plan.md` and `docs/validation/`, drop the `sprint-*.md` and `discovery.md` sweeps, grow the never-swept set with `docs/learnings/`, leave `prototype/` untouched, and repoint the handoff to `/sdd:discovery` [PRD: farc]
 - **PRD ref:** `prd.md > Foundations & Migration`
 - **Spec ref:** `spec.md > Foundations & Migration > Archive adaptation`
 - **What to build:** In `skills/archive/SKILL.md`, adapt the sweep to v6: allow-list `plan.md` in place of the scope/prd/spec trio; add `docs/validation/`; drop the dead `sprint-*.md` glob and drop `discovery.md`; keep `retro.md`, `open-concerns.md`, `*-resume.md`, and root `process-notes-*.md`. Grow the never-swept carry-forward set to include `docs/learnings/` alongside `backlog.md`, `sdd-feedback.md`, `project-state.json`. `prototype/` sits at the repo root outside `docs/`, so archive never touches it — no special exclusion logic needed. Repoint the handoff from `/clear` + `/sdd:scope` to `/clear` + `/sdd:discovery`. Update the reset map: drop `currentSprint`/`buildMode`, carry `settings`, rekey `commandExplanationsShown`.
 - **Acceptance criteria:** (from `prd.md > Foundations & Migration`)
-  - [ ] `farc` — `/sdd:archive` sweeps the single document (not the scope/prd/spec trio), sweeps `docs/validation/`, drops the dead `sprint-*.md` glob, excludes disposable prototype code from the versioned archive, and repoints its handoff from `/clear` + `/sdd:scope` to `/sdd:discovery`.
+  - [x] `farc` — `/sdd:archive` sweeps the single document (not the scope/prd/spec trio), sweeps `docs/validation/`, drops the dead `sprint-*.md` glob, excludes disposable prototype code from the versioned archive, and repoints its handoff from `/clear` + `/sdd:scope` to `/sdd:discovery`.
 - **Verification:** `claude plugin validate .` passes. The sweep allow-list, never-swept set, and reset map match spec `Archive adaptation`; the handoff names `/sdd:discovery`; a dry run confirms `plan.md` + `docs/validation/` are swept, `sprint-*.md`/`discovery.md` are not, and `prototype/` and `docs/learnings/` are untouched.
 
 ---

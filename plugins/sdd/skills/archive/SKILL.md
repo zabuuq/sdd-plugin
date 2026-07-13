@@ -1,6 +1,6 @@
 ---
 name: archive
-description: Close a finished project cycle — sweep its SDD artifacts into docs/archive/v{N}/, snapshot the living docs, reset project-state.json for a fresh /sdd:scope, and (in a git repo) branch, commit, push, and open a PR.
+description: Close a finished project cycle — sweep its SDD artifacts into docs/archive/v{N}/, snapshot the living docs, reset project-state.json for a fresh /sdd:discovery, and (in a git repo) branch, commit, push, and open a PR.
 disable-model-invocation: true
 ---
 
@@ -44,7 +44,7 @@ Output the following as plain text. This is not a question — do not wait for a
 
 **What /sdd:archive does**
 
-Archive closes out a finished project cycle. It sweeps the cycle's SDD-produced artifacts (scope, prd, spec, discovery, retro, open concerns, sprint files, resume files, and root process-notes) into a versioned `docs/archive/v{N}/` with an auto-generated `INDEX.md`, snapshots the cross-cycle living docs, resets `docs/project-state.json` so the next `/sdd:scope` starts clean, and — when run inside a git repo — branches, commits, pushes, and opens a PR. The carry-forward living docs (`docs/backlog.md`, `docs/sdd-feedback.md`, `docs/project-state.json`) are never swept; they stay live and are only snapshotted.
+Archive closes out a finished project cycle. It sweeps the cycle's SDD-produced artifacts (the plan, validation files, retro, open concerns, resume files, and root process-notes) into a versioned `docs/archive/v{N}/` with an auto-generated `INDEX.md`, snapshots the cross-cycle living docs, resets `docs/project-state.json` so the next `/sdd:discovery` starts clean, and — when run inside a git repo — branches, commits, pushes, and opens a PR. The never-swept carry-forward set (`docs/backlog.md`, `docs/sdd-feedback.md`, `docs/project-state.json`, `docs/learnings/`) stays live; the three files are only snapshotted, and `docs/learnings/` is never even snapshotted — it simply persists. `prototype/` sits at the repo root outside `docs/`, so the sweep never touches it — it stays live as the durable north-star reference, excluded from the versioned archive by construction.
 
 ---
 
@@ -64,7 +64,6 @@ Run these checks and computations before proposing any plan or making any change
 2. Capture from `docs/project-state.json`:
    - **`cycleNumber`** — the current working cycle (top-level integer). **If absent, assume `1`.**
    - **`lastCommand`** — the captured value held per the State Updates exemption above.
-   - **`currentSprint`** — the current sprint number.
 
 ### Resolve target version N
 
@@ -86,16 +85,17 @@ Compute the set of files this archive would sweep. **Do not move anything yet** 
 
 Include a file only if it matches the allow-list:
 
-- **Exact names in `docs/`:** `scope.md`, `prd.md`, `spec.md`, `discovery.md`, `retro.md`, `open-concerns.md`.
-- **Globs in `docs/`:** `sprint-*.md`, `*-resume.md`.
+- **Exact names in `docs/`:** `plan.md`, `retro.md`, `open-concerns.md`.
+- **Directory in `docs/`:** `docs/validation/` — every file under it, preserving relative paths into `docs/archive/v{N}/validation/`.
+- **Globs in `docs/`:** `*-resume.md`.
 - **Root-level glob:** `process-notes-*.md`.
 
 Never include any of the following in the sweep set:
 
-- The carry-forward trio — `docs/backlog.md`, `docs/sdd-feedback.md`, `docs/project-state.json`. These stay live; they are only snapshotted (a future item), never swept.
+- The carry-forward set — `docs/backlog.md`, `docs/sdd-feedback.md`, `docs/project-state.json`, and the `docs/learnings/` directory. These stay live; the three files are only snapshotted, never swept, and `docs/learnings/` is never swept or snapshotted.
 - The `docs/archive/` directory itself or anything inside it.
 
-Anything else in `docs/` that is neither on the allow-list nor part of the trio nor under `docs/archive/` is left in place by this step (it will be surfaced later in the plan gate — a future item).
+Anything else in `docs/` that is neither on the allow-list nor part of the carry-forward set nor under `docs/archive/` is left in place by this step (it will be surfaced later in the plan gate — a future item).
 
 ### Nothing-to-archive exit
 
@@ -165,19 +165,19 @@ The resolved **selected refs** set is the output of Step A. It is held and **fed
 
 Present the plan as plain text, in this order. Keep it scannable — group and count, do not dump every filename.
 
-1. **Will archive** — the sweep set, **grouped with counts**, not an exhaustive per-filename list. Group by kind, for example: "the planning trio (scope, prd, spec)", "discovery / retro / open-concerns (whichever are present)", "N sprint files", "N resume files", "N root process-notes files". Show only the groups that actually have members. A one-line total file count is fine; a full filename roster is not.
+1. **Will archive** — the sweep set, **grouped with counts**, not an exhaustive per-filename list. Group by kind, for example: "the plan (plan.md)", "retro / open-concerns (whichever are present)", "N validation files", "N resume files", "N root process-notes files". Show only the groups that actually have members. A one-line total file count is fine; a full filename roster is not.
 
    **`Will archive (refs):` group** — *only when Step A ran and resolved a non-empty selected-refs set.* List the resolved selected refs by their **flattened relative path** under `docs/refs/` (e.g. `foo.md`, `sub/bar.md`) — one per line. This folds the Step A selection into the plan so the user sees exactly which references the single confirmation below will sweep. **Omit this group entirely** when Step A was skipped or resolved to an empty selection (no refs to archive) — keeping the plan inert for the no-refs case.
 
-2. **Left in place** — the left-in-place set computed in pre-flight: everything in `docs/` that is neither on the allow-list, nor part of the carry-forward trio, nor under `docs/archive/`. List these by name (this set is normally small, and the point is to let the user see exactly what stays behind). If it is empty, say so. Make clear that these files will **not** be moved — so the user can abort here, relocate any straggler manually, and re-run.
+2. **Left in place** — the left-in-place set computed in pre-flight: everything in `docs/` that is neither on the allow-list, nor part of the carry-forward set (including `docs/learnings/`), nor under `docs/archive/`. List these by name (this set is normally small, and the point is to let the user see exactly what stays behind). If it is empty, say so. Make clear that these files will **not** be moved — so the user can abort here, relocate any straggler manually, and re-run.
 
    **`docs/refs/` is NEVER shown here.** Exclude `docs/refs/` (and everything under it) from this "Left in place" set **outright, in all cases** — engaged, empty/absent, or partial selection. Refs are owned wholly by the refs path: selected refs surface in the `Will archive (refs):` group above; unselected refs simply stay live and are not re-surfaced here. This holds even when Step A was skipped (empty candidate list or no sweep) — `docs/refs/` still does not appear under "Left in place." Pre-feature, `docs/refs/` would have fallen into this set; it is now removed from the computation entirely, so it is never double-surfaced.
 
 3. **Target** — `docs/archive/v{N}/`, using the authoritative `N` resolved in pre-flight. If `N` was advanced past one or more existing `v{N}` directories (because the starting `cycleNumber` slot was already taken), say so explicitly, e.g. "v3 already exists, so this cycle will be archived as v4."
 
-4. **Living-doc snapshots** — note that snapshots of the carry-forward trio (`docs/backlog.md`, `docs/sdd-feedback.md`, `docs/project-state.json`) will be written into the archive, and that an `INDEX.md` will be auto-generated. The live trio itself stays in `docs/` and is not moved.
+4. **Living-doc snapshots** — note that snapshots of the three carry-forward files (`docs/backlog.md`, `docs/sdd-feedback.md`, `docs/project-state.json`) will be written into the archive, and that an `INDEX.md` will be auto-generated. The live trio itself stays in `docs/` and is not moved.
 
-5. **`project-state.json` reset** — note that `docs/project-state.json` will be reset for a fresh cycle (so the next `/sdd:scope` starts clean). A one-line summary is enough here; the exact reset map is applied later.
+5. **`project-state.json` reset** — note that `docs/project-state.json` will be reset for a fresh cycle (so the next `/sdd:discovery` starts clean). A one-line summary is enough here; the exact reset map is applied later.
 
 6. **Branch & PR** — *git repo only.* Note that a branch `archive-v{N}` will be created and a PR opened. If `archive-v{N}` already exists and a collision suffix will be applied, name the actual branch that will be used. **Omit both this branch line and the PR mention entirely when the project is not a git repo** — in that case the run will sweep, snapshot, and reset locally with no git step, and the plan must not promise a branch or PR.
 
@@ -197,7 +197,7 @@ The repository and `docs/` are left exactly as pre-flight found them. Report tha
 
 ## Execute the Archive (sweep, snapshots, INDEX.md)
 
-This section runs **only after** the user has given the single explicit confirmation at the Plan Gate. Use the authoritative target version `N` and the sweep set computed in pre-flight, and the `lastCommand`, `cycleNumber`, and `currentSprint` values captured there.
+This section runs **only after** the user has given the single explicit confirmation at the Plan Gate. Use the authoritative target version `N` and the sweep set computed in pre-flight, and the `lastCommand` and `cycleNumber` values captured there.
 
 Two later steps are **out of scope here and must not be performed in this section:**
 
@@ -210,7 +210,7 @@ Run the steps below in **exactly this order**: create `v{N}/` → snapshot trio 
 
 Create `docs/archive/v{N}/` using the resolved `N` from pre-flight. (Its parent `docs/archive/` already holds prior cycles; only the new `v{N}/` is created.)
 
-### 2. Snapshot the carry-forward trio (before any reset)
+### 2. Snapshot the three carry-forward files (before any reset)
 
 Copy each of the three carry-forward living docs into `docs/archive/v{N}/`, **byte-identical** to its live counterpart as it stands at archive time:
 
@@ -226,11 +226,12 @@ These are **copied, not moved** — the live trio stays in `docs/`.
 
 **Move** (not copy) every file in the sweep set computed in pre-flight into `docs/archive/v{N}/`, preserving filenames. The sweep set is the allow-list:
 
-- Exact `docs/` names: `scope.md`, `prd.md`, `spec.md`, `discovery.md`, `retro.md`, `open-concerns.md`.
-- `docs/` globs: `sprint-*.md`, `*-resume.md`.
+- Exact `docs/` names: `plan.md`, `retro.md`, `open-concerns.md`.
+- `docs/validation/` — moved into `docs/archive/v{N}/validation/`, preserving relative paths.
+- `docs/` globs: `*-resume.md`.
 - Root-level glob: `process-notes-*.md`.
 
-Move only the files actually present in the pre-flight sweep set — do not invent or assume artifacts the cycle did not produce. After this step (and the refs move in step 4), the **only** files left in `docs/` outside `docs/archive/` are the live carry-forward trio (`backlog.md`, `sdd-feedback.md`, `project-state.json`) and any **unselected** references still live under `docs/refs/`.
+Move only the files actually present in the pre-flight sweep set — do not invent or assume artifacts the cycle did not produce. After this step (and the refs move in step 4), the **only** things left in `docs/` outside `docs/archive/` are the live carry-forward set (`backlog.md`, `sdd-feedback.md`, `project-state.json`, `learnings/`) and any **unselected** references still live under `docs/refs/`.
 
 ### 4. Move the selected references
 
@@ -253,13 +254,13 @@ Write the file using this template, substituting the runtime values:
 ```
 # docs/archive/v{N}/
 
-This directory contains a snapshot of v{N} planning, sprint, and process
+This directory contains a snapshot of v{N} planning, validation, and process
 artifacts, archived at the start of the next cycle. Files here are historical
 and are not modified by later cycles.
 
 ## Contents
 
-- <auto-enumerated swept files, grouped: planning artifacts / sprint files / process notes>
+- <auto-enumerated swept files, grouped: plan / validation files / process notes>
 - reference files: <flattened relative paths of swept refs — e.g. refs/foo.md, refs/sub/bar.md> (only when >=1 ref swept)
 - `project-state.json` — snapshot of final v{N} state (lastCommand `<value>`).
 - `backlog.md`, `sdd-feedback.md` — snapshots of the cross-cycle living docs as they stood at v{N} close; live copies remain in `docs/`.
@@ -269,7 +270,6 @@ and are not modified by later cycles.
 - Cycle: v{N}
 - Archived: <date>
 - Last command at archive: `<lastCommand>`
-- Sprints: <currentSprint>
 - Artifacts archived: <count>
 ```
 
@@ -277,14 +277,13 @@ Fill the template as follows:
 
 - **`{N}`** — the resolved target version.
 - **Contents list** — derived from the files *actually swept* (step 3 allow-list sweep and step 4 refs move), grouped so the list stays accurate regardless of which artifacts the cycle produced:
-  - **planning artifacts** — the swept exact-name docs (`scope.md`, `prd.md`, `spec.md`, `discovery.md`, `retro.md`, `open-concerns.md`) that are present;
-  - **sprint files** — swept `sprint-*.md` (and any `*-resume.md`);
+  - **plan** — the swept exact-name docs (`plan.md`, `retro.md`, `open-concerns.md`) that are present;
+  - **validation files** — swept `docs/validation/` contents by relative path (and any `*-resume.md`);
   - **process notes** — swept `process-notes-*.md`;
   - **reference files** — the refs **actually swept** in step 4, listed one per bullet line as `reference files:` followed by their **flattened relative paths under `refs/`** (e.g. `reference files: refs/foo.md, refs/sub/bar.md`). Emit this group with **flattened per-file granularity**, not a single `refs/` summary line. **Emit it ONLY when at least one ref was swept**; omit it entirely when no ref was swept.
-  List only groups that have members. Place the `reference files` group **after** the swept-file groups (planning / sprint / process notes) and **before** the fixed `project-state.json` snapshot bullet. After all swept-file groups (including reference files), include the fixed `project-state.json` and `backlog.md`/`sdd-feedback.md` snapshot bullets shown in the template.
+  List only groups that have members. Place the `reference files` group **after** the swept-file groups (plan / validation / process notes) and **before** the fixed `project-state.json` snapshot bullet. After all swept-file groups (including reference files), include the fixed `project-state.json` and `backlog.md`/`sdd-feedback.md` snapshot bullets shown in the template.
 - **`lastCommand`** — the value captured in pre-flight (pre-reset). It appears in **both** the `project-state.json` Contents bullet and the `Last command at archive:` summary bullet.
 - **`Archived:`** — the current date as supplied by the running agent at runtime.
-- **`Sprints:`** — the captured `currentSprint`.
 - **`Artifacts archived:`** — the count of **all files actually swept**: the allow-list sweep set (step 3) **plus** every reference swept in step 4. Refs count toward this single total (all-files-archived semantics) — they are **not** tallied separately. The trio snapshots are not counted as swept artifacts.
 
 `## Cycle summary` is **factual metadata bullets only** — no narrative prose. Do not write a paragraph summarizing the cycle; emit only the bulleted metadata above.
@@ -301,11 +300,10 @@ Rewrite the live `docs/project-state.json` field-by-field, using the authoritati
 
 | Field | Reset behavior |
 |---|---|
-| `version` | **Carry** — leave at `1`. Schema version, not cycle state. |
+| `version` | **Carry** — leave at `2`. Schema version, not cycle state. |
 | `cycleNumber` | **Bump to `N + 1`**, where `N` is the authoritative target version resolved in pre-flight. |
-| `currentSprint` | **Reset to `0` (or omit the field entirely) — NOT `1`.** `/sdd:plan` computes the next sprint as `currentSprint + 1`, so `0` or an absent field makes the next cycle's first sprint `1`. |
-| `buildMode` | **Carry** — preserve the existing value. Stable user preference. |
 | `smallProject` | **Reset to `null`.** The new cycle re-judges right-sizing from scratch. |
+| `settings` | **Carry** — sticky user choices (e.g. `prototypeFidelity`) survive cycles. |
 | `lastCommand` | **Set to `"archive"`.** |
 | `commandExplanationsShown` | **Normalize and flip to `false` except `archive`** — see the rule below. |
 | `notes` | **Rewrite to a fresh seed line** naming the new cycle and where the prior cycle was archived. |
@@ -318,8 +316,8 @@ Setting `lastCommand: "archive"` **here** is the deferred write promised in `## 
 
 This is the single place the `commandExplanationsShown` object is normalized — the live file is not separately cleaned during the build. Apply all three rules:
 
-- **Drop the stale legacy keys** `sprint`, `iterate`, and `reflect` (not real commands).
-- **Add an `archive` key** if one is not already present.
+- **Drop stale legacy keys** — any key not in the v6 command set (e.g. `scope`, `prd`, `spec`, `plan`, `polish`, `sprint`, `iterate`, `reflect`).
+- **Ensure every v6 key exists:** `discovery`, `refine`, `validate`, `prototype`, `build`, `retro`, `checkpoint`, `resolve-pr`, `onboard`, `pause`, `unpause`, `feedback`, `archive`.
 - **Flip every key to `false` EXCEPT `archive`**, whose existing value is **preserved**. The archive blurb is once-per-project, not once-per-cycle — a maintainer who has already seen it must not see it again after a reset. Every other command's explanation re-fires for the fresh cycle.
 
 ### `notes` reseed
@@ -328,7 +326,7 @@ Replace `notes` with a short, factual seed line for the new cycle — naming the
 
 ### Validity
 
-After the rewrite, `docs/project-state.json` **must remain valid, parseable JSON.** Write the complete object, not a patch: emit every carried, bumped, reset, and normalized field together so the file parses cleanly. (If you reset `currentSprint` by omitting it rather than writing `0`, simply do not emit that key — the object is still valid.)
+After the rewrite, `docs/project-state.json` **must remain valid, parseable JSON.** Write the complete object, not a patch: emit every carried, bumped, reset, and normalized field together so the file parses cleanly. The dropped v1 fields (`currentSprint`, `buildMode`) are removed outright if a pre-v2 file still carries them.
 
 After this reset completes, the git steps (branch, commit, push, PR) run in the next section.
 
@@ -380,12 +378,12 @@ The inert cases, mapped to their acceptance criteria:
 
 ## Handoff
 
-After Git Integration finishes (whether it opened a PR, skipped git for a non-repo, or stopped at a git failure), emit the completion handoff. `/sdd:archive` is out-of-pattern — it is not an interview command — so it does **not** use the interview-handoff template and does **not** touch `handoffWarningShown`. Emit a one-line outcome plus a two-line handoff pointing at `/sdd:scope`:
+After Git Integration finishes (whether it opened a PR, skipped git for a non-repo, or stopped at a git failure), emit the completion handoff. `/sdd:archive` is out-of-pattern — it is not an interview command — so it does **not** use the interview-handoff template and does **not** touch `handoffWarningShown`. Emit a one-line outcome plus a two-line handoff pointing at `/sdd:discovery`:
 
 ```
 Cycle v{N} archived to docs/archive/v{N}/. PR opened: <url>.
 
-Run `/clear`, then `/sdd:scope` to start the next cycle.
+Run `/clear`, then `/sdd:discovery` to start the next cycle.
 ```
 
 Substitute the resolved `{N}` and the actual PR url at runtime.
@@ -395,4 +393,4 @@ Substitute the resolved `{N}` and the actual PR url at runtime.
 - **Not a git repo:** omit the PR sentence (e.g. `Cycle v{N} archived to docs/archive/v{N}/.` with no PR clause, optionally noting the project is not a git repo).
 - **Git step failed:** state the failure rather than a PR url (e.g. note the file archive is complete but the PR was not opened, consistent with the failure report above).
 
-**The next step is ALWAYS `/sdd:scope`**, regardless of the git outcome — the second handoff line never changes.
+**The next step is ALWAYS `/sdd:discovery`**, regardless of the git outcome — the second handoff line never changes.
