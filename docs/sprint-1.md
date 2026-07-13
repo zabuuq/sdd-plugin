@@ -190,97 +190,97 @@ Out of scope: the deferred automated third-party AI validation, GitHub-native PR
 ---
 
 ### Item 16 — Validate: optional, user-initiated command
-- [ ] Create `skills/validate/SKILL.md` as an optional, user-initiated command; the chain proceeds `refine → prototype` whether or not it ran [PRD: vopt]
+- [x] Create `skills/validate/SKILL.md` as an optional, user-initiated command; the chain proceeds `refine → prototype` whether or not it ran [PRD: vopt]
 - **PRD ref:** `prd.md > Validate (optional)`
 - **Spec ref:** `spec.md > Validate`
 - **What to build:** Create `skills/validate/SKILL.md`. It's optional and user-initiated: the chain can go from `refine` straight to `prototype` whether or not `validate` has run, and running it is the maintainer's choice.
 - **Acceptance criteria:** (from `prd.md > Validate (optional)`)
-  - [ ] `vopt` — `/sdd:validate` is optional: the flow can proceed from `refine` to `prototype` whether or not `validate` has run, and running it is user-initiated.
+  - [x] `vopt` — `/sdd:validate` is optional: the flow can proceed from `refine` to `prototype` whether or not `validate` has run, and running it is user-initiated.
 - **Verification:** `claude plugin validate .` passes. `prototype` is reachable without `validate` having run; `validate` only runs when the user invokes it.
 
 ---
 
 ### Item 17 — Validate: self-critique + external files + reconciliation
-- [ ] Build validate's three beats: offer (ask-first) a self-critique written into `docs/validation/`; gather all files there (both full-copy and suggestion-list forms); walk the differences one at a time with keep/remove/change, bumping to `2.x` [PRD: vslf, vscn, vbth, vdif, vkrc]
+- [x] Build validate's three beats: offer (ask-first) a self-critique written into `docs/validation/`; gather all files there (both full-copy and suggestion-list forms); walk the differences one at a time with keep/remove/change, bumping to `2.x` [PRD: vslf, vscn, vbth, vdif, vkrc]
 - **PRD ref:** `prd.md > Validate (optional)`
 - **Spec ref:** `spec.md > Validate > Three beats`, `spec.md > Validate > Source-agnostic drop-zone`
 - **What to build:** Beat 1 — offer to run Claude's adversarial self-critique (ask first, do not auto-run); on yes, write the findings as a validation file into `docs/validation/`, uniform with external sources; on no, skip (`vslf`). Beat 2 — scan `docs/validation/`; any file there is a validation file, no naming convention (`vscn`); handle both a full modified copy of the document (extract changes by diff against `plan.md`) and a suggestion-list file (`vbth`). Beat 3 — present the differences between the validations and `plan.md` one at a time (`vdif`); for each, accept keep / remove / change and apply in place (`vkrc`); walk carried-over markers in the same pass; bump the version to `2.x`; anything unresolvable becomes a carry-forward marker.
 - **Acceptance criteria:** (from `prd.md > Validate (optional)`)
-  - [ ] `vslf` — On start, the command offers to run its own adversarial self-critique — it asks first and does not auto-run; on decline it goes straight to gathering external validation files.
-  - [ ] `vscn` — The command scans `docs/validation/` for external validation files; any file present is treated as a validation file, no naming convention required.
-  - [ ] `vbth` — The command handles both a full modified copy of the document (changes extracted by diff) and a file that only lists suggestions.
-  - [ ] `vdif` — The command presents the differences between the validations and the document one at a time.
-  - [ ] `vkrc` — For each difference, the command accepts a keep / remove / change decision and applies it to the document in place.
+  - [x] `vslf` — On start, the command offers to run its own adversarial self-critique — it asks first and does not auto-run; on decline it goes straight to gathering external validation files.
+  - [x] `vscn` — The command scans `docs/validation/` for external validation files; any file present is treated as a validation file, no naming convention required.
+  - [x] `vbth` — The command handles both a full modified copy of the document (changes extracted by diff) and a file that only lists suggestions.
+  - [x] `vdif` — The command presents the differences between the validations and the document one at a time.
+  - [x] `vkrc` — For each difference, the command accepts a keep / remove / change decision and applies it to the document in place.
 - **Verification:** `claude plugin validate .` passes. Behavior matches spec `Three beats`: self-critique is offered (ask-first) and, if accepted, dropped as a file into `docs/validation/`; both a full-copy and a suggestion-list validation file are handled; differences are walked one at a time with keep/remove/change; `plan.md` ends at `2.x` with any unresolved item left as a carry-forward marker.
 
 ---
 
 ### Item 18 — Prototype: persisted fidelity
-- [ ] Create `skills/prototype/SKILL.md` fidelity handling: ask hi-fi vs lo-fi on first run, persist to `settings.prototypeFidelity`, reuse without re-asking, switch only on explicit request [PRD: pfid, pfps, pfsw]
+- [x] Create `skills/prototype/SKILL.md` fidelity handling: ask hi-fi vs lo-fi on first run, persist to `settings.prototypeFidelity`, reuse without re-asking, switch only on explicit request [PRD: pfid, pfps, pfsw]
 - **PRD ref:** `prd.md > Prototype`
 - **Spec ref:** `spec.md > Prototype > Fidelity (persisted)`, `spec.md > Foundations & Migration > project-state.json schema (v2)`
 - **What to build:** In `skills/prototype/SKILL.md`, on the first prototype run in a project ask hi-fi (clickable) vs lo-fi (screenshots) (`pfid`); persist the answer to `project-state.json` under `settings.prototypeFidelity` and reuse it on later runs without re-asking (`pfps`); switch the persisted choice only when the maintainer explicitly asks, never re-surfacing it each run (`pfsw`).
 - **Acceptance criteria:** (from `prd.md > Prototype`)
-  - [ ] `pfid` — On the first prototype run in a project, the command asks hi-fi (clickable) vs lo-fi (screenshots).
-  - [ ] `pfps` — The choice is persisted to `docs/project-state.json` and reused on later runs without re-asking.
-  - [ ] `pfsw` — The maintainer can switch the persisted fidelity by explicitly asking; the command does not re-surface the choice each run.
+  - [x] `pfid` — On the first prototype run in a project, the command asks hi-fi (clickable) vs lo-fi (screenshots).
+  - [x] `pfps` — The choice is persisted to `docs/project-state.json` and reused on later runs without re-asking.
+  - [x] `pfsw` — The maintainer can switch the persisted fidelity by explicitly asking; the command does not re-surface the choice each run.
 - **Verification:** `claude plugin validate .` passes. First run asks and writes `settings.prototypeFidelity`; a later run reuses it silently; an explicit switch request updates it, and no run re-prompts on its own.
 
 ---
 
 ### Item 19 — Prototype: build & navigation
-- [ ] Build the prototype in plain HTML/CSS/JS at `prototype/` (walled off), author navigation path(s) from `plan.md` only, and write them to `prototype/navigation-paths.md` surfaced to the maintainer [PRD: pweb, pnav, pcmp, pwal]
+- [x] Build the prototype in plain HTML/CSS/JS at `prototype/` (walled off), author navigation path(s) from `plan.md` only, and write them to `prototype/navigation-paths.md` surfaced to the maintainer [PRD: pweb, pnav, pcmp, pwal]
 - **PRD ref:** `prd.md > Prototype`
 - **Spec ref:** `spec.md > Prototype > Build & navigation`
 - **What to build:** In `skills/prototype/SKILL.md`, produce the prototype in plain HTML/CSS/JS (`pweb`), output to `prototype/` at the repo root and walled off from any real build — nothing marks it as a foundation (`pwal`). Author navigation path(s) from `plan.md` and nothing else (`pnav`), producing one or more paths as needed to navigate the prototype; write them to a companion `prototype/navigation-paths.md` (not into `plan.md`) and surface them to the maintainer (`pcmp`).
 - **Acceptance criteria:** (from `prd.md > Prototype`)
-  - [ ] `pweb` — The prototype is built in plain HTML/CSS/JS.
-  - [ ] `pnav` — The command authors the navigation path(s) from the source-of-truth document and nothing else.
-  - [ ] `pcmp` — The navigation paths are written to a companion file paired with the prototype (not into the source-of-truth document) and surfaced to the maintainer.
-  - [ ] `pwal` — The prototype's code is kept walled off from any real build; nothing marks it as a foundation for the final product.
+  - [x] `pweb` — The prototype is built in plain HTML/CSS/JS.
+  - [x] `pnav` — The command authors the navigation path(s) from the source-of-truth document and nothing else.
+  - [x] `pcmp` — The navigation paths are written to a companion file paired with the prototype (not into the source-of-truth document) and surfaced to the maintainer.
+  - [x] `pwal` — The prototype's code is kept walled off from any real build; nothing marks it as a foundation for the final product.
 - **Verification:** `claude plugin validate .` passes. Behavior matches spec `Build & navigation`: prototype output is plain HTML/CSS/JS under `prototype/`, nav paths derive only from `plan.md` and land in `prototype/navigation-paths.md`, and nothing labels the prototype code as a build foundation.
 
 ---
 
 ### Item 20 — Prototype: loop, gap-marking, review, issue map
-- [ ] Reuse the loop skeleton (no git) to build pages; on a twice-failed page write `[GAP: …]` into `plan.md` and continue; walk each page along the nav paths against the document; optionally emit a page→issue mapping [PRD: plop, pfal, prvw, pmap]
+- [x] Reuse the loop skeleton (no git) to build pages; on a twice-failed page write `[GAP: …]` into `plan.md` and continue; walk each page along the nav paths against the document; optionally emit a page→issue mapping [PRD: plop, pfal, prvw, pmap]
 - **PRD ref:** `prd.md > Prototype`
 - **Spec ref:** `spec.md > Prototype > Loop behavior`, `spec.md > Prototype > Build & navigation`, `spec.md > Build-Loop Skeleton`
 - **What to build:** In `skills/prototype/SKILL.md`, reuse the vendored loop skeleton (plan → make → separate checker → bounded retry ≤2) without git machinery (`plop`). When a page fails its checker after the bounded retry, write a `[GAP: …]` marker into `plan.md` (per `markers.md`) and continue building the rest rather than halting (`pfal`). The prototype-review step walks each page along the navigation paths and checks it against the document (`prvw`). Optionally produce a page→issue mapping that seeds the real build issues (`pmap`).
 - **Acceptance criteria:** (from `prd.md > Prototype`)
-  - [ ] `plop` — The command reuses the build-loop skeleton (plan → make → separate-checker → bounded retry ≤2) without the git machinery.
-  - [ ] `pfal` — When a page fails its checker after the bounded retry, the command writes a `[GAP: …]` marker into the document and continues building the rest of the prototype rather than halting.
-  - [ ] `prvw` — The prototype-review step walks each page along the navigation paths and checks it against the document.
-  - [ ] `pmap` — The command can optionally produce a page→issue mapping that seeds the real build issues.
+  - [x] `plop` — The command reuses the build-loop skeleton (plan → make → separate-checker → bounded retry ≤2) without the git machinery.
+  - [x] `pfal` — When a page fails its checker after the bounded retry, the command writes a `[GAP: …]` marker into the document and continues building the rest of the prototype rather than halting.
+  - [x] `prvw` — The prototype-review step walks each page along the navigation paths and checks it against the document.
+  - [x] `pmap` — The command can optionally produce a page→issue mapping that seeds the real build issues.
 - **Verification:** `claude plugin validate .` passes. Behavior matches `build-loop.md` prototype specialization: a twice-failed page writes a `[GAP]` into `plan.md` and the loop continues; review walks the nav paths against the document; the optional page→issue mapping is produced on request.
 
 ---
 
 ### Item 21 — Lesson capture (automatic)
-- [ ] Add automatic lesson capture: detect lesson-worthy events and write them to `docs/learnings/` unprompted, active during discovery/refine/prototype/build, surfaced at retro; leave the ad-hoc "record globally now" move manual [PRD: lcau, lcsp, lcsr, lcno]
+- [x] Add automatic lesson capture: detect lesson-worthy events and write them to `docs/learnings/` unprompted, active during discovery/refine/prototype/build, surfaced at retro; leave the ad-hoc "record globally now" move manual [PRD: lcau, lcsp, lcsr, lcno]
 - **PRD ref:** `prd.md > Lesson Capture`
 - **Spec ref:** `spec.md > Lesson Capture`
 - **What to build:** Add cross-cutting lesson capture (in `sdd-guide` so the relevant commands inherit it): the AI detects lesson-worthy events — lost-context / redundant-question events, repeated roadblocks, course corrections, reusable designs/practices/preferences — and writes them to `docs/learnings/` without prompting (`lcau`). Capture is active during doc creation (`discovery`, `refine`) and item build (`prototype`, `build`) (`lcsp`); captured lessons surface at `/sdd:retro` for promotion (`lcsr`). The maintainer's ad-hoc "record this globally now" move stays a manual action — not implemented or watched for by the plugin (`lcno`). `docs/learnings/` is a permanent carry-forward store, never swept by archive.
 - **Acceptance criteria:** (from `prd.md > Lesson Capture`)
-  - [ ] `lcau` — The AI detects lesson-worthy events and writes them to `docs/learnings/` without prompting.
-  - [ ] `lcsp` — Automatic capture is active during doc creation (`discovery`, `refine`) and item build (`prototype`, `build`).
-  - [ ] `lcsr` — Captured lessons surface at `/sdd:retro` for promotion.
-  - [ ] `lcno` — The maintainer's ad-hoc "record this globally right now" move is left as a manual action, not implemented or watched for.
+  - [x] `lcau` — The AI detects lesson-worthy events and writes them to `docs/learnings/` without prompting.
+  - [x] `lcsp` — Automatic capture is active during doc creation (`discovery`, `refine`) and item build (`prototype`, `build`).
+  - [x] `lcsr` — Captured lessons surface at `/sdd:retro` for promotion.
+  - [x] `lcno` — The maintainer's ad-hoc "record this globally right now" move is left as a manual action, not implemented or watched for.
 - **Verification:** `claude plugin validate .` passes. The capture behavior is defined in `sdd-guide` and active across `discovery`/`refine`/`prototype`/`build`; a simulated lesson-worthy event writes a `docs/learnings/` entry unprompted; the entry is available to retro; no "record globally now" watcher exists.
 
 ---
 
 ### Item 22 — Checkpoint
-- [ ] Create `skills/checkpoint/SKILL.md`: an anytime command that reads the session and prints a tailored `/compact <instructions>` string, writes no file, and never runs compact itself [PRD: ckan, ckrd, ckpr, cknr, ckps]
+- [x] Create `skills/checkpoint/SKILL.md`: an anytime command that reads the session and prints a tailored `/compact <instructions>` string, writes no file, and never runs compact itself [PRD: ckan, ckrd, ckpr, cknr, ckps]
 - **PRD ref:** `prd.md > Checkpoint`
 - **Spec ref:** `spec.md > Checkpoint`
 - **What to build:** Create `skills/checkpoint/SKILL.md`. It runs anytime, independent of chain position (`ckan`); reads the session and emits a tailored instruction string for Claude Code's `/compact <instructions>` form, naming what to preserve (`ckrd`); prints the string to chat and writes no file (`ckpr`); never runs `/compact` itself (`cknr`); and is distinct from `/sdd:pause` — it writes no resume file (`ckps`). This is the on-demand replacement for the removed between-rounds auto-suggest.
 - **Acceptance criteria:** (from `prd.md > Checkpoint`)
-  - [ ] `ckan` — `/sdd:checkpoint` runs anytime, independent of chain position.
-  - [ ] `ckrd` — The command reads the session and emits a tailored instruction string for Claude Code's `/compact <instructions>` form, naming what to preserve.
-  - [ ] `ckpr` — The instruction string is printed to chat; the command writes no file.
-  - [ ] `cknr` — The command never runs `/compact` itself.
-  - [ ] `ckps` — The command is distinct from `/sdd:pause`: it does not write a resume file.
+  - [x] `ckan` — `/sdd:checkpoint` runs anytime, independent of chain position.
+  - [x] `ckrd` — The command reads the session and emits a tailored instruction string for Claude Code's `/compact <instructions>` form, naming what to preserve.
+  - [x] `ckpr` — The instruction string is printed to chat; the command writes no file.
+  - [x] `cknr` — The command never runs `/compact` itself.
+  - [x] `ckps` — The command is distinct from `/sdd:pause`: it does not write a resume file.
 - **Verification:** `claude plugin validate .` passes. Invoking checkpoint prints a `/compact <instructions>` string naming what to preserve, writes no file, and never invokes compact; it produces no resume file.
 
 ---
