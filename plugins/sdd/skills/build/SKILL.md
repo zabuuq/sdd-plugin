@@ -293,7 +293,7 @@ Wrap-up does **not** commit changes. This is consistent with the `/sdd:build` no
 
 ### Step W1: Surface Iteration Candidates
 
-Before asking the satisfaction question, scan `process-notes-sprint-N.md` (where N is `currentSprint` from `docs/project-state.json`) for `[iteration-candidate]` entries written **before wrap-up began** — entries written during checklist execution, not entries the wrap-up itself might write. Use the `[iteration-candidate]` parser documented in `skills/sdd-guide/references/sprint-tags.md`; refer to it by name rather than redefining the regex.
+Before asking the satisfaction question, scan `process-notes-sprint-N.md` (where N is `currentSprint` from `docs/project-state.json`) for `[iteration-candidate]` entries written **before wrap-up began** — entries written during checklist execution, not entries the wrap-up itself might write. An `[iteration-candidate]` entry is a process-notes line beginning with the literal marker `[iteration-candidate]`.
 
 For each matched entry, capture a brief one-line summary suitable for surfacing alongside the satisfaction question. If no `[iteration-candidate]` entries exist in the file, the candidate list is empty and only the satisfaction question is emitted in the next step.
 
@@ -343,7 +343,7 @@ After all dispositions are collected and no `actually iterate` was chosen, proce
 
 Close-sprint actions begin here. This step writes the PRD AC checkoff for every closed sprint item in the current sprint file (`docs/sprint-N.md` where N = `currentSprint` from `docs/project-state.json`).
 
-Use the `[PRD: ...]` parser documented in `skills/sdd-guide/references/sprint-tags.md`; refer to it by name rather than redefining the regex. Use the AC line format (also documented there) when locating and updating AC checkboxes in `docs/prd.md`.
+A `[PRD: ...]` tag is an inline `[PRD: id1, id2, ...]` list of 4-char lowercase alphabetic AC IDs. AC lines in `docs/prd.md` are checkbox bullets carrying the ID in inline backticks before the AC text.
 
 For each closed (`[x]`) item in the current sprint file:
 
@@ -372,8 +372,8 @@ For each unfinished item, in order:
 **On user confirmation (split this item):**
 
 - Move the unfinished item's unchecked PRD ACs to a new story in `docs/prd.md`. Use a clear new-story anchor that conveys the carry-forward intent.
-- Generate fresh 4-char lowercase alphabetic IDs (`[a-z]{4}` pattern, per `references/sprint-tags.md`) for any new ACs introduced by the split. **Collision-check against existing PRD IDs before settling** — do not reuse retired IDs.
-- ACs that move unchanged from the original story to the new story keep their existing IDs (IDs are stable across reorders per `references/sprint-tags.md`).
+- Generate fresh 4-char lowercase alphabetic IDs (`[a-z]{4}` pattern) for any new ACs introduced by the split. **Collision-check against existing PRD IDs before settling** — do not reuse retired IDs.
+- ACs that move unchanged from the original story to the new story keep their existing IDs (IDs are stable across reorders).
 - Sprint-file marking choice for this SKILL: leave the unfinished item's `[ ]` checkbox as-is in the sprint file. The unfinished status is the clearest signal that the item did not close, and the close-sprint manifest's "Story splits" line is the canonical record of where the work moved. The split is recorded in process notes (Step W10) and the manifest, not by mutating the sprint-file line. Future readers locate the split via the manifest.
 - Record the split as `<original-story-anchor> → <new-story-anchor>: <ac-ids>` in working memory for the close-sprint manifest assembled in Step W10.
 
@@ -399,7 +399,7 @@ This step is sdd-plugin-specific. It runs **before** the process-notes write (St
 
 **Activation gate.** Check whether `docs/v2-verification.md` exists in the running project's `docs/` directory. If the file is **absent: skip this step entirely. No warning, no fallback write, no auto-creation.** The file's presence in the current project is the sole activation signal. When this step is skipped, the manifest's `v2-verification rows updated` line in Step W10 reads `(none)`. (Satisfies `aahv`.)
 
-**When the file exists**, for each closed (`[x]`) sprint item in the current sprint file (`docs/sprint-N.md` where N = `currentSprint`) that carries a `[FB: FB-NNN]` tag (use the `[FB: ...]` parser documented in `skills/sdd-guide/references/sprint-tags.md`; refer to it by name rather than redefining the regex):
+**When the file exists**, for each closed (`[x]`) sprint item in the current sprint file (`docs/sprint-N.md` where N = `currentSprint`) that carries a `[FB: FB-NNN]` tag (the inline tag form `[FB: FB-NNN]`, comma-separated for multiples):
 
 1. For each `FB-NNN` ID in the tag's payload, locate the row in `docs/v2-verification.md` whose `ID` column matches `FB-NNN`. The full column schema is documented in `docs/spec.md > Plugin-Project-Specific Artifacts > docs/v2-verification.md`; refer to it by name rather than restating the schema.
 2. Append `sprint N, item M` to that row's `Shipped (sprint/item)` column, where:
@@ -426,7 +426,7 @@ Include the following content, in this order:
 - **Notable items** captured from the Step W8 "anything notable?" response.
 - **Tech-debt entries** for every candidate assigned `capture as tech-debt` in Step W4. Format each entry so future commands (e.g., `/sdd:plan`'s carry-forward read) can locate them. Use either an inline `### Tech-debt` header introducing a sub-list of entries, or one `[tech-debt]` line marker per entry — keep it human-readable and machine-locatable.
 - **Discard decisions** for every candidate assigned `discard` in Step W4. One brief line each, e.g. `- Discarded: <one-line candidate summary> — reason (if user gave one).`
-- **The structured `[close-sprint-manifest]` block** per `docs/spec.md > Cross-Cutting Mechanisms > Close-Sprint Manifest`. The full block format is documented in `references/sprint-tags.md`; follow it exactly. Use this literal layout:
+- **The structured `[close-sprint-manifest]` block** per `docs/spec.md > Cross-Cutting Mechanisms > Close-Sprint Manifest`. Use this literal layout:
 
   ```
   [close-sprint-manifest] timestamp: <ISO-8601 timestamp>

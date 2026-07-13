@@ -14,7 +14,7 @@ On startup, load the following:
 
 1. `skills/sdd-guide/SKILL.md` (shared behavior) — and nothing else.
 
-**Skips:** Do NOT load `references/deepening-rounds.md`, `references/context-management.md`, `references/right-sizing.md`, or `docs/backlog.md`. None of them apply to a mechanical close-and-reset command. `/sdd:archive` asks no interview questions, runs no deepening rounds, and makes no right-sizing judgment.
+**Skips:** Do NOT load `references/deepening-rounds.md`, `references/right-sizing.md`, or `docs/backlog.md`. None of them apply to a mechanical close-and-reset command. `/sdd:archive` asks no interview questions, runs no deepening rounds, and makes no right-sizing judgment.
 
 **Protocol exemptions** — `/sdd:archive` is deliberately exempt from several cross-cutting protocols defined in `sdd-guide`:
 

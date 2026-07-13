@@ -42,7 +42,7 @@ This order ensures the agent has project conventions first, then the immediate t
 
 When `/sdd:build` is invoked against a sprint that was previously closed and is now being re-opened (typically via `/sdd:polish`), augment the re-entry sequence with a `[close-sprint-manifest]` lookup:
 
-- After step 2 (current sprint file), scan `process-notes-sprint-N.md` for a `[close-sprint-manifest]` block. See `references/sprint-tags.md` for the exact parser.
+- After step 2 (current sprint file), scan `process-notes-sprint-N.md` for a `[close-sprint-manifest]` block (bounded by `[close-sprint-manifest] timestamp: ...` and `[/close-sprint-manifest]` lines).
 - If a `[close-sprint-manifest]` block is present, **the close-sprint state is the authoritative reference** for what was checked off, what splits happened, and what dispositions were recorded at the previous close. Treat the live sprint checklist as the working surface, but resolve any discrepancy against the manifest.
 - If no manifest is present, the sprint was never formally closed; proceed with the standard re-entry order above.
 

@@ -10,13 +10,10 @@ Read `skills/sdd-guide/SKILL.md` for shared behavior before executing this comma
 
 Read `skills/sdd-guide/references/deepening-rounds.md` for the two-phase interview pattern used by this command.
 
-Read `skills/sdd-guide/references/context-management.md` for the three-tier between-rounds context recommendation (continue / `/compact` / `/clear`) emitted alongside the end-of-round content recommendation.
-
 ## Loading
 
 - Load: `skills/sdd-guide/SKILL.md` (core behavior)
 - Load: `skills/sdd-guide/references/deepening-rounds.md` (interview pattern)
-- Load: `skills/sdd-guide/references/context-management.md` (between-rounds context recommendation)
 - Load: `skills/sdd-guide/references/backlog.md` (defer-to-backlog write trigger and entry format)
 - Load: `docs/scope.md` in full
 
@@ -97,8 +94,6 @@ When an out-of-scope item surfaces during the PRD interview — something the us
 ### Deepening Rounds
 
 After the section-by-section walkthrough is complete, follow the deepening rounds protocol defined in `skills/sdd-guide/references/deepening-rounds.md` — including the Phase 1 → Phase 2 transition, the per-round question count (5 default, up to 10 with explicit reason+permission past the cap), and the structured end-of-round content recommendation (continue-with-topic-preview or close-with-reasoning). Do not emit a bare transition prompt; the reference defines the recommendation wording.
-
-After the end-of-round content recommendation fires, emit the three-tier between-rounds context recommendation per `skills/sdd-guide/references/context-management.md`. Order is fixed: content recommendation first, then context recommendation, in the same end-of-round message group. The two are separate and independent.
 
 Deepening questions for the PRD should target edge cases, ambiguities, thin areas, hidden assumptions, and unexplored angles. Ask them one at a time per the reference.
 

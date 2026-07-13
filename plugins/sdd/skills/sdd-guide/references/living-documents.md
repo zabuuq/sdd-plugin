@@ -79,10 +79,10 @@ When `/sdd:refine` processes changes, update documents in this order. **Each ste
 1. **`docs/prd.md`** — Update stories, move items from unvetted to approved, or modify existing acceptance criteria. AC editing semantics:
    - **Pure reword (same intent):** the AC's checked/unchecked state survives; confirm with the user that the intent did not shift.
    - **Semantic change:** un-check the AC. Surface any work already shipped against the old wording as an iteration candidate — log it to the current open sprint's process notes if one exists, otherwise flag it to the user.
-   - **Split or merge:** new ACs get fresh 4-char IDs and start unchecked; old IDs are removed (not recycled). See `references/sprint-tags.md` for AC ID rules.
+   - **Split or merge:** new ACs get fresh 4-char IDs and start unchecked; old IDs are removed (not recycled).
    Show the user exactly what changed and get confirmation before proceeding.
 2. **`docs/spec.md`** — Update technical specifications to match the PRD changes. Show the user the changes and get confirmation.
-3. **Open sprint files (if affected)** — when the PRD edit touched an AC referenced in a `[PRD: ...]` tag inside an **open** sprint file, offer to update those refs in lockstep. An open sprint file is one without a `[close-sprint-manifest]` block (see `references/sprint-tags.md` for the parser). **Closed sprint files are never touched.** Show and confirm.
+3. **Open sprint files (if affected)** — when the PRD edit touched an AC referenced in a `[PRD: ...]` tag inside an **open** sprint file, offer to update those refs in lockstep. An open sprint file is one without a `[close-sprint-manifest]` block. **Closed sprint files are never touched.** Show and confirm.
 4. **`AGENTS.md`** — Update agent instructions if the changes affect how work is structured or delegated. Show and confirm.
 5. **`CLAUDE.md`** — Update project conventions if the changes affect coding standards, patterns, or project-wide rules. Show and confirm.
 

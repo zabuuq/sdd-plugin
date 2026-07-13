@@ -14,11 +14,10 @@ On startup, load the following in order:
 
 1. `skills/sdd-guide/SKILL.md` (shared behavior)
 2. `skills/sdd-guide/references/deepening-rounds.md`
-3. `skills/sdd-guide/references/context-management.md` (three-tier between-rounds context recommendation)
-4. `skills/sdd-guide/references/backlog.md` (defer-to-backlog write trigger and entry format)
-5. `skills/sdd-guide/templates/discovery-template.md`
-6. user profile (`~/.claude/sdd-user-profile.json`)
-7. `docs/refs/` (if non-empty)
+3. `skills/sdd-guide/references/backlog.md` (defer-to-backlog write trigger and entry format)
+4. `skills/sdd-guide/templates/discovery-template.md`
+5. user profile (`~/.claude/sdd-user-profile.json`)
+6. `docs/refs/` (if non-empty)
 
 ## State Updates (immediate)
 
@@ -125,8 +124,6 @@ The agent may reference content loaded from `docs/refs/` (per the acknowledgment
 ## Interview — Phase 2: Deepening Rounds
 
 Once Phase 1 is complete, transition to Phase 2 by following the deepening rounds protocol defined in `skills/sdd-guide/references/deepening-rounds.md` — including the Phase 1 → Phase 2 transition, the per-round question count (5 default, up to 10 with explicit reason+permission past the cap), and the structured end-of-round content recommendation (continue-with-topic-preview or close-with-reasoning). Do not emit a bare transition prompt; the reference defines the recommendation wording, and the Phase 1 → Phase 2 transition fires the same structured recommendation even though no deepening round has run yet.
-
-After the end-of-round content recommendation fires, emit the three-tier between-rounds context recommendation per `skills/sdd-guide/references/context-management.md`. Order is fixed: content recommendation first, then context recommendation, in the same end-of-round message group.
 
 Deepening questions for `/sdd:discovery` should target the project's nature — unexplored angles of motivation, audience nuance, prior-art tensions, hidden assumptions about what the project IS. They should not drift into scope, requirements, or architecture; if a thread starts pulling that way, note it for the appropriate later command and steer back to "what is this?" Ask one question at a time per the reference.
 
