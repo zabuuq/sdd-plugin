@@ -12,7 +12,23 @@ Project context, architecture decisions, and conventions for any AI agent or dev
 
 **What problem it solves:** ad-hoc prompting works for small tasks but breaks down on multi-week projects. SDD provides scaffolding — a known sequence, shared artifacts, and predictable interaction patterns — so multi-session, multi-sprint work stays coherent.
 
-## Current cycle (v5)
+## Current cycle (v6)
+
+v6 is a **clean-break rewrite of SDD's front end** into a brainstorm-first, single-document flow — the largest change since v1. It replaces the four-document planning chain (`scope → prd → spec`) and the old plan/polish machinery with **six chain commands** (`discovery → refine → validate → prototype → build → retro`, with `validate` optional) plus anytime utilities (`checkpoint`, `resolve-pr`). Audience unchanged: Jason solo, no external users, no backward compatibility — which is what makes a clean break acceptable.
+
+Load-bearing design:
+- **One document, `docs/plan.md`** — intent + requirements + architecture in a single source of truth, updated in place, never renamed. Draft/final/validated maturity is an in-file numeric **version** (`0.x` draft → `1.x` final → `2.x` validated). AI assumptions, gaps, and feasibility concerns are tagged **inline as markers** (`[ASSUMPTION a#]`, `[GAP g#]`, `[CONCERN c#]`); the new `references/markers.md` is their parser contract (replaces the retired `sprint-tags.md`). Nothing is ever force-decided — unresolved markers carry forward.
+- **Discovery is data-first** — ingest mixed material (text / images / transcribed audio), inventory-gate it, interview from what's already provided, then auto-draft `plan.md`.
+- **Validate is optional** — an ask-first self-critique plus external files dropped into `docs/validation/` (a source-agnostic drop-zone), reconciled one difference at a time.
+- **Prototype** is disposable HTML/CSS/JS at repo-root `prototype/`, walled off from the real build, with an AI-authored navigation-paths companion file.
+- **Build is an autonomous build-loop** — refined items → GitHub issues → one issue / one branch / one PR, checked by a separate agent, never auto-merged; human PR review is the only gate. The loop skeleton is **vendored** into `references/build-loop.md` (shared with prototype, minus git). `/sdd:resolve-pr` does PR/branch hygiene asynchronously.
+- **GitHub is a hard dependency**, verified at `/sdd:onboard` (hard block, not a warning).
+- **project-state.json → schema v2** — adds a `settings` object (persisted user choices, e.g. prototype fidelity), drops `currentSprint`/`buildMode`.
+- **Context auto-suggest removed** — `references/context-management.md` retires; `/sdd:checkpoint` replaces it as an on-demand tool. `docs/learnings/` becomes a permanent, never-swept carry-forward store.
+
+**Status: planning in progress.** The spec is written (`docs/spec.md`); v6 is **not yet built**. The live plugin still runs the v5 command set — the "Coding conventions", "File naming", and "Files to be aware of" sections below describe the *current* repo, not the v6 target. See `docs/scope.md`, `docs/prd.md`, `docs/spec.md`.
+
+## Prior cycle (v5)
 
 v5 **extends `/sdd:archive`** to handle the `docs/refs/` reference directory, which the command currently ignores entirely — `docs/refs/` is neither on the sweep allow-list nor part of the carry-forward trio, so it silently falls into "left in place" and is never read or moved. When a **real** archive run (non-empty sweep set) finds files under `docs/refs/`, the command:
 

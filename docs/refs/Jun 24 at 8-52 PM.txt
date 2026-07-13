@@ -1,0 +1,32 @@
+[Speaker 1]
+I forgot about some other things that I want with. This process is a quick prototype. As part of the process, so I spit out to you all of my um. Brainstorming, and we work out all the brainstorming we come up with these scope and PRD and specs. And then the next step would be a very quick.
+
+[Speaker 1]
+One shot. Prototype. That looks like what I wanted to look like? And you'll not. You'll basically. You take what you think is going, I want. Is the AI will take what it thinks that I would want? And spits out that prototype. And so, then, with the? Scope, PRD, and spec documents and the Prototype.
+
+[Speaker 1]
+We can go through an interview process to find out what what works. What doesn't work? What do we like, what don't we like those kinds of things, and the Prototype needs to be something that is. No real data, just a. Um. A, uh, what do you? What's it called back to like the like?
+
+[Speaker 1]
+A like, a figma, where, where it's clickable, and it, um? You can go through it, but there's no real data that's being saved. Um, it's just a something that shows the general. Just of? What the application is supposed to look like?
+
+[Speaker 1]
+High level prototype, no low level prototype. No, no, sorry, I'm asking. Another person here, so keep that in mind when you're transcribing this. You take your time?
+
+[Speaker 2]
+High Fidelity. High Fidelity prototype. Um, you know, it's. It's basically something that can be.
+
+[Speaker 1]
+Interacted with, and it'll look kind of like it, but also maybe just a series of screenshots. Maybe that could be, uh, maybe it could be a low Fidelity prototype. It's just a series of what looked like screenshots of. What the application does. Maybe it could be an option that you can ask me, um?
+
+[Speaker 1]
+And. You know, let's when we do it as the High Fidelity or low Fidelity. Let's just do it as web page. It's just the simplest way you can do it as HTML. We can use. Css to make it look good. And if we need any kind of interaction to make it look like it's doing something, JavaScript will fill in the the blanks.
+
+[Speaker 1]
+Um. So? Take my brainstorm. Build the documents. They'd have a short discussion about the documents for some clarifications. Build thee, and that'll be an interview process. Build the Prototype, the High Fidelity prototype or the low Fidelity prototype based on what it is I want. Then, we'll come back around.
+
+[Speaker 1]
+And refine those documents based on what we see from the Prototype. Create our list of items, our issues that we need to go through. And.
+
+[Speaker 1]
+Start plugging away at it.

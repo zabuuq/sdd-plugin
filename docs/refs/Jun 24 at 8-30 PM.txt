@@ -1,0 +1,134 @@
+[Speaker 1]
+I want to completely change the way the plugin works. Or at least the path of the plug-in. But I've been finding is that it is just taking too long to get through the initial steps before we can actually begin development and part of the problem. Is that? Um, sometimes it's not until we actually get into development that some of the questions can be answered.
+
+[Speaker 1]
+So, what I want to do is? Change the.
+
+[Speaker 1]
+Change the um? Um. The process. So that? Initially, it's just a brainstorming session. I'm going to try to do a lot of recording like this one. And get transcripts from that and use that as my brainstorming. And then I want the AI to take my brainstorming session glean from it.
+
+[Speaker 1]
+The important information. And create an initial.
+
+[Speaker 1]
+Project requirements document. And specs.
+
+[Speaker 1]
+Could potentially also create a scope as well.
+
+[Speaker 1]
+Yeah, I think actually all three. Let's start now with that. It was all three. And then what I wanted to do is. Then interview me about what it's already created.
+
+[Speaker 1]
+I think I also would like it to do research.
+
+[Speaker 1]
+Into what it is that I'm doing to make sure that a valid scope. Project requirements, document, and specs. Now, here's the thing, though too, is that sometimes these projects that I want to do are going to be very large projects that are going to be have to broken up into smaller pieces, but honestly.
+
+[Speaker 1]
+The smaller pieces. I don't think I don't know that that we need to create an individual scope for the smaller piece, as the scope should be the entirety of the project.
+
+[Speaker 1]
+And the project requirements document should also include that in the specs should include that the entire project, but then from there once, once we've gone through the question and answers of. Whether this scope is accurate, whether the project requirements document is accurate, whether these specs are accurate, and I need it to be something that's fast.
+
+[Speaker 1]
+I don't want to be taking eight hours two days a week just to put together my documents, and that's the problem that I've been having. So we get. From my brainstorming. For a brainstorming with the AI. Through a recording, or whether it's just a long document that I spit out.
+
+[Speaker 1]
+Then, we just boom. Create those three documents. And those three documents cover the entirety of.
+
+[Speaker 1]
+The bill, what the, what the, what the project as a whole would be?
+
+[Speaker 1]
+Then. From that, we determine.
+
+[Speaker 1]
+Then. From that, I want the AI to then just create a list of items to do. And I think instead of it all being local in, um? Files. I'm actually kind of thinking I wanted to create GitHub issues for each of the tasks.
+
+[Speaker 1]
+Because then I can actually. Pull in other AI agents through those GitHub repos. To be able to do some of this stuff. Like? Github's built-in AI. I think it's co-pilot right now, or being able to pull codex in to be able to do some stuff. Um.
+
+[Speaker 1]
+That list, then I will. Work with the AI or on my own. Maintain what needs to be, you know, confirmed what needs to be done in which order? Will that, you know, that'll be the next, you'll you've created the list.
+
+[Speaker 1]
+And I confirmed the list.
+
+[Speaker 1]
+And that list automatically becomes the backlog, so to speak, instead of having to have a separate backlog. That list becomes the backlog that I'm then just going to pull the items from when we do our planning.
+
+[Speaker 1]
+To be able to create what we want, what what we want to do in each Sprint.
+
+[Speaker 1]
+And then. That'll also allow me to do things like set up a loop for you to be able to go through an AI to go through and just pick off, um, items one at a time.
+
+[Speaker 1]
+Now, I have been building some. Agents and Claude.
+
+[Speaker 1]
+Documents, markdown documents. So that? I can have a better control over my environments, and I've got some templated. Agents files based on what type of work is being done. I've got some templated skills files that I'm going to be able to use for what type of work is being done, and so on and so forth.
+
+[Speaker 1]
+And I want to.
+
+[Speaker 2]
+Actually, I wasn't sure. I'm not sure why I was telling you that.
+
+[Speaker 1]
+I lost my train of thought.
+
+[Speaker 2]
+Uh, just a
+
+[Speaker 1]
+Note for the note taker here. There's only one speaker I just was changing my tone a little bit, so I think you got confused, thinking that I was two different people.
+
+[Speaker 1]
+Hmm.
+
+[Speaker 2]
+Oh, another
+
+[Speaker 1]
+Thing. This plug-in is pretty much going to be for me. Nobody else seemed to be interested in. Taking a look at it. So right now, I'm just gonna build it for me. Uh, if somebody else wants to take a look at it at some point, then fine, but you know, right now, it's just build it the way I want to work.
+
+[Speaker 1]
+I want to think about the Retro. Oh, that's right, I remember now. What it was, I was, the reason I was telling you about those agents and skills is one of the things that's being put into them is to take Lessons Learned as they, as they happen and plug them right back into my.
+
+[Speaker 1]
+There's some memory, and there's some Lessons Learned and things to keep track of those. And I want that to be part of this process, too, in that. As you go through and and? Learn what it is that I want to do. Figure out my scope, figure out the project requirements documents, figure out the specs, then anything that you learn in that process needs to be cataloged so that you don't make those mistakes again.
+
+[Speaker 1]
+Or so we don't forget them later on. And then, also, as you're going through each individual item and fixing them or or pushing them out, you need to take the lessons that you learned there and plug them back into the, uh, into the process, too, so that you don't forget them.
+
+[Speaker 1]
+Um, we might have to rely on the agents and skills that I've written already. In my system, and this is kind of back to the I'm the only one that's going to be using this right now, so. Um, but so let's, let's just not bother, you know. Let's just assume all things are going to be installed.
+
+[Speaker 1]
+Um, maybe we can do something to the effect of? If something, if it's looking for something that's not installed, it could even make a notes. Or it can just fail quietly and just continue on. And we'll, we'll discuss that. We can go through that. Um, I'd like to kind of start doing this new faster process with you as we do this.
+
+[Speaker 1]
+Update to the system and let's see what we can learn from it and how we can make it work.
+
+[Speaker 1]
+Um, and then I still want to do a retro, but again, it just maybe it's just me, and and if it's just me, then I get it. Maybe I'm just not?
+
+[Speaker 1]
+Doing what I'm supposed to because I want to learn from lessons, but either. But I just keep finding myself saying, oh yeah, it's okay, yeah, it's okay. Yeah, everything was great. Yeah, everything was great, and I don't feel like I'm actually gleaning anything, and so I kind of want to have a.
+
+[Speaker 1]
+A streamlined process of if everything went well.
+
+[Speaker 1]
+We ask one. Question did everything go well, and then we, and if it's the answer is yes, then we go on, um. I think the Retro should. You should have, um. Uh, the lessons you've learned listed out to me so that, I know. What you've learned, and then I can.
+
+[Speaker 1]
+Confirm those or at least acknowledge them. And then you could ask me if I saw any thing like that as well. But um? Then, um? Let's keep it simple.
+
+[Speaker 1]
+And not go. Nuts on these and not go nuts on. You know, hours of retro as well? So, the overall for this is I want it streamlined as much as possible, but I don't want to miss out on the context that we've been building, and I don't want to miss out on the interview process because that's one of the things that I most liked about.
+
+[Speaker 1]
+This system was the interview part. So? Take all this brain dump that I just did and see what you can come up with.
