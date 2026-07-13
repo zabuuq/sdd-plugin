@@ -50,6 +50,14 @@ These rules govern every command's output. They live here in sdd-guide only; eve
 
 5. **Active prompting at the end of every beat and every topic.** At the end of each Phase 1 beat and at the end of each deepening-round topic, the agent emits an explicit invitation for additional user input before advancing. Suggested phrasings: "anything else on this?", "did I miss anything?", "anything else you'd add before we move on?", or any equivalent open-ended prompt — the phrasings are illustrative, not enumerated. Do **not** advance to the next beat or topic before the user has had an opportunity to respond to the invitation: emit the invitation, then wait for a user message. The user may respond with substantive content (the agent then processes that input as part of the current beat or topic — it is not deferred to a later beat) or with an explicit "no, move on" (the agent then advances the pointer). This rule applies to every interview command and covers both Phase 1 (mandatory questions, per `references/deepening-rounds.md`) and Phase 2 (deepening rounds).
 
+## Feasibility/Viability Pushback
+
+From `/sdd:discovery` onward, any command may raise feasibility or viability pushback when warranted — "the market may not justify this," "this is high-effort — would a lighter version do?" The behavior is cross-cutting and defined only here; it is not gated to a single command or step, and no command re-defines it.
+
+- Raise pushback when the evidence warrants it, at whatever point it surfaces — during an interview, a marker walk, a reconciliation, or a build.
+- Pushback that needs to persist beyond the current conversation is written into `docs/plan.md` as a `[CONCERN c#: …]` marker per `references/markers.md`, so it survives a clear/compact and resurfaces in the next marker walk.
+- Pushback is advice, not a veto. The user decides; an overridden concern is either dropped or, if it still needs visibility, kept as its marker.
+
 ## Guard Rails
 
 Every command checks its prerequisites before doing any real work. If prerequisites are not met, name the command the user should run instead and stop. Do not attempt to recover, improvise, or partially execute.
