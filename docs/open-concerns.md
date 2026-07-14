@@ -4,11 +4,14 @@
 
 ## Open
 
-### context-loading.md has no v6 disposition
-- **Raised by:** /sdd:build — v6 sprint 1, item 3/7 (foundations group).
-- **Concern:** `references/context-loading.md` is absent from the spec's v6 file-structure listing, but no sprint item deletes or rewrites it. Its content is heavily v5 (per-command load table naming `scope`/`prd`/`plan`/`polish`, sprint-file re-entry order). Left untouched during the foundations group. Needs a decision at item 28's reference sweep: delete it, or rewrite its load table for the v6 command set.
+_(none)_
 
 ## Resolved
+
+### context-loading.md has no v6 disposition
+- **Raised by:** /sdd:build — v6 sprint 1, item 3/7 (foundations group).
+- **Concern:** `references/context-loading.md` was absent from the spec's v6 file-structure listing, but no sprint item deleted or rewrote it; its content was heavily v5 (per-command load table naming `scope`/`prd`/`plan`/`polish`, sprint-file re-entry order).
+- **Resolved by:** Maintainer decision at item 28 (2026-07-13): **deleted.** Each v6 command SKILL carries its own `## Loading` list, so a central load table is redundant; the file was removed in the retired-commands sweep along with the five dead command directories.
 
 ### Free-tier ChatGPT / Gemini automation capabilities
 - **Raised by:** /sdd:scope — v6 Round 1, Topic 2 (research/validate step). Refined /sdd:prd — v6 Round 1, Q4 (validation split into `/sdd:validate`).

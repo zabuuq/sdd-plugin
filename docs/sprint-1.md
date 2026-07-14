@@ -354,12 +354,12 @@ Out of scope: the deferred automated third-party AI validation, GitHub-native PR
 ---
 
 ### Item 28 — Remove retired commands
-- [ ] Delete the `scope`, `prd`, `spec`, `plan`, and `polish` skill directories (last, once the new flow is proven), keeping `onboard`, `pause`, `unpause`, `feedback`, `archive` [PRD: frem]
+- [x] Delete the `scope`, `prd`, `spec`, `plan`, and `polish` skill directories (last, once the new flow is proven), keeping `onboard`, `pause`, `unpause`, `feedback`, `archive` [PRD: frem]
 - **PRD ref:** `prd.md > Foundations & Migration`
 - **Spec ref:** `spec.md > Foundations & Migration > Command removals`, `spec.md > File Structure`
 - **What to build:** Delete the `plugins/sdd/skills/scope`, `prd`, `spec`, `plan`, and `polish` directories. Keep `onboard`, `pause`, `unpause`, `feedback`, and `archive`. (The new `validate`/`prototype`/`checkpoint`/`resolve-pr` commands are added and `discovery`/`refine`/`build`/`retro` rewritten by earlier items.) Do this last, after the new flow is proven, so nothing is removed before its replacement works. Sweep for and remove any lingering references to the deleted commands.
 - **Acceptance criteria:** (from `prd.md > Foundations & Migration`)
-  - [ ] `frem` — The commands `scope`, `prd`, `spec`, `plan`, and `polish` are removed; `onboard`, `pause`, `unpause`, `feedback`, and `archive` are kept.
+  - [x] `frem` — The commands `scope`, `prd`, `spec`, `plan`, and `polish` are removed; `onboard`, `pause`, `unpause`, `feedback`, and `archive` are kept.
 - **Verification:** `claude plugin validate .` passes with the five command directories gone and the plugin still structurally valid; a repo-wide grep finds no dangling references to the removed commands.
 
 ---

@@ -80,7 +80,7 @@ Every command checks its prerequisites before doing any real work. If prerequisi
 
 **Lightweight validation on every command startup:**
 
-- Required files exist on disk (e.g., `/sdd:prd` requires `docs/scope.md`).
+- Required files exist on disk (e.g., `/sdd:refine` requires `docs/plan.md`).
 - `docs/project-state.json` parses as valid JSON if it exists.
 - Sprint files have the expected structure (checklist items with spec/PRD references) when sprint-dependent commands load them.
 
@@ -119,8 +119,7 @@ Each command outputs a brief purpose explanation on its first run within a proje
 
 Process notes capture the human side of the work. Write them in real time as the conversation progresses — never wait for end-of-command to dump a summary.
 
-- **Planning phases** (`/sdd:discovery`, `/sdd:scope`, `/sdd:prd`, `/sdd:spec`): append to per-phase notes in the project root (`process-notes-<phase>.md`).
-- **Sprint cycles** (`/sdd:plan`, `/sdd:build`, `/sdd:polish`, `/sdd:refine`): write to `process-notes-sprint-N.md` (N = current sprint).
+- **Chain commands** (`/sdd:discovery`, `/sdd:refine`, `/sdd:validate`, `/sdd:prototype`, `/sdd:build`): append to per-command notes in the project root (`process-notes-<command>.md`).
 
 **Capture four categories:** **decisions** (and rationale), **pushback** (from either side, and how resolved), **difficult questions** (and what made them hard), and **pivots** (struggles and shifts in direction).
 

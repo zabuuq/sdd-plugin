@@ -14,14 +14,14 @@ Read `skills/sdd-guide/SKILL.md` for shared behavior before executing this comma
 On startup, load the following in order:
 
 1. `skills/sdd-guide/SKILL.md` (shared behavior)
-2. `docs/project-state.json` — read `currentSprint`, `lastCommand`, and `commandExplanationsShown`
+2. `docs/project-state.json` — read `lastCommand` and `commandExplanationsShown`
 3. `~/.claude/sdd-user-profile.json` — read `feedbackLocalPath` if the file exists. This is the optional cross-project forwarding target (the **root directory of the local plugin clone**, not the full path to the feedback file). If the file does not exist, or the field is absent, `null`, or empty, treat the forwarding target as unset and continue silently.
 
 **Skips:** everything else. Do not load the PRD, spec, sprint files, open concerns, deepening rounds, living documents, or any other context. This command is designed to be instant.
 
 ## Prerequisites
 
-- `docs/project-state.json` must exist. If missing: "Run `/sdd:scope` first."
+- `docs/project-state.json` must exist. If missing: "Run `/sdd:discovery` first."
 
 If the prerequisite fails, stop immediately. Do not attempt partial execution.
 
@@ -70,7 +70,7 @@ Wait for the response. Use that response as the feedback note.
 Read the following from `docs/project-state.json`:
 
 - **Timestamp:** Generate an ISO-8601 timestamp for the current moment (e.g., `2026-04-09T14:32:00Z`).
-- **Current sprint number:** Read from `currentSprint`. If no sprint has been created yet, use `0`.
+- **Active command:** Read from `lastCommand` (the command in flight when feedback was raised).
 - **Last command run:** Read from `lastCommand` in `docs/project-state.json`. `/sdd:feedback` does not overwrite this field, so the current value is the preceding non-feedback command — exactly what the note should attribute.
 - **Project directory name:** Derive from the current working directory (the final segment of the path).
 

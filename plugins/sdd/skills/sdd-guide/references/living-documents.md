@@ -1,6 +1,6 @@
 # Living Documents
 
-**Used by:** `/sdd:refine`, `/sdd:build`, `/sdd:polish`
+**Used by:** `/sdd:discovery` (state-file creation), `/sdd:build` (CLAUDE.md/AGENTS.md updates), `/sdd:archive` (reset map)
 
 This reference defines how the SDD plugin handles updates to project documents after their initial creation.
 
@@ -8,12 +8,11 @@ This reference defines how the SDD plugin handles updates to project documents a
 
 The following documents can be modified after initial creation:
 
-- `docs/prd.md`
-- `docs/spec.md`
+- `docs/plan.md` — only through the chain commands that own it (`/sdd:refine`, `/sdd:validate`, `/sdd:prototype`'s `[GAP]` writes)
 - `CLAUDE.md`
 - `AGENTS.md`
 
-All other documents (scope, process notes, sprint files) are append-only or immutable once created.
+All other documents (process notes, `docs/retro.md`, archive contents) are append-only or immutable once created.
 
 ## project-state.json Schema and Reset
 
@@ -74,12 +73,11 @@ The following are permanent cross-cycle stores. `/sdd:archive` snapshots the thr
 
 ## Default Stance
 
-**Resist changes to scope, PRD, and spec.** These documents represent deliberate decisions made during planning. Changes should not happen casually.
+**Resist casual changes to `docs/plan.md`.** The plan represents deliberate decisions; it changes through the chain (a marker resolution in `/sdd:refine`, a reconciliation ruling in `/sdd:validate`, a `[GAP]` write from `/sdd:prototype`), not through ad-hoc edits mid-build.
 
 When new ideas, features, or requirements surface during build or iteration:
-- Default action: Add them to the **backlog** or **unvetted section** of the PRD.
-- Do not modify the spec or approved PRD stories without going through `/sdd:refine`.
-- Push back on scope changes. Make the user justify why this can't wait for the next sprint or a future project.
+- Default action: add them to `docs/backlog.md` via the defer-vs-drop prompt in `references/backlog.md`.
+- Push back on scope changes. Make the user justify why this can't wait for a future pass.
 
 ## Update Ordering for `/sdd:refine`
 
@@ -107,14 +105,14 @@ The following documents are **never updated by `/sdd:refine`**:
 When accumulated changes — across multiple `/sdd:refine` cycles or through organic discovery during build — fundamentally shift the project's direction, scope, or complexity:
 
 - Recognize the shift explicitly. Name what has changed and why it constitutes a fundamental shift rather than incremental refinement.
-- Suggest re-scoping: going back to `/sdd:scope` to re-evaluate the project boundaries.
+- Suggest re-scoping: re-running `/sdd:discovery` to re-evaluate the project from the ground up (it will confirm before overwriting `docs/plan.md`).
 - Frame this as a deliberate, weighty decision. Re-scoping is not routine maintenance. It means the project has evolved beyond what the original scope anticipated, and the team should consciously decide whether to embrace the new direction or cut back to the original vision.
 
-## PRD Health Monitoring
+## Plan Health Monitoring
 
-Monitor the PRD for signs of scope creep or unwieldy complexity:
+Monitor `docs/plan.md` for signs of scope creep or unwieldy complexity:
 
-- **10+ epics:** `/sdd:prd` emits a phase-split recommendation. **This does not block PRD generation** — the user may elect to keep one phase. The recommendation suggests breaking the project into distinct phases with clear boundaries, each with its own sprint cycle.
-- **5+ unvetted items:** Flag scope creep. The rate of new ideas is outpacing the rate of deliberate planning. The user should either run `/sdd:refine` to process the backlog or consciously defer items to a future project.
+- **10+ epics in Requirements:** recommend splitting the project into distinct phases with clear boundaries. This is a recommendation, not a block.
+- **Fast-growing backlog:** when new ideas are outpacing deliberate planning, flag it — the user should consciously defer items to a future project rather than let the backlog balloon.
 
-Surface these warnings during any command that loads the PRD, not just during `/sdd:refine`.
+Surface these warnings from any command that loads the plan.

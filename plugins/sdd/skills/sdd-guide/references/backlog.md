@@ -1,6 +1,6 @@
 # Backlog
 
-**Used by:** `/sdd:discovery`, `/sdd:scope`, `/sdd:prd`, `/sdd:spec`, `/sdd:plan`
+**Used by:** `/sdd:discovery`, `/sdd:refine`, `/sdd:validate`
 
 Canonical home for every "how" detail of the backlog mechanism. The backlog is an append-only deferral log written during planning. If a writing command needs to add an entry, route through this file's `## Write trigger` and use this file's `## Entry format`; do not restate the prompt text or the entry schema inline in command SKILL files.
 
@@ -43,15 +43,15 @@ The `Source` field records where the deferral originated. Format:
 
 Examples (verbatim):
 
-- `Source: /sdd:scope — Phase 1, beat "audience" — local tech group as contributors vs consumers`
-- `Source: /sdd:prd — Round 2 deepening — story-split threshold edge cases`
-- `Source: /sdd:spec — Phase 1, beat "v2-verification.md schema" — grouping rows by epic`
+- `Source: /sdd:discovery — pre-draft interview, question 3 — local tech group as contributors vs consumers`
+- `Source: /sdd:refine — marker walk, [GAP g2] — story-split threshold edge cases`
+- `Source: /sdd:validate — reconciliation, difference 4 — grouping requirements by epic`
 
 ## Write trigger
 
 A backlog entry is only ever written via an explicit user-facing confirmation prompt. There is no implicit or silent path that writes to `docs/backlog.md`.
 
-When a planning command surfaces an item the user signals they want to push off — out of scope for the current project, out of scope for the current PRD round, deferred rather than fit into the current sprint, etc. — the command emits a prompt that explicitly distinguishes the two outcomes:
+When a planning command surfaces an item the user signals they want to push off — out of scope for the current project, out of scope for the current PRD round, deferred rather than folded into `docs/plan.md`, etc. — the command emits a prompt that explicitly distinguishes the two outcomes:
 
 - **Defer to backlog** — write an entry to `docs/backlog.md` using the `## Entry format` above.
 - **Drop** — write no entry. Record the drop decision (item summary and the fact that the user chose to drop rather than defer) in the current phase's process-notes file only.
@@ -63,7 +63,7 @@ The prompt fires every time such an item surfaces. The user's answer gates the w
 
 Recommended prompt shape (paraphrasable, not a fixed string):
 
-> This isn't going into the current [scope / PRD / spec / sprint]. Defer to backlog (write an entry to `docs/backlog.md`) or drop (record the decision in process notes only)?
+> This isn't going into the current plan. Defer to backlog (write an entry to `docs/backlog.md`) or drop (record the decision in process notes only)?
 
 The prompt names both options explicitly. Do not collapse it into a single yes/no question.
 
@@ -72,12 +72,10 @@ The prompt names both options explicitly. Do not collapse it into a single yes/n
 The following commands write to `docs/backlog.md` via the write trigger above:
 
 - `/sdd:discovery`
-- `/sdd:scope`
-- `/sdd:prd`
-- `/sdd:spec`
-- `/sdd:plan`
+- `/sdd:refine`
+- `/sdd:validate`
 
-Every other SDD command is a **non-writer**: `/sdd:onboard`, `/sdd:build`, `/sdd:polish`, `/sdd:refine`, `/sdd:retro`, `/sdd:pause`, `/sdd:unpause`, `/sdd:feedback`. `/sdd:refine` in particular **does not edit `docs/backlog.md`**; see `references/living-documents.md > ## Exclusions from the Living-Documents Chain`. The backlog is append-only during planning and is never reshaped by post-planning commands.
+Every other SDD command is a **non-writer**: `/sdd:onboard`, `/sdd:prototype`, `/sdd:build`, `/sdd:retro`, `/sdd:checkpoint`, `/sdd:resolve-pr`, `/sdd:pause`, `/sdd:unpause`, `/sdd:feedback`, `/sdd:archive`. Build agents in particular never act on backlog entries (see `skills/build/SKILL.md`). The backlog is append-only during planning and is never reshaped by post-planning commands.
 
 ## Append order and modification rule
 
@@ -100,4 +98,4 @@ The exact wording of the marker comment is flexible; what matters is that the fi
 
 ## Parser note
 
-Backlog entries are detected by an `^### ` heading scan against `docs/backlog.md`. "The file has at least one entry" means at least one line in the file matches the regex `^### ` (start-of-line heading at the level-3 depth). The pointer-mechanism in planning artifacts (`scope.md`, `prd.md`, `spec.md`, `sprint-N.md` include a pointer to `docs/backlog.md` in lieu of an inline deferred-items section when this check passes) uses exactly this rule.
+Backlog entries are detected by an `^### ` heading scan against `docs/backlog.md`. "The file has at least one entry" means at least one line in the file matches the regex `^### ` (start-of-line heading at the level-3 depth). The pointer-mechanism in `docs/plan.md` (its `## Non-Goals` section includes a pointer to `docs/backlog.md` in lieu of an inline deferred-items list when this check passes) uses exactly this rule.
