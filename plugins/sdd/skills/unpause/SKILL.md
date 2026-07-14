@@ -43,7 +43,7 @@ Before loading anything else, verify that a resume file actually exists for the 
 
 **If `lastCommand` is unset, null, or empty** — including the case where `docs/project-state.json` does not exist or has no `lastCommand` field — there is no in-flight command to resume and no resume-file path to derive. Do not attempt to construct a path from an empty value. Emit a single message that states nothing is paused and points the user at starting fresh, for example:
 
-> Nothing to resume — `lastCommand` is unset in `docs/project-state.json`. If no project exists yet, run `/sdd:onboard`; otherwise run the chain command you want to start (e.g., `/sdd:scope`, `/sdd:prd`).
+> Nothing to resume — `lastCommand` is unset in `docs/project-state.json`. If no project exists yet, run `/sdd:onboard`; otherwise run the chain command you want to start (e.g., `/sdd:discovery`, `/sdd:refine`).
 
 Then exit cleanly. Do not write to `docs/project-state.json`. Do not write any other files.
 
@@ -51,14 +51,14 @@ Then exit cleanly. Do not write to `docs/project-state.json`. Do not write any o
 
 **If the resume file does not exist at the expected path**, exit cleanly. Do not read the source `SKILL.md`. Do not attempt to resume the interview. Emit a message that:
 
-1. Names the missing file path literally — `docs/<command>-resume.md`, with the actual prefix-stripped command name substituted (e.g., `docs/scope-resume.md` when `lastCommand = "/sdd:scope"`).
+1. Names the missing file path literally — `docs/<command>-resume.md`, with the actual prefix-stripped command name substituted (e.g., `docs/refine-resume.md` when `lastCommand = "/sdd:refine"`).
 2. Surfaces two next-step options for the user:
    - **(a)** Run `/sdd:pause` — if a command is currently in-flight and the user meant to pause it before resuming. This covers the case where the user mistakenly ran `/sdd:unpause` first.
-   - **(b)** Re-run the original command from scratch — e.g., `/sdd:scope` when `lastCommand = "/sdd:scope"` — if nothing was paused and the user wants to start fresh.
+   - **(b)** Re-run the original command from scratch — e.g., `/sdd:refine` when `lastCommand = "/sdd:refine"` — if nothing was paused and the user wants to start fresh.
 
 For example:
 
-> No resume file at `docs/scope-resume.md`. Either run `/sdd:pause` first if `/sdd:scope` is in-flight and needs to be snapshotted, or re-run `/sdd:scope` from scratch to start over.
+> No resume file at `docs/refine-resume.md`. Either run `/sdd:pause` first if `/sdd:refine` is in-flight and needs to be snapshotted, or re-run `/sdd:refine` from scratch to start over.
 
 Then exit cleanly. Do not modify `docs/project-state.json` — `lastCommand` must not be clobbered on this exit path, per the no-clobber rule in `## State Updates (immediate)` above. Do not write any other files. Do not append to process notes. Do not emit a handoff.
 
@@ -68,8 +68,8 @@ Then exit cleanly. Do not modify `docs/project-state.json` — `lastCommand` mus
 
 The resume file lives at `docs/<command>-resume.md`, where `<command>` is the value of `lastCommand` with the `/sdd:` prefix stripped. Concrete examples:
 
-- `lastCommand = "/sdd:scope"` → `docs/scope-resume.md`
-- `lastCommand = "/sdd:plan"` → `docs/plan-resume.md`
+- `lastCommand = "/sdd:discovery"` → `docs/discovery-resume.md`
+- `lastCommand = "/sdd:refine"` → `docs/refine-resume.md`
 - `lastCommand = "/sdd:discovery"` → `docs/discovery-resume.md`
 
 This path-derivation rule is the same one `/sdd:pause` uses on the write side — see `plugins/sdd/skills/pause/SKILL.md > ### Derive the resume-file path` and `references/pause-resume.md > ## Location convention` for the canonical convention.
@@ -80,8 +80,8 @@ Read this file before any other interview work. It is the seed for the resumed c
 
 Read `plugins/sdd/skills/<command>/SKILL.md`, where `<command>` is the same prefix-stripped `lastCommand` value used in step 3. Concrete examples:
 
-- `lastCommand = "/sdd:scope"` → `plugins/sdd/skills/scope/SKILL.md`
-- `lastCommand = "/sdd:plan"` → `plugins/sdd/skills/plan/SKILL.md`
+- `lastCommand = "/sdd:discovery"` → `plugins/sdd/skills/discovery/SKILL.md`
+- `lastCommand = "/sdd:refine"` → `plugins/sdd/skills/refine/SKILL.md`
 
 Loading the source `SKILL.md` brings in that command's loading directives, behavior, and any reference files it pulls in transitively. The source `SKILL.md` governs the resumed flow from this point forward — `/sdd:unpause` is not a parallel command, it is a dispatcher that hands control back to the paused command.
 

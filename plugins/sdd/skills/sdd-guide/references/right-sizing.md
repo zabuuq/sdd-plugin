@@ -1,8 +1,8 @@
 # Right-Sizing
 
-**Used by:** `/sdd:scope` (writes), `/sdd:prd`, `/sdd:spec`, `/sdd:plan` (re-evaluate)
+**Used by:** `/sdd:discovery` (writes), `/sdd:refine`, `/sdd:validate` (re-evaluate)
 
-This reference is the canonical home for the v2 right-sizing heuristic. It defines what a "small project" means in the SDD workflow, which command owns the judgment, how subsequent commands revisit it, and how the judgment shortens interviews without sacrificing the document's usefulness. Right-sizing is a quality-of-experience lever, not an excuse to skip rigor: when the project is genuinely small the interview shortens; when it is larger or uncertain the full cadence stays in force.
+This reference is the canonical home for the right-sizing heuristic. It defines what a "small project" means in the SDD workflow, which command owns the judgment, how subsequent commands revisit it, and how the judgment shortens interviews without sacrificing the document's usefulness. Right-sizing is a quality-of-experience lever, not an excuse to skip rigor: when the project is genuinely small the interview shortens; when it is larger or uncertain the full cadence stays in force.
 
 ## The `smallProject` field
 
@@ -10,13 +10,12 @@ This reference is the canonical home for the v2 right-sizing heuristic. It defin
 
 - `true` — the project is judged small. Interview commands may trim Phase 1 beats and may default to shorter deepening rounds (see below).
 - `false` — the project is judged normal-or-larger. Standard interview cadence applies.
-- `null` / absent — no judgment has been made yet. Standard cadence applies. This is the state before `/sdd:scope` finishes Phase 1.
+- `null` / absent — no judgment has been made yet. Standard cadence applies. This is the state before `/sdd:discovery` finishes its pre-draft interview.
 
 ### Authoring lifecycle
 
-- `/sdd:discovery` does **not** detect or write `smallProject`. Discovery is open exploration; a scale judgment at that stage would be premature and would also bias the very framing discovery is meant to surface. This is a deliberate v2 relocation; the initial PRD assigned detection to discovery, and v2 moved it. See `spec.md > PRD Edits Required` for the rationale trail.
-- `/sdd:scope` writes the **authoritative initial value** at the end of its Phase 1, after the mandatory scoping questions have been answered. Scope is the first command that has enough signal to make a defensible call, and it is the natural place to commit one.
-- `/sdd:prd`, `/sdd:spec`, and `/sdd:plan` **re-evaluate on startup**. Each reads the current value, applies the signals below against the material it now has access to, and may flip the value if contradictory or first-surfacing evidence appears. A re-evaluation that confirms the prior value is a no-op; a flip is logged in the relevant process notes file.
+- `/sdd:discovery` writes the **authoritative initial value** at the end of its pre-draft interview, after the mandatory questions have been answered. Discovery is the first command that has enough signal to make a defensible call — by then it has the ingest inventory, the brainstorm, and the interview answers — and it is the natural place to commit one. (In earlier SDD versions this judgment belonged to `/sdd:scope`; discovery inherits it in v6.)
+- `/sdd:refine` and `/sdd:validate` **re-evaluate on startup**. Each reads the current value, applies the signals below against the material it now has access to, and may flip the value if contradictory or first-surfacing evidence appears. A re-evaluation that confirms the prior value is a no-op; a flip is logged in the relevant process notes file.
 
 Re-evaluation is one-directional in practice but not by rule. A command can flip `true` to `false` if new complexity surfaces (a third-party integration mentioned in PRD that scope missed, a multi-component architecture that emerges in spec). It can also flip `false` to `true` if a project that initially looked larger turns out, on closer inspection, to be one feature wearing a costume. The bias should be toward humility — when in doubt, leave the value alone and proceed with standard cadence.
 
@@ -39,39 +38,28 @@ When `smallProject: true`, each interview command may trim its Phase 1 mandatory
 
 The lists below are skippable, not required-skipped. A command should still ask a beat if the user's earlier answers leave it genuinely open.
 
-### `/sdd:scope`
+### `/sdd:discovery`
 
-When the signals already point clearly to small by the time scope reaches its later mandatory questions, scope may skip:
+Discovery's pre-draft interview covers intent, requirements, and architecture in one pass, so it inherits the skippable beats of all three retired planning commands. When the signals already point clearly to small by the time discovery reaches its later mandatory questions, it may skip:
 
 - The "who are the users beyond yourself" beat (already answered: nobody, or a known small group).
-- The "what's out of scope" beat as a separate question — fold it into a closing summary instead.
+- The "what's out of scope" beat as a separate question — fold non-goals into a closing summary instead.
 - The "what does success look like in six months" beat — small projects don't need a six-month horizon.
+- The user-segmentation beat. One audience, no segmentation.
+- The "competitive landscape / differentiators" beat. Small projects rarely have competitors in any meaningful sense.
+- The architecture-overview beat — there's nothing multi-component to overview.
+- The "cross-cutting concerns" beat (observability, security posture, accessibility) unless the user has raised one explicitly.
+- The deployment-topology beat. A single deployable doesn't need a topology section.
 
-### `/sdd:prd`
+Acceptance-criteria generation in the auto-draft remains in full — small projects still need testable ACs.
 
-When `smallProject: true`:
+### `/sdd:refine`
 
-- Skip the user-segmentation beat. One audience, no segmentation.
-- Skip the "non-goals" beat as a standalone question; fold non-goals into the goals beat or into a brief closing.
-- Skip the "competitive landscape / differentiators" beat. Small projects rarely have competitors in any meaningful sense.
-- Acceptance-criteria generation remains in full — small projects still need testable ACs.
+Refine's marker walk is item-driven, not beat-driven — there are no Phase 1 beats to skip. When `smallProject: true`, right-sizing affects only its deepening-round defaults (see the thinness signal below).
 
-### `/sdd:spec`
+### `/sdd:validate`
 
-When `smallProject: true`:
-
-- Skip the architecture-overview beat — there's nothing multi-component to overview.
-- Skip the "cross-cutting concerns" beat (observability, security posture, accessibility) unless the user has raised one explicitly. Small private projects don't carry these as standing concerns.
-- Skip the deployment-topology beat. A single deployable doesn't need a topology section.
-- Open-concerns capture (see `references/open-concerns.md`) remains in full.
-
-### `/sdd:plan`
-
-When `smallProject: true`:
-
-- Skip the "how do we sequence multiple sprints" beat. Small projects often complete in one or two sprints.
-- Skip the dependency-graph beat. With one component and no integrations, dependencies are linear.
-- Sprint-item generation and PRD tag-back remain in full.
+Validate's reconciliation walk is difference-driven — one difference at a time, no Phase 1 beats to skip. When `smallProject: true`, right-sizing affects only its deepening-round defaults (see the thinness signal below).
 
 ## The thinness signal and sub-5-question rounds
 

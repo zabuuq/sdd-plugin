@@ -50,13 +50,37 @@ These rules govern every command's output. They live here in sdd-guide only; eve
 
 5. **Active prompting at the end of every beat and every topic.** At the end of each Phase 1 beat and at the end of each deepening-round topic, the agent emits an explicit invitation for additional user input before advancing. Suggested phrasings: "anything else on this?", "did I miss anything?", "anything else you'd add before we move on?", or any equivalent open-ended prompt — the phrasings are illustrative, not enumerated. Do **not** advance to the next beat or topic before the user has had an opportunity to respond to the invitation: emit the invitation, then wait for a user message. The user may respond with substantive content (the agent then processes that input as part of the current beat or topic — it is not deferred to a later beat) or with an explicit "no, move on" (the agent then advances the pointer). This rule applies to every interview command and covers both Phase 1 (mandatory questions, per `references/deepening-rounds.md`) and Phase 2 (deepening rounds).
 
+## Feasibility/Viability Pushback
+
+From `/sdd:discovery` onward, any command may raise feasibility or viability pushback when warranted — "the market may not justify this," "this is high-effort — would a lighter version do?" The behavior is cross-cutting and defined only here; it is not gated to a single command or step, and no command re-defines it.
+
+- Raise pushback when the evidence warrants it, at whatever point it surfaces — during an interview, a marker walk, a reconciliation, or a build.
+- Pushback that needs to persist beyond the current conversation is written into `docs/plan.md` as a `[CONCERN c#: …]` marker per `references/markers.md`, so it survives a clear/compact and resurfaces in the next marker walk.
+- Pushback is advice, not a veto. The user decides; an overridden concern is either dropped or, if it still needs visibility, kept as its marker.
+
+## Lesson Capture
+
+During doc creation (`/sdd:discovery`, `/sdd:refine`) and item build (`/sdd:prototype`, `/sdd:build`), the AI detects lesson-worthy events and writes them to `docs/learnings/` **without prompting** — capture is automatic, not offered.
+
+**Lesson-worthy events:**
+- Lost-context or redundant-question moments — the AI asked something already answered, or lost state a file should have carried.
+- Repeated roadblocks — the same failure or friction appearing twice.
+- Course corrections — the user redirecting an approach in a way that generalizes.
+- Reusable designs, practices, or preferences — anything worth applying to future work.
+
+**Capture format:** one terse lesson per file in `docs/learnings/` (short kebab-case filename, a few lines: what happened, the lesson, when it applies). Distill, don't transcribe.
+
+`docs/learnings/` is a **permanent carry-forward store** — never swept by `/sdd:archive`. Captured lessons surface at `/sdd:retro` for promotion (plugin-level → `/sdd:feedback`, global → `~/.claude`).
+
+The maintainer's ad-hoc "record this globally right now" move stays a **manual action** — the plugin does not implement or watch for it. Automatic capture writes only to `docs/learnings/`.
+
 ## Guard Rails
 
 Every command checks its prerequisites before doing any real work. If prerequisites are not met, name the command the user should run instead and stop. Do not attempt to recover, improvise, or partially execute.
 
 **Lightweight validation on every command startup:**
 
-- Required files exist on disk (e.g., `/sdd:prd` requires `docs/scope.md`).
+- Required files exist on disk (e.g., `/sdd:refine` requires `docs/plan.md`).
 - `docs/project-state.json` parses as valid JSON if it exists.
 - Sprint files have the expected structure (checklist items with spec/PRD references) when sprint-dependent commands load them.
 
@@ -67,12 +91,16 @@ If validation fails, report exactly what is wrong and which command or manual fi
 The standard project flow is:
 
 ```
-/sdd:onboard (one-time) → /sdd:discovery → /sdd:scope → /sdd:prd → /sdd:spec → /sdd:plan → /sdd:build → /sdd:polish → /sdd:refine (loop back to /sdd:plan)
+/sdd:onboard (one-time) → /sdd:discovery → /sdd:refine → /sdd:validate (optional) → /sdd:prototype → /sdd:build → /sdd:retro
 ```
+
+`/sdd:validate` is optional: the flow proceeds from `/sdd:refine` to `/sdd:prototype` whether or not it ran. Running it is the user's choice.
 
 `/sdd:retro` closes the project.
 
 `/sdd:feedback` runs anytime, independent of the chain.
+
+`/sdd:checkpoint` and `/sdd:resolve-pr` are anytime utilities, independent of the chain. `/sdd:checkpoint` emits a tailored `/compact` instruction string; `/sdd:resolve-pr` handles PR feedback and branch hygiene for build-loop PRs.
 
 `/sdd:pause` and `/sdd:unpause` are anytime utilities, independent of the chain. They suspend and resume the current command without altering chain position.
 
@@ -84,15 +112,14 @@ Each command outputs a brief purpose explanation on its first run within a proje
 
 - Tracked in `docs/project-state.json` under the `commandExplanationsShown` object (keyed by command name, value is boolean).
 - Not gated — the explanation is plain text the user scrolls past. It does not require acknowledgment or confirmation.
-- For commands that run multiple times (`/sdd:plan`, `/sdd:build`, `/sdd:polish`, `/sdd:refine`), the explanation only shows on the very first invocation in the project. Subsequent runs skip it.
+- For commands that run multiple times (`/sdd:refine`, `/sdd:validate`, `/sdd:prototype`, `/sdd:build`), the explanation only shows on the very first invocation in the project. Subsequent runs skip it.
 - If `commandExplanationsShown` does not exist in `project-state.json`, treat all commands as not yet explained.
 
 ## Process Notes
 
 Process notes capture the human side of the work. Write them in real time as the conversation progresses — never wait for end-of-command to dump a summary.
 
-- **Planning phases** (`/sdd:discovery`, `/sdd:scope`, `/sdd:prd`, `/sdd:spec`): append to per-phase notes in the project root (`process-notes-<phase>.md`).
-- **Sprint cycles** (`/sdd:plan`, `/sdd:build`, `/sdd:polish`, `/sdd:refine`): write to `process-notes-sprint-N.md` (N = current sprint).
+- **Chain commands** (`/sdd:discovery`, `/sdd:refine`, `/sdd:validate`, `/sdd:prototype`, `/sdd:build`): append to per-command notes in the project root (`process-notes-<command>.md`).
 
 **Capture four categories:** **decisions** (and rationale), **pushback** (from either side, and how resolved), **difficult questions** (and what made them hard), and **pivots** (struggles and shifts in direction).
 
@@ -130,17 +157,9 @@ Interview commands that offer optional deepening rounds (additional question pas
 
 See `references/deepening-rounds.md` for full detail — the mechanism, the literal recommendation wording, and the permission-prompt template for going past the hard cap.
 
-## Between-Rounds Context Recommendation
-
-After the end-of-round content recommendation above, the agent emits a **second**, separate recommendation choosing one of three context-management tiers: **continue**, **`/compact`**, or **`/clear`**. Order is fixed: content recommendation first, context recommendation second, same message group. The two are independent — the user may want another round and still need a `/compact` between them.
-
-The context recommendation is always definite — a named tier plus the agent's reasoning. Never a bare prompt like "want to compact?". The agent does **not** programmatically invoke `/compact` or `/clear`; both are user-run. The agent recommends; the user executes.
-
-See `references/context-management.md` for full detail — tier definitions, triggers, signals, the tier-mapping rules, failure-mode mitigation, examples, and the `/clear`-branch consolidation with `references/pause-resume.md`.
-
 ## End-of-Command Handoff
 
-Every interview command emits a handoff message unconditionally at completion. Interview commands are: `/sdd:onboard`, `/sdd:discovery`, `/sdd:scope`, `/sdd:prd`, `/sdd:spec`, `/sdd:plan`, `/sdd:polish`, `/sdd:refine`.
+Every interview command emits a handoff message unconditionally at completion. Interview commands are: `/sdd:onboard`, `/sdd:discovery`, `/sdd:refine`, `/sdd:validate`.
 
 **Standard form (every interview command, every time):**
 
@@ -167,19 +186,20 @@ Tracked via `handoffWarningShown` in `~/.claude/sdd-user-profile.json`. Seeded `
 | Outgoing | Next |
 |---|---|
 | `/sdd:onboard` | `/sdd:discovery` |
-| `/sdd:discovery` | `/sdd:scope` |
-| `/sdd:scope` | `/sdd:prd` |
-| `/sdd:prd` | `/sdd:spec` |
-| `/sdd:spec` | `/sdd:plan` |
-| `/sdd:plan` | `/sdd:build` |
-| `/sdd:refine` | `/sdd:plan` |
-| `/sdd:polish` | `/sdd:build` |
+| `/sdd:discovery` | `/sdd:refine` |
+| `/sdd:refine` | `/sdd:prototype` |
+| `/sdd:validate` | `/sdd:prototype` |
+
+`/sdd:refine`'s handoff names `/sdd:prototype`; it may note that `/sdd:validate` is available first, but the chain proceeds either way.
 
 **Out-of-pattern commands:**
 
-- `/sdd:build` — not in the interview-command set. The next-command recommendation comes from a wrap-up state check at the end of `/sdd:build`: route to `/sdd:plan` (sprint complete, more sprints planned), `/sdd:refine` (sprint complete, refinement needed before next plan), `/sdd:polish` (sprint complete, polish pass needed), or `/sdd:retro` (project complete).
+- `/sdd:prototype` — not an interview command. Emits the standard handoff form pointing to `/sdd:build` when the prototype review completes.
+- `/sdd:build` — not an interview command. Runs the autonomous build-loop; when the issue queue is drained it reports status and recommends `/sdd:retro` if the project is complete, otherwise names what remains.
 - `/sdd:retro` — terminal. Emits `Project closed.` plus a brief pointer to cross-project pattern capture. No `/clear` instruction and no next-command line.
+- `/sdd:checkpoint` — emits no handoff. Prints a `/compact <instructions>` string and returns.
+- `/sdd:resolve-pr` — emits no handoff. Anytime PR hygiene and feedback resolution; reports what it did and returns.
 - `/sdd:pause` — emits the PRD-required line `Paused. Run /sdd:unpause to resume.` Overrides the normal handoff template.
 - `/sdd:unpause` — emits no separate handoff. The resumed command emits its normal handoff at its own completion.
 - `/sdd:feedback` — emits no handoff (instant-return per PRD).
-- `/sdd:archive` — not an interview command; not bound by the interview-handoff template or `handoffWarningShown`. Closes and resets a finished cycle. Emits a one-line outcome (`Cycle v{N} archived to docs/archive/v{N}/.`) plus a two-line handoff to `/sdd:scope` (`Run /clear, then /sdd:scope to start the next cycle.`). A PR line (`PR opened: <url>.`) is conditional — present only when git opened a PR, omitted/replaced for a no-repo or failure. Next step is always `/sdd:scope`.
+- `/sdd:archive` — not an interview command; not bound by the interview-handoff template or `handoffWarningShown`. Closes and resets a finished cycle. Emits a one-line outcome (`Cycle v{N} archived to docs/archive/v{N}/.`) plus a two-line handoff to `/sdd:discovery` (`Run /clear, then /sdd:discovery to start the next cycle.`). A PR line (`PR opened: <url>.`) is conditional — present only when git opened a PR, omitted/replaced for a no-repo or failure. Next step is always `/sdd:discovery`.

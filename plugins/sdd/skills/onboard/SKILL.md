@@ -15,9 +15,23 @@ Read `skills/sdd-guide/SKILL.md` for shared behavior before executing this comma
 
 ## Prerequisites
 
-None. This is the first command in the SDD workflow.
+None beyond the GitHub gate below. This is the first command in the SDD workflow.
 
 ## Behavior
+
+### Step 0: GitHub Gate (hard block)
+
+GitHub is a hard dependency of the SDD workflow — `/sdd:build` creates issues, branches, and PRs, and `/sdd:resolve-pr` manages them. Verify both of the following before anything else:
+
+1. **A Git repository exists.** Run `git rev-parse --is-inside-work-tree` in the project directory.
+2. **`gh` is authenticated.** Run `gh auth status`.
+
+**If either check fails, hard-block.** This is a block, not a warning: do not continue onboarding, and tell the user that no SDD command — starting with `/sdd:discovery` — can proceed until the gate passes. Emit a clear remediation message naming exactly what failed:
+
+- No repository: "No Git repository found. Run `git init` (and connect a GitHub remote) first, then re-run `/sdd:onboard`."
+- `gh` unauthenticated or missing: "GitHub CLI is not authenticated. Run `gh auth login` first, then re-run `/sdd:onboard`."
+
+Only when both checks pass, continue to Step 1.
 
 ### Step 1: Check for Existing Profile
 
@@ -53,24 +67,21 @@ Output the following as plain text. This is NOT a question — do not wait for a
 
 SDD (Spec-Driven Development) is a structured, interview-driven process for planning and building software. Here's how it works:
 
-**Planning Phase:**
-- `/sdd:discovery` — Open exploration before structural decisions. Reads files placed in `docs/refs/` and runs an interview to capture "what is this?"
-- `/sdd:scope` — Defines the project boundary — what's in, what's out. We'll interview you, push back on vague thinking, and distill it into a clear project definition.
-- `/sdd:prd` — Translates your scope into precise, testable product requirements organized as user stories with acceptance criteria.
-- `/sdd:spec` — Designs the technical architecture: stack, file structure, data flow, testing strategy. Produces CLAUDE.md and AGENTS.md for AI agents to build from.
+**Planning:**
+- `/sdd:discovery` — The brainstorm-first entry point. Ingests whatever you have (text, images, audio in `docs/refs/` or pasted), interviews you from that material, and auto-drafts `docs/plan.md` — one document carrying intent, requirements, and architecture, with the AI's assumptions, gaps, and concerns tagged inline as markers.
+- `/sdd:refine` — Walks the markers in `plan.md` one at a time, resolves them with you in place, and finalizes the document (version `0.x` → `1.0`).
+- `/sdd:validate` (optional) — Offers an adversarial self-critique and reconciles external validation files dropped into `docs/validation/`, one difference at a time.
 
-**Sprint Loop:**
-- `/sdd:plan` — Pulls a logical batch of work from the PRD into a buildable sprint checklist with spec references and verification steps.
-- `/sdd:build` — Executes the sprint checklist. Supports step-by-step (one item per session) or autonomous (works through multiple items with checkpoints) modes. Closes the sprint in its wrap-up phase (PRD checkoff, story splitting, "anything notable?" beat).
-- `/sdd:polish` — Optional post-sprint cleanup. Bugs, features, UX improvements — scoped and appended to the sprint.
-- `/sdd:refine` — Runs unvetted PRD items through a compressed planning interview before the next sprint.
-
-Then loop back to `/sdd:plan` for the next cycle.
+**Build:**
+- `/sdd:prototype` — Builds a disposable HTML/CSS/JS prototype at `prototype/` with AI-authored navigation paths, so you can walk the product before the real build.
+- `/sdd:build` — Turns refined work into GitHub issues and runs the autonomous build-loop: one issue → one branch → one PR, each checked by a separate agent. Your PR review is the only gate — nothing auto-merges.
 
 **Project Close:**
-- `/sdd:retro` — Project-level retrospective across all sprints. Synthesizes what worked, what didn't, and how to improve. Captures cross-project patterns to your user profile.
+- `/sdd:retro` — Lists the lessons captured during the project for promotion, and reports timing and issue-queue status.
 
 **Anytime:**
+- `/sdd:checkpoint` — Prints a tailored `/compact` instruction string when context is getting long.
+- `/sdd:resolve-pr` — Works review feedback on build-loop PRs and cleans up branches of merged ones.
 - `/sdd:pause` and `/sdd:unpause` — Suspend and resume the current command across sessions.
 - `/sdd:feedback` — Quickly flag something the plugin could do better. Captures your note with context and returns immediately.
 
@@ -163,7 +174,7 @@ Write `~/.claude/sdd-user-profile.json` with the following schema:
 **Seed values for new v2 fields:**
 
 - `handoffWarningShown`: write the literal value `false` on profile creation. This flag is flipped to `true` later by the first interview command that emits a handoff warning to the user.
-- `defaultSprintMode`: write the literal value `null` on profile creation. (Omitting the field entirely is semantically equivalent to `null` per spec — either is acceptable.) This field can later be set to a user-chosen sprint mode by `/sdd:plan`.
+- `defaultSprintMode`: write the literal value `null` on profile creation. (Omitting the field entirely is semantically equivalent to `null` per spec — either is acceptable.) This is a legacy field from pre-v6 SDD versions; v6 has no sprint modes, but an existing value is preserved for older projects.
 
 **No-overwrite rule (seed-only-when-missing):**
 
@@ -172,7 +183,7 @@ When the profile **already exists** (the update flow from Step 1), do **not** ov
 Concretely:
 
 - If `handoffWarningShown: true` has been written by a downstream command (e.g., the first interview that emitted a handoff), **leave it as `true`**. Do not reset it to `false`.
-- If `defaultSprintMode` has been set to a value by `/sdd:plan` (e.g., `"step-by-step"` or `"autonomous"`), **leave that value in place**. Do not reset it to `null`.
+- If `defaultSprintMode` carries a value written by a pre-v6 SDD version (e.g., `"step-by-step"` or `"autonomous"`), **leave that value in place**. Do not reset it to `null`.
 - Only when a field is absent from the existing profile JSON does `/sdd:onboard` write the default (`false` or `null` respectively).
 
 This rule applies to both newly-created profiles (where all fields are absent and therefore all defaults are seeded) and to updates of existing profiles (where any already-present value wins over the default).
@@ -189,6 +200,6 @@ Then close with a heads-up that names `/sdd:discovery` as the recommended next c
 - The workflow explanation in step 2, the `/sdd:feedback` beat in step 5a, and the plugin update mechanics beat in step 5c are output text, not questions. Don't pause for acknowledgment on any of them.
 - For the update flow, surface current values from **both** `~/.claude/sdd-user-profile.json` (labeled `originally-onboarded`) and `~/.claude/sdd-cross-project-patterns.md` (labeled `retro-written`), then let the user pick which profile field to change. Cross-project patterns are read-only here — `/sdd:retro` owns that file.
 - If `~/.claude/sdd-cross-project-patterns.md` does not exist, **stay silent about it** — surface only the profile preferences. No warning, no empty section, no mention.
-- For `handoffWarningShown` and `defaultSprintMode`, follow the **seed-only-when-missing** rule: write the default (`false` / `null`) only when the field is absent. Never overwrite an existing value — downstream commands (`/sdd:plan`, the first handoff-emitting interview) own those fields after the seed.
+- For `handoffWarningShown` and `defaultSprintMode`, follow the **seed-only-when-missing** rule: write the default (`false` / `null`) only when the field is absent. Never overwrite an existing value — downstream writers (the first handoff-emitting interview; pre-v6 versions for `defaultSprintMode`) own those fields after the seed.
 - Accept any free-form answer for communication style — the examples are suggestions, not constraints.
 - If the user skips the `feedbackLocalPath` question in step 5b, omit the field (or write `null`) and do not re-ask in the same onboarding run.
