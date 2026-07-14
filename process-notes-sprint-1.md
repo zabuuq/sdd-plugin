@@ -118,3 +118,33 @@ prompting skipped (`docs/v2-verification.md` absent). No `plan-resume.md` to cle
 **Note on state file:** `docs/project-state.json` is still the v1 schema (with `currentSprint`/
 `buildMode`) — the v2 migration is Sprint 1 Item 1, not yet built. Set `currentSprint: 1` for the v5
 tooling running this build.
+
+
+## Sprint 1 wrap-up (close-sprint)
+
+### Decisions
+- Built inline (orchestrator-direct edits) rather than per-item subagents, per the maintainer's global preference for inline build work; per-item commits preserved the audit trail.
+- Adopted a group-branch workflow at the maintainer's direction: `v6` integration branch off `main`, five feature branches (foundations; discovery+refine; validate/prototype/lesson-capture/checkpoint; build/resolve-pr/retro/archive; remove-retired), one PR per group into `v6` (PRs #11-#15), human merge as the gate.
+- `references/context-loading.md` deleted (maintainer decision, 2026-07-13): each v6 SKILL carries its own Loading list, so the central table was redundant. Raised and resolved via docs/open-concerns.md.
+- `MIGRATION-v1-to-v2.md` deleted during item 28's sweep — entirely composed of instructions to run removed commands.
+- plugin.json bumped 3.2.0 -> 4.0.0 with a v6 description (clean break = major bump).
+- Item 1 migrated the live project-state.json to schema v2 mid-sprint (dogfood cost: a v5-style /sdd:build re-entry would have balked; accepted knowingly, sprint state carried in-session and in the sprint file).
+
+### Pushback
+- None of substance from either side; the maintainer redirected workflow (branching/PR structure) at sprint start and answered the context-loading.md question when asked.
+
+### Surprises
+- `deepening-rounds.md` had no between-rounds context-recommendation wiring left to trim — v3's efficiency pass had already removed it, making half of item 6 a no-op.
+- A commit-splitting script bug in group 2 (str.index matched an inline backticked mention instead of a heading) corrupted refine/SKILL.md; caught before push, both commits reset and rebuilt cleanly.
+- The five retired command directories survived `git rm -r` as empty dirs (untracked leftovers) and needed an explicit rmdir.
+
+### Notable (maintainer)
+- None reported at wrap-up.
+
+[close-sprint-manifest] timestamp: 2026-07-14T00:00:00Z
+- PRD ACs checked: fsch, fcek, fchn, fcas, ftpl, fgit, fgbl, ffea, ingm, ausd, invl, ingw, noin, dfsc, dfst, dfrq, draf, dnam, dasm, dgap, rwlk, rres, rlop, rnau, rcnt, rpsl, rfin, vopt, vslf, vscn, vbth, vdif, vkrc, pfid, pfps, pfsw, pweb, pnav, pcmp, pwal, plop, pfal, prvw, pmap, lcau, lcsp, lcsr, lcno, ckan, ckrd, ckpr, cknr, ckps, bgat, biss, blop, bchk, bmrg, bnod, bfan, rpvc, rpbh, brpf, rpst, rtls, rtpr, rtre, rttm, rtiq, rtdr, farc, frem
+- Story splits: (none)
+- Iteration candidate dispositions: (none)
+- Tech-debt entries: 0 (informational)
+- v2-verification rows updated: (none)
+[/close-sprint-manifest]
