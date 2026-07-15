@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "cycleNumber": 7,
-  "smallProject": null,
-  "lastCommand": "archive",
+  "cycleNumber": 6,
+  "smallProject": false,
+  "lastCommand": "/sdd:build",
   "settings": {
     "prototypeFidelity": null
   },
@@ -21,5 +21,5 @@
     "feedback": false,
     "archive": true
   },
-  "notes": "v7 cycle. Prior cycle archived to docs/archive/v6/."
+  "notes": "v6 cycle. Migrated to schema v2 during sprint 1 (2026-07-13): added settings, dropped currentSprint/buildMode, rekeyed commandExplanationsShown to the v6 command set."
 }
