@@ -19,9 +19,9 @@ Every item (a GitHub issue for `build`, a page for `prototype`) runs the same fi
 | | `build` (durable) | `prototype` (disposable) |
 |---|---|---|
 | Isolation | git worktree per item; agents fan out across issues in parallel | none — pages build in place under `prototype/` |
-| Output | one branch + one PR per issue | pages in `prototype/` |
+| Output | one branch + one PR per issue by default; issues sharing a GitHub milestone (opt-in) build under one branch + one PR for the milestone, closing every issue in the group | pages in `prototype/` |
 | On twice-failed item | **stop and surface** to the maintainer — no guessing past a failure | write a `[GAP: …]` marker into `plan.md` (per `references/markers.md`) and **continue** with the remaining pages |
-| PR/branch stamping | `sdd` label on the PR + branch prefix `sdd/<issue>-<slug>`, so `/sdd:resolve-pr` recognizes its own | n/a |
+| PR/branch stamping | `sdd` label on the PR + branch prefix `sdd/<issue>-<slug>` (per-issue) or `sdd/m<milestone>-<slug>` (grouped), so `/sdd:resolve-pr` recognizes its own | n/a |
 
 ## Shared rules
 
