@@ -42,7 +42,7 @@ Check if `~/.claude/sdd-user-profile.json` exists.
 - Read the file and announce: "I found an existing SDD profile."
 - Surface the user's current preferences from **two sources**, with each preference clearly **labeled by its origin** so the user can tell where it came from:
 
-  1. **From `~/.claude/sdd-user-profile.json`** — display every field present in the file, each tagged as **`originally-onboarded`** (the value was set during an `/sdd:onboard` run). Fields currently in scope: `communicationStyle`, `gitPreference`, `showWorkflowExplanation`, `feedbackLocalPath`, `handoffWarningShown`, `defaultSprintMode`. Skip any field that is absent from the file (don't display a placeholder).
+  1. **From `~/.claude/sdd-user-profile.json`** — display every field present in the file, each tagged as **`originally-onboarded`** (the value was set during an `/sdd:onboard` run). Fields currently in scope: `communicationStyle`, `gitPreference`, `showWorkflowExplanation`, `feedbackLocalPath`, `defaultSprintMode`. Skip any field that is absent from the file (don't display a placeholder). A legacy `handoffWarningShown` field may still be present in older profiles; it is inert (no command reads it) — display it if present, but never seed, write, or strip it.
   2. **From `~/.claude/sdd-cross-project-patterns.md`** — read the file as plain markdown and surface its high-level content (entry titles or one-line summaries — whatever is structurally available). Tag each surfaced item as **`retro-written`** (the pattern was written by `/sdd:retro`, not by onboarding).
 
   Use the literal label strings `originally-onboarded` and `retro-written` (or display them as "from your onboarding profile" / "from your cross-project retro patterns" — both phrasings are acceptable as long as the origin is unambiguous to the user).
@@ -50,7 +50,7 @@ Check if `~/.claude/sdd-user-profile.json` exists.
 - **Silent missing-file branch:** if `~/.claude/sdd-cross-project-patterns.md` does not exist (the user has never run `/sdd:retro`), **surface only the profile preferences and say nothing about the missing patterns file.** Do not emit a warning, do not emit a "no patterns yet" header, do not mention the file. The absence is invisible to the user.
 - **Read-only on cross-project patterns:** the update flow **never writes** to `~/.claude/sdd-cross-project-patterns.md`. That file is owned by `/sdd:retro`. The update flow only reads it for display, and only ever writes back to `~/.claude/sdd-user-profile.json`.
 - Ask which preference they'd like to update. The user can update any individual preference without re-answering everything. Only profile fields are editable here — cross-project retro patterns are surfaced for context but cannot be edited in this flow.
-- After updates, apply the **seed-only-when-missing rule** from Step 6 (see "No-overwrite rule" there) for `handoffWarningShown` and `defaultSprintMode`: if either field is already present in the existing profile, preserve its current value; only seed defaults for fields that are missing.
+- After updates, apply the **seed-only-when-missing rule** from Step 6 (see "No-overwrite rule" there) for `defaultSprintMode`: if the field is already present in the existing profile, preserve its current value; only seed the default when it is missing.
 - Write the file back with the updated `updatedAt` timestamp.
 - Done — skip steps 2-6.
 
@@ -166,25 +166,25 @@ Write `~/.claude/sdd-user-profile.json` with the following schema:
   "gitPreference": <true or false>,
   "showWorkflowExplanation": <true or false>,
   "feedbackLocalPath": "<absolute path or null>",
-  "handoffWarningShown": false,
   "defaultSprintMode": null
 }
 ```
 
 **Seed values for new v2 fields:**
 
-- `handoffWarningShown`: write the literal value `false` on profile creation. This flag is flipped to `true` later by the first interview command that emits a handoff warning to the user.
 - `defaultSprintMode`: write the literal value `null` on profile creation. (Omitting the field entirely is semantically equivalent to `null` per spec — either is acceptable.) This is a legacy field from pre-v6 SDD versions; v6 has no sprint modes, but an existing value is preserved for older projects.
+
+`handoffWarningShown` is **retired** — `/sdd:onboard` no longer seeds it and no command reads or flips it. A stray `handoffWarningShown` in an older profile is inert data: leave it untouched (no migration strips it) and it never errors.
 
 **No-overwrite rule (seed-only-when-missing):**
 
-When the profile **already exists** (the update flow from Step 1), do **not** overwrite `handoffWarningShown` or `defaultSprintMode` if they are already present in the file with any value. Seed defaults **only when the field is missing**.
+When the profile **already exists** (the update flow from Step 1), do **not** overwrite `defaultSprintMode` if it is already present in the file with any value. Seed the default **only when the field is missing**.
 
 Concretely:
 
-- If `handoffWarningShown: true` has been written by a downstream command (e.g., the first interview that emitted a handoff), **leave it as `true`**. Do not reset it to `false`.
 - If `defaultSprintMode` carries a value written by a pre-v6 SDD version (e.g., `"step-by-step"` or `"autonomous"`), **leave that value in place**. Do not reset it to `null`.
-- Only when a field is absent from the existing profile JSON does `/sdd:onboard` write the default (`false` or `null` respectively).
+- Only when the field is absent from the existing profile JSON does `/sdd:onboard` write the default (`null`).
+- A stray `handoffWarningShown` is left exactly as-is — onboard neither seeds nor strips it.
 
 This rule applies to both newly-created profiles (where all fields are absent and therefore all defaults are seeded) and to updates of existing profiles (where any already-present value wins over the default).
 
@@ -200,6 +200,6 @@ Then close with a heads-up that names `/sdd:discovery` as the recommended next c
 - The workflow explanation in step 2, the `/sdd:feedback` beat in step 5a, and the plugin update mechanics beat in step 5c are output text, not questions. Don't pause for acknowledgment on any of them.
 - For the update flow, surface current values from **both** `~/.claude/sdd-user-profile.json` (labeled `originally-onboarded`) and `~/.claude/sdd-cross-project-patterns.md` (labeled `retro-written`), then let the user pick which profile field to change. Cross-project patterns are read-only here — `/sdd:retro` owns that file.
 - If `~/.claude/sdd-cross-project-patterns.md` does not exist, **stay silent about it** — surface only the profile preferences. No warning, no empty section, no mention.
-- For `handoffWarningShown` and `defaultSprintMode`, follow the **seed-only-when-missing** rule: write the default (`false` / `null`) only when the field is absent. Never overwrite an existing value — downstream writers (the first handoff-emitting interview; pre-v6 versions for `defaultSprintMode`) own those fields after the seed.
+- For `defaultSprintMode`, follow the **seed-only-when-missing** rule: write the default (`null`) only when the field is absent. Never overwrite an existing value — pre-v6 versions own that field after the seed. `handoffWarningShown` is retired: never seed, write, or strip it.
 - Accept any free-form answer for communication style — the examples are suggestions, not constraints.
 - If the user skips the `feedbackLocalPath` question in step 5b, omit the field (or write `null`) and do not re-ask in the same onboarding run.

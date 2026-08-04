@@ -17,8 +17,8 @@
 ### [Epic]
 
 - As [who], I want [what], so [why].
-  - [ ] `abcd` — [Testable acceptance criterion.]
-  - [ ] `efgh` — [Testable acceptance criterion.]
+  - `abcd` — [Testable acceptance criterion.]
+  - `efgh` — [Testable acceptance criterion.]
 
 ## Architecture
 
