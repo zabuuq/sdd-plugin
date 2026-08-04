@@ -25,7 +25,7 @@ All other documents (process notes, `docs/retro.md`, archive contents) are appen
 | `smallProject` | boolean / null | Right-sizing judgment for the current cycle. Stays top-level: machine-owned, AI-derived — not a user setting. |
 | `lastCommand` | string | Most recent command to run (see `## State Tracking` in `SKILL.md`). |
 | `settings` | object | **Persisted user choices.** Seeded `{ "prototypeFidelity": null }`; `prototypeFidelity` is `"hifi"`, `"lofi"`, or `null` (not yet asked). Written by the command that asks the choice; carried across cycles. |
-| `commandExplanationsShown` | object | Per-command booleans gating the once-per-project explanation blurb (see `## Command Explanations` in `SKILL.md`). Keys are the v6 command set: `discovery`, `refine`, `validate`, `prototype`, `build`, `retro`, `checkpoint`, `resolve-pr`, `onboard`, `pause`, `unpause`, `feedback`, `archive`. |
+| `commandExplanationsShown` | object | Per-command booleans gating the once-per-project explanation blurb (see `## Command Explanations` in `SKILL.md`). Keys are the v6 command set: `discovery`, `refine`, `validate`, `prototype`, `build`, `retro`, `checkpoint`, `resolve-pr`, `onboard`, `pause`, `unpause`, `feedback`, `archive`, `amend`. A state file missing the `amend` key treats amend as not-yet-explained (no migration needed). |
 | `notes` | string | Free-text seed line naming the cycle. |
 
 Schema v2 (v6) **dropped** the v1 fields `currentSprint` and `buildMode` — both were sprint-machinery state; v6 has no sprint documents and build is always autonomous. Maturity of `docs/plan.md` lives only in that document's in-file version line, never duplicated into state.
@@ -55,7 +55,7 @@ The reset must leave `project-state.json` a valid, parseable JSON file. The drop
 The reset normalizes the object to the current command set:
 
 - **Drop stale legacy keys** (any key not in the v6 command set — e.g. `scope`, `prd`, `spec`, `plan`, `polish`, `sprint`, `iterate`, `reflect`).
-- **Ensure every v6 key exists:** `discovery`, `refine`, `validate`, `prototype`, `build`, `retro`, `checkpoint`, `resolve-pr`, `onboard`, `pause`, `unpause`, `feedback`, `archive`.
+- **Ensure every v6 key exists:** `discovery`, `refine`, `validate`, `prototype`, `build`, `retro`, `checkpoint`, `resolve-pr`, `onboard`, `pause`, `unpause`, `feedback`, `archive`, `amend`.
 - Flip every key to `false` **except `archive`**, whose value is preserved (the archive blurb is once-per-project, not once-per-cycle).
 
 ### Never-swept carry-forward set

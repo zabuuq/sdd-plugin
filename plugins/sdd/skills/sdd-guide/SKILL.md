@@ -96,11 +96,15 @@ The standard project flow is:
 
 `/sdd:validate` is optional: the flow proceeds from `/sdd:refine` to `/sdd:prototype` whether or not it ran. Running it is the user's choice.
 
+`/sdd:prototype` is optional too: `/sdd:refine` can hand straight to `/sdd:build`. Prototyping is the user's call — a modification job (say, text edits to a working site) may not need one — and no command, handoff, or doc treats the prototype as a required step in the chain.
+
 `/sdd:retro` closes the project.
 
 `/sdd:feedback` runs anytime, independent of the chain.
 
 `/sdd:checkpoint` and `/sdd:resolve-pr` are anytime utilities, independent of the chain. `/sdd:checkpoint` emits a tailored `/compact` instruction string; `/sdd:resolve-pr` handles PR feedback and branch hygiene for build-loop PRs.
+
+`/sdd:amend` is an anytime utility too, independent of the chain. It appends new items to an existing `docs/plan.md` (any version, draft or finalized), bumps the version a single minor point, and hands off to `/sdd:refine` so the added markers get walked. Its only precondition is an existing `docs/plan.md`; it is not a fixed step in the linear chain.
 
 `/sdd:pause` and `/sdd:unpause` are anytime utilities, independent of the chain. They suspend and resume the current command without altering chain position.
 
@@ -112,7 +116,7 @@ Each command outputs a brief purpose explanation on its first run within a proje
 
 - Tracked in `docs/project-state.json` under the `commandExplanationsShown` object (keyed by command name, value is boolean).
 - Not gated — the explanation is plain text the user scrolls past. It does not require acknowledgment or confirmation.
-- For commands that run multiple times (`/sdd:refine`, `/sdd:validate`, `/sdd:prototype`, `/sdd:build`), the explanation only shows on the very first invocation in the project. Subsequent runs skip it.
+- For commands that run multiple times (`/sdd:refine`, `/sdd:validate`, `/sdd:prototype`, `/sdd:build`, `/sdd:amend`), the explanation only shows on the very first invocation in the project. Subsequent runs skip it.
 - If `commandExplanationsShown` does not exist in `project-state.json`, treat all commands as not yet explained.
 
 ## Process Notes
@@ -166,20 +170,10 @@ Every interview command emits a handoff message unconditionally at completion. I
 ```
 [One-line outcome summary, e.g., "Spec generated."]
 
-Run `/clear`, then `/sdd:[next-command]` to continue.
+Run `/sdd:[next-command]` to continue.
 ```
 
-**First-handoff explanation (prepended once per user, then never again):**
-
-```
-Heads-up: `/clear` wipes this conversation window so the next command starts fresh.
-Your work is safe in `docs/` and process-notes files — only the chat scrollback gets
-cleared. This handoff fires after every interview command from now on.
-
-[standard form follows]
-```
-
-Tracked via `handoffWarningShown` in `~/.claude/sdd-user-profile.json`. Seeded `false` by `/sdd:onboard`, flipped `true` by the first interview command that emits a handoff. Cross-project, one-time-per-user — once a user has seen the explanation in any project, it never appears again.
+The handoff says nothing about context management — no `/clear` instruction, no first-run explanation block. `/sdd:checkpoint` remains the on-demand context tool for when the user wants it.
 
 **Next-command map:**
 
@@ -189,6 +183,7 @@ Tracked via `handoffWarningShown` in `~/.claude/sdd-user-profile.json`. Seeded `
 | `/sdd:discovery` | `/sdd:refine` |
 | `/sdd:refine` | `/sdd:prototype` |
 | `/sdd:validate` | `/sdd:prototype` |
+| `/sdd:amend` | `/sdd:refine` |
 
 `/sdd:refine`'s handoff names `/sdd:prototype`; it may note that `/sdd:validate` is available first, but the chain proceeds either way.
 
@@ -199,7 +194,8 @@ Tracked via `handoffWarningShown` in `~/.claude/sdd-user-profile.json`. Seeded `
 - `/sdd:retro` — terminal. Emits `Project closed.` plus a brief pointer to cross-project pattern capture. No `/clear` instruction and no next-command line.
 - `/sdd:checkpoint` — emits no handoff. Prints a `/compact <instructions>` string and returns.
 - `/sdd:resolve-pr` — emits no handoff. Anytime PR hygiene and feedback resolution; reports what it did and returns.
+- `/sdd:amend` — not a chain command. Anytime utility: appends items to an existing `docs/plan.md`, bumps the version a single minor point, and emits the standard handoff form pointing at `/sdd:refine` (per the next-command map above).
 - `/sdd:pause` — emits the PRD-required line `Paused. Run /sdd:unpause to resume.` Overrides the normal handoff template.
 - `/sdd:unpause` — emits no separate handoff. The resumed command emits its normal handoff at its own completion.
 - `/sdd:feedback` — emits no handoff (instant-return per PRD).
-- `/sdd:archive` — not an interview command; not bound by the interview-handoff template or `handoffWarningShown`. Closes and resets a finished cycle. Emits a one-line outcome (`Cycle v{N} archived to docs/archive/v{N}/.`) plus a two-line handoff to `/sdd:discovery` (`Run /clear, then /sdd:discovery to start the next cycle.`). A PR line (`PR opened: <url>.`) is conditional — present only when git opened a PR, omitted/replaced for a no-repo or failure. Next step is always `/sdd:discovery`.
+- `/sdd:archive` — not an interview command; not bound by the interview-handoff template. Closes and resets a finished cycle. Emits a one-line outcome (`Cycle v{N} archived to docs/archive/v{N}/.`) plus a two-line handoff to `/sdd:discovery` (`Run /clear, then /sdd:discovery to start the next cycle.`). A PR line (`PR opened: <url>.`) is conditional — present only when git opened a PR, omitted/replaced for a no-repo or failure. Next step is always `/sdd:discovery`.

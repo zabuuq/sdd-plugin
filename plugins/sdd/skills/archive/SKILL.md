@@ -378,7 +378,7 @@ The inert cases, mapped to their acceptance criteria:
 
 ## Handoff
 
-After Git Integration finishes (whether it opened a PR, skipped git for a non-repo, or stopped at a git failure), emit the completion handoff. `/sdd:archive` is out-of-pattern — it is not an interview command — so it does **not** use the interview-handoff template and does **not** touch `handoffWarningShown`. Emit a one-line outcome plus a two-line handoff pointing at `/sdd:discovery`:
+After Git Integration finishes (whether it opened a PR, skipped git for a non-repo, or stopped at a git failure), emit the completion handoff. `/sdd:archive` is out-of-pattern — it is not an interview command — so it does **not** use the interview-handoff template. Emit a one-line outcome plus a two-line handoff pointing at `/sdd:discovery`:
 
 ```
 Cycle v{N} archived to docs/archive/v{N}/. PR opened: <url>.

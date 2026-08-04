@@ -12,6 +12,15 @@ Project context, architecture decisions, and conventions for any AI agent or dev
 
 **What problem it solves:** ad-hoc prompting works for small tasks but breaks down on multi-week projects. SDD provides scaffolding — a known sequence, shared artifacts, and predictable interaction patterns — so multi-session, multi-sprint work stays coherent.
 
+## Versioning: two separate schemes
+
+The plugin carries **two version numbers that measure different things and are not meant to match**:
+
+- **`plugin.json` semver (`4.x`)** — the published plugin version, what Claude Code shows when the plugin is installed. This is what "version 4" refers to. It bumps on release (e.g. `4.0.0 → 4.1.0` for a tweak pass).
+- **`project-state.json` `cycleNumber` (an integer, e.g. `7`)** — an internal dev-loop counter owned solely by `/sdd:archive`, tracking how many times the plugin has been developed against itself. It has nothing to do with the published version.
+
+They diverged early and stay separate **by design**. Collapsing them would force a semver judgment at every archive and couple release numbering to internal dev loops. No machinery keeps them in sync: `cycleNumber`, the `docs/archive/v{N}/` numbering, and `/sdd:archive` are untouched. When in doubt, "version N" means the plugin semver. (`CLAUDE.md` needs no separate note — it imports this file via `@AGENTS.md`.)
+
 ## Current cycle (v6)
 
 v6 is a **clean-break rewrite of SDD's front end** into a brainstorm-first, single-document flow — the largest change since v1. It replaces the four-document planning chain (`scope → prd → spec`) and the old plan/polish machinery with **six chain commands** (`discovery → refine → validate → prototype → build → retro`, with `validate` optional) plus anytime utilities (`checkpoint`, `resolve-pr`). Audience unchanged: Jason solo, no external users, no backward compatibility — which is what makes a clean break acceptable.

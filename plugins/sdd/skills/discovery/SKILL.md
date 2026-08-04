@@ -101,7 +101,7 @@ Once the user accepts the close-recommendation at the end of the interview, prod
 
 - Use `skills/sdd-guide/templates/plan-template.md` as the schema; keep its section order (`Overview`, `Goals & Success`, `Requirements`, `Architecture`, `Key Decisions`, `Non-Goals`).
 - The file is `docs/plan.md` **from creation** — never `plan-draft.md`, never a versioned sibling. Draft status lives only in the version line: write `**Version:** 0.1` at the top. The major digit `0` *is* the draft marker; a re-draft in the same maturity bumps the minor (`0.2`).
-- Requirements are epic-grouped stories with acceptance criteria carrying stable 4-char lowercase alphabetic IDs in inline backticks, assigned at write time. `/sdd:build` later lifts issues from these ACs by ID — the document owns them.
+- Requirements are epic-grouped stories with acceptance criteria carrying stable 4-char lowercase alphabetic IDs in inline backticks, assigned at write time. Write each AC as a plain list item — `` - `abcd` — <criterion> `` — with no `[ ]` checkbox. `/sdd:build` later lifts issues from these ACs by ID — the document owns them.
 
 ### Inline markers
 
@@ -131,4 +131,4 @@ Per sdd-guide's `## Process Notes` section, append to `process-notes-discovery.m
 
 Runs as the final step after the auto-draft is written.
 
-Emit the handoff per the canonical template in `skills/sdd-guide/SKILL.md > ## End-of-Command Handoff`, including the first-handoff explanation and `handoffWarningShown` tracking. The `[next-command]` slot is always `/sdd:refine`. Outcome-summary line: `Plan drafted at Version 0.1.` The handoff fires unconditionally at completion.
+Emit the handoff per the canonical template in `skills/sdd-guide/SKILL.md > ## End-of-Command Handoff`. The `[next-command]` slot is always `/sdd:refine`. Outcome-summary line: `Plan drafted at Version 0.1.` The handoff fires unconditionally at completion.
