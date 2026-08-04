@@ -34,7 +34,8 @@ Appending a `PROPOSED` clause never counts as resolution. The marker stays until
 - Resolve first → replace the marked span in place with settled content → strip the marker, leaving no breadcrumb → re-scan → repeat.
 - A marker added mid-loop (including a `prototype` `[GAP]`) is caught on a later re-scan.
 - **Hard constraint:** the AI never strips a marker on its own; a marker is removed only through explicit user resolution. No silent closures.
-- **Nothing is force-decided at any level, including prototype.** An item that genuinely can't be settled stays tagged and carries forward indefinitely. The AI may append a `PROPOSED` solution but must keep the marker.
+- **Carry-forward is the maintainer's call.** A marker is left tagged (deferred to a later command) only when the maintainer explicitly decides it can't be resolved yet. The AI never initiates deferral on its own judgment — not because a discussion stalls without a ruling, not because the item looks like it depends on something downstream, not as cleanup. The AI attempts every marker; only the maintainer shelves one. (These AI-initiated conditions are not independent grounds for the AI to defer.)
+- **Nothing is force-decided at any level, including prototype.** An item the maintainer decides can't be settled stays tagged and carries forward indefinitely. The AI may append a `PROPOSED` solution but must keep the marker.
 
 ## Writers and resolvers
 

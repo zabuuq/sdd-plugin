@@ -46,9 +46,11 @@ For each marker:
 
 **Never auto-remove.** The AI never strips a marker on its own initiative — not for staleness, not because it seems settled by a nearby resolution, not as cleanup. A marker is removed only through explicit user resolution of that marker. No silent closures.
 
+**Attempt every marker.** The walk attempts a genuine resolution of every marker in document order. The AI never skips a marker or sets one aside on its own judgment — each marker is worked with the maintainer until the maintainer resolves it or the maintainer explicitly decides to carry it forward (Step 2). Reaching for carry-forward is never the AI's move to make.
+
 ## Step 2: Carry-Forward
 
-Not every marker resolves during refine. When one can't be settled — the user doesn't know yet, the decision depends on something downstream, the discussion stalls without a ruling — **leave it tagged in the document**. It carries forward to `/sdd:prototype` (and beyond) as-is; unresolved markers are a normal end state, not a failure. Nothing is force-decided.
+Not every marker resolves during refine — but carry-forward is **the maintainer's call, never the AI's**. A marker is left tagged only when the maintainer explicitly decides it can't be settled yet (they don't know the answer, or they rule that it should wait). The AI never initiates carry-forward on its own judgment: not because a discussion stalls without a ruling, not because the decision looks like it depends on something downstream, not as cleanup. Those are not grounds for the AI to defer — the AI keeps attempting the marker until the maintainer resolves it or the maintainer chooses to shelve it. When the maintainer makes that call, **leave the marker tagged in the document**; it carries forward to `/sdd:prototype` (and beyond) as-is. Unresolved markers the maintainer chose to carry are a normal end state, not a failure. Nothing is force-decided.
 
 The AI may append a **proposed solution** to an unresolved marker using the `PROPOSED` form from `references/markers.md`:
 
@@ -56,7 +58,7 @@ The AI may append a **proposed solution** to an unresolved marker using the `PRO
 [GAP g2: the plan doesn't say how sessions expire — PROPOSED: default to a 30-day idle window]
 ```
 
-The proposal rides inside the marker; the marker stays in place. Appending a proposal is never resolution — only the user's explicit decision resolves and strips. When the user later accepts a proposal, that acceptance is the explicit resolution: apply it in place and strip per Step 1's rules.
+The proposal rides inside the marker; the marker stays in place. Offering a `PROPOSED` clause is never resolution and never substitutes for attempting resolution with the maintainer — the walk still works the marker, and the proposal never shelves it. Only the user's explicit decision resolves and strips. When the user later accepts a proposal, that acceptance is the explicit resolution: apply it in place and strip per Step 1's rules.
 
 Before finalizing, tell the user which markers remain tagged so carrying them forward is a choice, not an accident.
 
@@ -75,4 +77,4 @@ Per sdd-guide's `## Process Notes` section, append to `process-notes-refine.md` 
 
 ## End-of-Command Handoff
 
-Runs after finalize completes. Emit the handoff per the canonical template in `skills/sdd-guide/SKILL.md > ## End-of-Command Handoff`. The `[next-command]` slot is `/sdd:prototype`; the handoff may note that `/sdd:validate` is available first (optional — the chain proceeds either way). Outcome-summary line: `Plan finalized at 1.0.` (adjust the version to what was written). The handoff fires unconditionally at completion.
+Runs after finalize completes. Emit the handoff per the canonical template in `skills/sdd-guide/SKILL.md > ## End-of-Command Handoff`, and **present the prototype as optional**: name both "prototype it" and "go straight to build" as valid next steps rather than nudging toward prototype. The `[next-command]` slot names `/sdd:prototype`, but the handoff states plainly that going straight to `/sdd:build` is an equally valid path — a modification job may not need a prototype at all — and that `/sdd:validate` is available first. The chain proceeds either way. Outcome-summary line: `Plan finalized at 1.0.` (adjust the version to what was written). The handoff fires unconditionally at completion.
