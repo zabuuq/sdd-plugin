@@ -26,6 +26,17 @@ Update `lastCommand` in `docs/project-state.json` to `"/sdd:prototype"` before a
 
 `docs/plan.md` must exist. If it does not, stop immediately and output: "Run `/sdd:discovery` first." Do not proceed.
 
+## Progress-Aware Startup (detect and auto-advance)
+
+Before building anything, detect an existing prototype so a re-run never rebuilds from scratch.
+
+- **Detect the prototype.** When `prototype/` already holds built pages, do not rebuild them wholesale — auto-advance toward the review.
+- **Version stamp.** `/sdd:prototype` records the `docs/plan.md` version it built against as a line in `prototype/navigation-paths.md` (e.g. `Built against plan version: 1.2`). Use it to decide what a re-run must do:
+  - **Some pages are missing** → build only the missing pages, then proceed to review.
+  - **The current `plan.md` version is newer than the recorded one** → auto-rebuild only the pages affected by the changed plan sections (no prompt), then proceed to review.
+  - **The recorded version matches the current plan and all pages exist** → auto-advance straight to the review without rebuilding.
+- **Silent.** Like `/sdd:build`, this detect-and-auto-advance is silent — no "rebuild, resume, or start over?" prompt. Auto-advance is a `build`/`prototype`-only behavior; `discovery`, `refine`, and `validate` resume through the live document or `/sdd:pause` instead.
+
 ## Step 1: Fidelity (persisted)
 
 Read `settings.prototypeFidelity` from `docs/project-state.json`.
@@ -46,6 +57,7 @@ Read `settings.prototypeFidelity` from `docs/project-state.json`.
 - Author the navigation path(s) — the ordered walk-throughs a reviewer follows to experience the product — **from `docs/plan.md` and nothing else**. Not from the prototype code as built, not from generic UX patterns: the paths express what the plan says the product does, so walking them tests the plan.
 - Produce one or more paths as the plan warrants (e.g. a core flow plus secondary flows).
 - Write the paths to a **companion file `prototype/navigation-paths.md`** — never into `plan.md`. Each path lists its steps: start page, action, expected next page/state.
+- Record the plan version built against as the first line of `prototype/navigation-paths.md` (e.g. `Built against plan version: 1.2`), so a later `/sdd:prototype` run can tell whether the prototype is current — see Progress-Aware Startup.
 - **Surface the paths to the maintainer** when the build completes: name the companion file and give the one-line gist of each path so the review can start immediately.
 
 ## Step 3: Loop, Review, and Issue Map
@@ -56,9 +68,20 @@ Build the pages with the vendored loop skeleton from `references/build-loop.md`,
 
 **On a twice-failed page:** write a `[GAP: …]` marker into `docs/plan.md` per `references/markers.md`, placed in the section the page implements and naming what couldn't be built and why — then **continue building the remaining pages**. The prototype loop never halts on a failed page; a too-complex page is information about the plan, and the gap resurfaces in the review below and in the next `/sdd:refine` scan. (A `[GAP]` write pre-validate bumps the plan's minor version, e.g. `1.0 → 1.1`.)
 
-### Prototype review
+### Prototype review — Phase A (AI review)
 
-When the loop finishes, walk **each page along the navigation paths** from `prototype/navigation-paths.md` and check it against `docs/plan.md`: does the page do what the plan says at that step? Report per-path results to the maintainer — what matches, what diverges, and where `[GAP]` markers were written. The review is the command's deliverable as much as the pages are.
+When the loop finishes, the AI walks **each page along the navigation paths** from `prototype/navigation-paths.md` and checks it against `docs/plan.md`: does the page do what the plan says at that step? Report per-path results to the maintainer — what matches, what diverges, and where `[GAP]` markers were written. This AI-driven review runs first and is unchanged from before.
+
+### Prototype review — Phase B (interactive walkthrough)
+
+After Phase A, the AI walks the maintainer through the prototype so lived-experience issues surface and get fixed on the spot.
+
+- **Step the maintainer through each navigation path**, one step per turn: name the page, the action to take, and the expected next page/state. The maintainer reports **pass**, **fail**, or **change-wanted** for that step before the walk moves on.
+- **Fix flagged issues live.** When the maintainer flags a fail or a change, fix it in the prototype immediately — before the walk continues. Prototype fixes are in-place edits under `prototype/`; no branches, no PRs.
+- **Re-walk to confirm.** After a live fix, re-walk the affected path or restart the affected step so the fix is verified in place before moving on.
+- **Both fidelities.** Phase B runs for hi-fi and lo-fi alike: hi-fi the maintainer clicks through the pages; lo-fi the AI steps through the screens in order and the maintainer confirms by eye. Live fixes and re-walk-to-confirm work identically either way.
+
+The review — both phases — is the command's deliverable as much as the pages are.
 
 ### Optional: page→issue map
 
