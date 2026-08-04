@@ -31,6 +31,18 @@ Update `lastCommand` in `docs/project-state.json` to `"/sdd:build"` before any o
 - `docs/plan.md` must exist with version major `≥ 1` (finalized). If missing: "Run `/sdd:discovery` first." If still at major `0`: "Run `/sdd:refine` first."
 - The GitHub gate must hold: a Git repository and an authenticated `gh`. On failure: "GitHub gate failed. Run `/sdd:onboard` to fix it." Stop; this is a block.
 
+**The prototype is not a prerequisite.** `refine → build` is a supported, first-class path — build's only chain prerequisite is `docs/plan.md` at version `≥ 1.0`. A prototype may or may not exist; build never requires one, never checks for one, and no wording here implies prototyping is a required step. Skipping the prototype takes no extra interview, confirmation, or gate: the maintainer skips it by running `/sdd:build`.
+
+## Progress-Aware Startup (detect and auto-advance)
+
+Before proposing any issue, detect work already done so a re-run never duplicates it.
+
+- **Detect existing issues.** Query open `sdd`-labeled issues in the repo and read their bodies for referenced AC IDs (the link-back stamped at creation). A plan item counts as *already an issue* when an open `sdd`-labeled issue references that item's AC ID(s) in its body. Detection is the `sdd` label **plus** an AC-ID match — never title similarity.
+- **Auto-advance, silently.** When issues already exist for the plan, skip re-creating them and go straight to the build loop. Do not prompt "resume, skip, or start over?" — the detect-and-auto-advance is silent. Propose new issues only for genuinely new plan items that have no matching `sdd`-labeled issue yet.
+- **Scope.** Detect-and-auto-advance is a `build`- and `prototype`-only behavior. `discovery`, `refine`, and `validate` are not given artifact-detection auto-advance: refine and validate resume through the live `plan.md`; discovery resumes through `/sdd:pause` → `/sdd:unpause`.
+
+Auto-advance suppresses only the re-create prompt. It does **not** suppress the optional milestone-grouping offer described in Step 2 — on a re-run the maintainer still gets a skippable chance to group issues before the loop starts.
+
 ## Step 1: Issues from Refined Work
 
 Build agents work **GitHub issues**, and issues come only from **refined work** — content that lives in `docs/plan.md` (settled requirements with ACs). The pipeline is: idea → refined into `plan.md` → issue → build.
@@ -51,7 +63,7 @@ A refined item (a story or coherent slice of `plan.md`'s Requirements) becomes o
 
 Use `gh issue create`. If `prototype/issue-map.md` exists, offer it as the starting queue — each row is a candidate issue — but every issue still carries the five parts lifted from `plan.md`.
 
-Before creating issues, show the user the proposed issue list (titles + AC IDs) and confirm once; then create them.
+Before creating issues, show the user the proposed issue list (titles + AC IDs) and confirm once; then create them. At this confirm step the maintainer may optionally assign issues to a GitHub milestone to group them for the loop (see Step 2's milestone grouping) — this is offered but never required.
 
 ## Step 2: Build-Loop
 
@@ -59,7 +71,16 @@ Run the vendored loop skeleton from `references/build-loop.md` with its **build 
 
 ### One issue → one branch → one PR
 
-Each issue maps to exactly one branch and one pull request. No batching several issues into a branch, no splitting one issue across PRs. The PR closes the loop for its issue (`Closes #N` in the body).
+Each issue maps to exactly one branch and one pull request. No batching several issues into a branch, no splitting one issue across PRs. The PR closes the loop for its issue (`Closes #N` in the body). This is the default and holds whenever no milestone grouping is declared.
+
+### Milestone grouping (opt-in)
+
+Grouping is opt-in per run and uses GitHub-native milestones. It never changes the default above unless the maintainer asks for it.
+
+- **Default unchanged.** With no milestone assignments on the issues, every issue builds as its own branch and PR, exactly as above.
+- **Grouped build.** Issues sharing a GitHub milestone build together under **one branch and one PR** for that milestone; that PR closes every issue in the group (a `Closes #N` line per issue). `build` groups by whatever milestone assignments exist on the issues **at loop time** — so the maintainer can assign milestones at the Step 1 issue-confirm step on a fresh run, or on a later re-run before the loop starts.
+- **Stamping holds.** A milestone branch uses an `sdd/`-prefixed name (e.g. `sdd/m3-<milestone-slug>`) and its PR carries the `sdd` label — the same stamping convention as per-issue branches/PRs, so `/sdd:resolve-pr` recognizes milestone output too.
+- **Never forced.** The maintainer is not required to define milestones and is not prompted to when they don't want them. On a re-run the chance to assign milestones before building is offered but skippable — this offer is distinct from the silent creation auto-advance (which suppresses only the re-create prompt, not this grouping opportunity).
 
 ### Stamping convention
 
