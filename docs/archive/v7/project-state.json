@@ -1,11 +1,11 @@
 {
   "version": 2,
-  "cycleNumber": 8,
+  "cycleNumber": 7,
   "smallProject": null,
+  "lastCommand": "/sdd:retro",
   "settings": {
     "prototypeFidelity": null
   },
-  "lastCommand": "archive",
   "commandExplanationsShown": {
     "discovery": false,
     "refine": false,
@@ -21,5 +21,5 @@
     "feedback": false,
     "archive": true
   },
-  "notes": "v8 cycle. Prior cycle archived to docs/archive/v7/."
+  "notes": "v7 cycle. Prior cycle archived to docs/archive/v6/."
 }
