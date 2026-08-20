@@ -1,0 +1,44 @@
+I am really fucking pissed right now. I went through this process with you in the last version and it seems like major chunks of what we talked about are missing.
+There was supposed to be a whole section on going through the prototype, walking through the happy path that you've created, and making sure that they're correct and refining that.
+But that seems to be missing from it in a project that I'm working.
+I don't know what the fuck is going on.
+All right, this is the way I see it.
+We start with oddboarding.
+That's fine.
+We go through the discovery, which I give you a bunch of documents or recordings.
+You take those and you ask me questions.
+If I don't give you any documents or recordings, you just simply ask me questions like we did before.
+From there, we create our draft.
+document. I think that process is good, but please double check it because at this point, I'm so,
+things are so fucked up. I don't know what's going on. We then go through a refinement of that
+document where I answer your gaps that you find or the concerns that you have, things that you've put
+into that draft document. The result of that refinement.
+is a version one of this document.
+After that, I can run it through a validation, which would either you or a third party would be doing the validation,
+and you would then look through the documents created from that validation and run me through
+another series of interviews, which, by the way, that's the way refinement was supposed to work, too,
+series of interviews.
+You would run me through it through it.
+series of interviews for the validation, and then we would come up with the next version of
+this. Now, the validation can be skipped. It's not required. Now, so far as I know, that's working,
+but again, I don't know. I haven't actually tried that one yet on a project. After the validation,
+then we run the prototype. You create the prototype. From the prototype, you have a happy
+path that you've created, one or multiple, and then we go through that.
+together where you step me through what I'm supposed to be clicking on, and I tell you whether or not
+it worked or not or whether I want changes at that step. After that, then we make any other further
+updates to the document that we need to, and you take that document and what we went through with the
+prototype, and we create the skills. This is, and that skills, I'm sorry, we create the issues in GitHub.
+Now, this is where I'm not skills. I'm sorry, we create the issues in GitHub. Now, this is where I'm
+not sure where this is going, and I've already asked you that question, we're supposed to go through
+that, this iteration. Once we've created those issues, and I've approved that those issues have
+been made, and I don't have any extra issues that need to be added, then we run the build loop
+where you loop through the issues in groups of milestones, pushing that each issue up to the
+repository as you created it into a separate branch. The branch would be about the milestone. So
+before the milestone, once you're done with your milestone, then you would do a PR back, I think,
+unless we decided that we're going to do it per issue, which is fine. But, you know, do you need to
+figure that part out too. Once we're through that loop and I sign off on the whole thing, then we're
+we're done. And one of the things that I'm wanting to work with you here to make some further
+updates is so that we can come back through and do this discovery stuff all over again, but not
+necessarily need to run the prototype because not don't need to run a prototype every single time
+I'm doing something. So we're making the prototype optional. But I'm just, I'm so frustrated with this
+whole process right now. I really need to get this right.
