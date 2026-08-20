@@ -67,3 +67,26 @@ Deferred items surfaced during planning. Each entry is fully self-contained so i
 - **Source:** /sdd:spec — v6, build/resolve-pr design — PR/branch hygiene automation.
 
 ---
+
+### Remove the `/clear` handoff from `/sdd:archive`
+- **What:** `plugins/sdd/skills/archive/SKILL.md` line 386 still emits the line "Run `/clear`, then `/sdd:discovery` to start the next cycle." as its cycle-reset handoff. Cycle 7 removed the `/clear` nudge from every other command handoff (commit 6bbb240, "Add /sdd:amend, drop /clear and AC checkboxes"), but archive was out of that pass's file-disjoint partition and kept its copy. Rewrite the handoff to point straight at `/sdd:discovery` with no context-management instruction, matching how `/sdd:build` and `/sdd:retro` now end. Note the other `/clear` mentions across the plugin are **not** stale and should be left alone — `pause/SKILL.md`, `checkpoint/SKILL.md`, and `references/pause-resume.md` describe pause/resume mechanics, and `build`, `retro`, and `sdd-guide` explicitly state that *no* `/clear` handoff is emitted. Archive's is the only surviving instruction telling the user to run it.
+- **Why deferred:** Surfaced during PR #25 (cycle 7's shared-behavior issue) but out of scope for that issue — the cycle-7 build partitioned issues by file, and `archive/SKILL.md` was owned by no issue in that partition. Fixing it there would have broken the file-disjoint invariant the partition depended on.
+- **Trigger to revisit:** Next cycle that touches `plugins/sdd/skills/archive/SKILL.md`, or the next general docs-consistency pass. Cheap and self-contained — a one-command fix whenever a cycle has room.
+- **Dependencies:** None. Single file, single handoff block.
+- **Source:** /sdd:retro — cycle 7; surfaced out-of-scope in PR #25.
+
+---
+
+### Update `AGENTS.md` and `living-documents.md` off the v5 sprint/PRD model
+- **What:** Both files still document the pre-v6 world of sprint files, a separate PRD, and checkbox-tagged acceptance criteria — a structure v6 replaced with the single `docs/plan.md` document and inline markers. Known stale spots:
+  - `AGENTS.md` ~line 103 — "ID-based PRD acceptance criteria references," describing `[PRD: a7kp]` tags on sprint items and naming `/sdd:prd` and `/sdd:plan`, neither of which exists in the v6 command set.
+  - `AGENTS.md` ~lines 145–168 — the "Sprint item format" and "PRD acceptance criterion format" blocks, plus a tag-conventions list naming `[close-sprint-manifest]` and `[sprint-reopened]` (the latter emitted by `/sdd:polish`, a command v6 dropped). The AC checkbox format `- [ ] `abcd` ...` was explicitly dropped in commit 6bbb240.
+  - `AGENTS.md` also still describes `docs/open-concerns.md` as cross-phase continuity carried across `/clear` boundaries.
+  - `plugins/sdd/skills/sdd-guide/references/living-documents.md` ~line 92 — the PRD-edit cascade step that opens sprint files and updates `[PRD: ...]` refs, gated on a `[close-sprint-manifest]` block.
+  Audit both files end-to-end rather than patching only these lines; the rot is likely broader than the greps that found it. Decide per section whether the v6 equivalent (plan.md, inline markers, `references/markers.md`) replaces it or the section is simply gone.
+- **Why deferred:** Same reason as the archive `/clear` item — surfaced in PR #25 but outside cycle 7's file-disjoint issue partition. It's also genuinely larger than a line fix: `AGENTS.md` is the durable agent-facing source of truth, so correcting it means re-deriving what the v6 model actually says, not find-and-replace.
+- **Trigger to revisit:** Next cycle that opens `AGENTS.md`, or before onboarding anyone new to the repo — stale agent instructions actively mislead, and `AGENTS.md` is loaded by default.
+- **Dependencies:** The v6 plan.md/marker model must be settled (it is — `docs/spec.md` and `references/markers.md` define it). Note `AGENTS.md` points at `plugins/sdd/skills/sdd-guide/references/sprint-tags.md` as the full tag reference and that file no longer exists — the pointer is already dangling, which is a second reason this audit is overdue.
+- **Source:** /sdd:retro — cycle 7; surfaced out-of-scope in PR #25.
+
+---
