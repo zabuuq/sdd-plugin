@@ -1,0 +1,34 @@
+I'm going to record myself rambling on a little bit about the things that I want to do for the discovery for this plugin.
+First off, it is still suggesting that I use clear in between commands,
+which was something that I was pretty sure we had decided against,
+and I would like for you to check the stuff that you just archive,
+the most recent archives, to see if that was in there,
+because that was supposed to be something from what I understood.
+But we were getting rid of that, and it's still there.
+Also making sure that the context checker is not there.
+I haven't seen it yet, but just want to make sure that that got removed.
+Second thing that I want to discuss about this is that I realize that this is going through a process.
+Excuse me, let me rephrase that.
+The process that we designed is one design.
+designed around getting a prototype and then continuing on from that prototype.
+And I was just thinking, it's like, there's going to be cases where there's already a working system
+and I'm just making some tweaks.
+You know, like maybe I, for example, have a website that is already done and the client wants some tweaks made to the website.
+I don't need to go through a prototype process with that.
+So I'm thinking that I'd like to make the prototype an opportunity,
+thing as well, that we can skip past that if it's not needed and go right to the development.
+I want to discuss as to whether or not we would need any extra sets of questions if we skip the prototype
+or if we should be able to just skip it and continue right to the creating of the tickets
+and development. Furthermore, it comes to the tickets.
+I had some ideas on how I wanted the tickets to be made and when I wanted those tickets to be made.
+But now as I'm looking through the process, I'm not sure if that was captured properly or not.
+When, let's discuss, when are the tickets being made right now?
+At what step do we make, start making tickets in GitHub?
+And then I just want to make sure that that step is properly
+hashed out. It might be okay the way it is, and I've just haven't gotten to that point yet,
+because I haven't actually fully tested this yet since we made the most recent version.
+But these are some tweaks I want to make to this. I do not want this to be a whole new version.
+So this should be like, I think we're at version 4.0, so this would be an update to make it 4.1
+because I think these are more tweaks to the process that we're creating, not a whole new version.
+I'm trying to think that there's anything else.
+No, that's it for now.
