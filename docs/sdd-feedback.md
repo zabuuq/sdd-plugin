@@ -137,3 +137,9 @@
 - **After command:** /sdd:retro
 - **Project:** sdd-plugin
 - **Note:** /sdd:build should partition issues by file, not by epic, when the loop never merges mid-build. In this cycle the 4.1 plan's 10 epics overlapped heavily on shared files (sdd-guide, refine, discovery, build, prototype, living-documents). Because the build loop opens PRs and never merges until the human gate, every branch is cut from the same base — so any two epic-granular PRs touching the same file would collide at merge time regardless of authoring order. The conflict-free slicing was to regroup the 10 epics into 4 file-disjoint issues where each file is owned by exactly one issue (build-subsystem / prototype-subsystem / refine+markers / shared-behavior). Cross-cutting ACs (like removing /clear across handoffs) force a "shared-behavior" bucket — accept it. Ground the partition by grepping where each concern actually lives, not by the plan's impact-map labels (e.g. refine/SKILL.md had no literal /clear, so /clear removal was sdd-guide-only). Suggestion: when /sdd:build creates issues from a plan whose epics share files, offer a file-disjoint regrouping instead of one-issue-per-epic, and surface the file-ownership map for confirmation. Captured also in docs/learnings/build-loop-file-disjoint-partition.md.
+
+### 2026-10-29T15:19:29Z
+- **Cycle:** 6 (not started)
+- **After command:** /sdd:archive
+- **Project:** the-loft-419
+- **Note:** Add a /sdd:status command that reports whether an SDD process is active in the project and where in the process it is.
