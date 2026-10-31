@@ -143,3 +143,9 @@
 - **After command:** /sdd:archive
 - **Project:** the-loft-419
 - **Note:** Add a /sdd:status command that reports whether an SDD process is active in the project and where in the process it is.
+
+### 2026-10-31T18:57:00Z
+- **Sprint:** none (discovery)
+- **After command:** /sdd:discovery
+- **Project:** detroit-rencen-redevelopment
+- **Note:** The pause command should automatically commit changes to the repo and push to origin. It should not create a PR, only commit and push.
